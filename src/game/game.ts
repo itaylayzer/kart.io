@@ -4,6 +4,7 @@ import { Global } from "./store/Global";
 import { PhysicsObject } from "./physics/PhysicsMesh";
 import * as THREE from "three";
 import System, { SpriteRenderer } from "three-nebula";
+import { Player } from "./player/Player";
 
 export default (assets: loadedAssets) => {
   Global.assets = assets;
@@ -25,9 +26,13 @@ export default (assets: loadedAssets) => {
       .concat(PhysicsObject.childrens.flatMap((v) => v.update))
       .map((fn) => fn());
 
+    for (const player of Player.clients.values()) {
+      player.predictedUpdate();
+    }
+    Global.cameraController.update();
+
     Global.system.update();
     Global.renderer.render(Global.scene, Global.camera);
-    Global.world.step(2.6 * Global.deltaTime);
 
     // Global.cannonDebugger.update();
 
