@@ -50,6 +50,7 @@ export default () => (
       sfx_shoot: "sfx/shoot.mp3",
       txt_circle: "textures/circle.png",
       txt_road: "textures/CentralMarking.png",
+      mystery:"textures/mystery.png",
     }}
   >
     <App />
