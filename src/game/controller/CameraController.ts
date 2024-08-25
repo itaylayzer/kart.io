@@ -3,6 +3,7 @@ import { Global } from "../store/Global";
 import { LocalPlayer } from "../player/LocalPlayer";
 import * as CANNON from "cannon-es";
 import { damp } from "three/src/math/MathUtils.js";
+import { Player } from "../player/Player";
 function explodeFn(t: number) {
   return t < Math.PI * 4
     ? (100 * Math.sin(t + Math.PI)) / Math.pow(t + Math.PI, 3)
@@ -30,7 +31,9 @@ export class CameraController {
     this.forceRotation = new THREE.Vector3();
   }
 
-  public update(body: LocalPlayer) {
+  public update() {
+    const player: Player = LocalPlayer.getInstance();
+    if (player === undefined) return;
     if (Global.keyboardController.isKeyDown("Space")) {
       this.driftSide[0] = Global.keyboardController.horizontalRaw * 0.6;
     }
@@ -45,20 +48,20 @@ export class CameraController {
       Global.deltaTime * 7
     );
 
-    const vec = new THREE.Vector3().copy(body.position);
-    const forwardVec = new THREE.Vector3().copy(
-      body.quaternion.vmult(new CANNON.Vec3(0, 0, 1))
+    const vec = player.position.clone();
+    const forwardVec = new THREE.Vector3(0, 0, 1).applyQuaternion(
+      player.quaternion
     );
-    const rightVec = body.quaternion.vmult(new CANNON.Vec3(1, 0, 0));
-    const upVec = body.quaternion.vmult(new CANNON.Vec3(0, 1, 0));
 
-    rightVec
-      .clone()
-      .scale(
-        1 * (Global.keyboardController.horizontal + this.driftSide[1]),
-        rightVec
-      );
-    const lookVec = new CANNON.Vec3().copy(rightVec.clone().scale(0.5 / 3));
+    const rightVec = new THREE.Vector3(1, 0, 0).applyQuaternion(
+      player.quaternion
+    );
+
+    const upVec = new THREE.Vector3(0, 1, 0).applyQuaternion(player.quaternion);
+    rightVec.multiplyScalar(
+      1 * (Global.keyboardController.horizontal + this.driftSide[1])
+    );
+    const lookVec = rightVec.clone().multiplyScalar(0.5 / 3);
 
     this.camera.position
       .copy(vec)
@@ -67,11 +70,11 @@ export class CameraController {
           .clone()
           .multiplyScalar(-1 / 2 + -Global.keyboardController.vertical / 5)
       )
-      .add(rightVec.scale(0.5 / 2))
-      .add(new THREE.Vector3().copy(upVec.scale(1 / 2)));
+      .add(rightVec.clone().multiplyScalar(0.5 / 2))
+      .add(upVec.clone().multiplyScalar(1 / 2));
 
-    lookVec.vadd(body.position, lookVec);
-    lookVec.vadd(new CANNON.Vec3(0, 0.6 / 3, 0), lookVec);
+    lookVec.add(player.position);
+    lookVec.add(new CANNON.Vec3(0, 0.6 / 3, 0));
 
     this.camera.lookAt(new THREE.Vector3().copy(lookVec));
     this.camera.rotateZ(
