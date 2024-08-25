@@ -19,6 +19,7 @@ import { createRoad } from "./road2";
 import { io } from "socket.io-client";
 import { CC } from "../../store/codes";
 import { OnlinePlayer } from "../../player/OnlinePlayer";
+import { MysteryBox } from "../meshes/MysteryBox";
 init(Dat);
 
 function setupLights() {
@@ -231,6 +232,12 @@ function setupSocket() {
     Global.socket.on("disconnect", () => {
         Global.socket = undefined;
     });
+
+    new MysteryBox(new CANNON.Vec3(28, 0.4, 42));
+    new MysteryBox(new CANNON.Vec3(29, 0.4, 42));
+    new MysteryBox(new CANNON.Vec3(30, 0.4, 42));
+    new MysteryBox(new CANNON.Vec3(31, 0.4, 42));
+    new MysteryBox(new CANNON.Vec3(27, 0.4, 42));
 }
 
 export default function () {
