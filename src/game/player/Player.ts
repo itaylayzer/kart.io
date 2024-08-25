@@ -2,14 +2,13 @@ import createPlayerNameSprite from "../api/createPlayerNameSprite";
 import * as THREE from "three";
 import { Global } from "../store/Global";
 export class Player {
-  public static clients: Map<string, Player>;
+  public static clients: Map<number, Player>;
 
   public update: (
     position: THREE.Vector3Like,
     quaternion: THREE.Quaternion,
     velocity: THREE.Vector3Like,
-    velocityMagnitude: number,
-    horizontal: number
+    velocityMagnitude: number
   ) => void;
 
   public predictedUpdate: () => void;
@@ -20,7 +19,7 @@ export class Player {
   public position: THREE.Vector3;
   public quaternion: THREE.Quaternion;
 
-  constructor(public pid: string, public name: string, tagNameColor: string) {
+  constructor(public pid: number, public name: string, tagNameColor: string) {
     this.position = new THREE.Vector3();
     this.quaternion = new THREE.Quaternion();
     Player.clients.set(pid, this);
@@ -38,35 +37,44 @@ export class Player {
     const nametag = createPlayerNameSprite(name, tagNameColor);
     nametag.position.y += 0.35;
     group.add(nametag);
-    let velocityVec = new THREE.Vector3();
-    this.update = (
-      position,
-      quaternion,
-      velocity,
-      velocityMagnitude,
-      horizontal
-    ) => {
-      group.position.copy(this.position.copy(position));
-      group.quaternion.copy(this.quaternion.copy(quaternion));
-      velocityVec.copy(velocity);
-      model.rotation.set(0, 0, 0);
+    const _vel = new THREE.Vector3();
 
-      backweels.rotateX(velocityMagnitude);
-      frontweels.rotation.y = horizontal * 0.4;
+    const queue: Array<() => void> = [];
 
-      for (const [id, cf] of frontweels.children.entries()) {
-        id < 2 ? cf.rotateY(velocityMagnitude) : cf.rotateX(velocityMagnitude);
-      }
+    this.update = (position, quaternion, velocity, velocityMagnitude) => {
+      queue.push(() => {
+        group.position.copy(this.position.copy(position));
+        group.quaternion.copy(this.quaternion.copy(quaternion));
+        model.rotation.set(0, 0, 0);
 
-      steeringweel.rotation.set(0, 0, 0);
-      steeringweel.rotateOnAxis(
-        new THREE.Vector3(0, -0.425, 1),
-        (-horizontal * Math.PI * 2) / 3
-      );
+        _vel.copy(velocity);
+
+        backweels.rotateX(velocityMagnitude);
+        frontweels.rotation.y = Global.keyboardController.horizontal * 0.4;
+
+        for (const [id, cf] of frontweels.children.entries()) {
+          id < 2
+            ? cf.rotateY(velocityMagnitude)
+            : cf.rotateX(velocityMagnitude);
+        }
+
+        steeringweel.rotation.set(0, 0, 0);
+        steeringweel.rotateOnAxis(
+          new THREE.Vector3(0, -0.425, 1),
+          (-Global.keyboardController.horizontal * Math.PI * 2) / 3
+        );
+      });
     };
 
     this.predictedUpdate = () => {
-      //   this.position.add(velocityVec);
+      if (queue.length === 0) {
+        this.position.copy(
+          group.position.add(_vel.clone().multiplyScalar(Global.deltaTime))
+        );
+      }
+      while (queue.length) {
+        queue.pop()!();
+      }
     };
 
     this.disconnect = () => {

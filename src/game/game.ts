@@ -42,9 +42,13 @@ export default (assets: loadedAssets) => {
     Global.stats.update();
   };
 
-  setInterval(() => {
-    animate();
-  }, 1000 / 120);
+  Global.renderer.setAnimationLoop(() => {
+    for (let i = 0; i < 2; i++) {
+      // Run twice per frame
+
+      animate();
+    }
+  });
 
   return {
     destroyer: () => {

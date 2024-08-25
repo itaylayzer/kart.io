@@ -6,7 +6,7 @@ export class LocalPlayer extends Player {
   static getInstance() {
     return this.instance;
   }
-  constructor(pid: string) {
+  constructor(pid: number) {
     super(pid, getNameFromURL(), "#124eb5");
     LocalPlayer.instance = this;
   }

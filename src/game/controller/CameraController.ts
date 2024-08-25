@@ -34,10 +34,10 @@ export class CameraController {
   public update() {
     const player: Player = LocalPlayer.getInstance();
     if (player === undefined) return;
-    if (Global.keyboardController.isKeyDown("Space")) {
+    if (Global.keyboardController.isKeyDown(32)) {
       this.driftSide[0] = Global.keyboardController.horizontalRaw * 0.6;
     }
-    if (Global.keyboardController.isKeyUp("Space")) {
+    if (Global.keyboardController.isKeyUp(32)) {
       this.driftSide[0] = 0;
     }
 

@@ -133,10 +133,10 @@ export class DriveController {
     }
 
     update() {
-        if (this.keyboardController.isKeyDown("Space")) {
+        if (this.keyboardController.isKeyDown(32)) {
             this.driftSide[0] = this.keyboardController.horizontalRaw * 0.6;
         }
-        if (this.keyboardController.isKeyUp("Space")) {
+        if (this.keyboardController.isKeyUp(32)) {
             this.driftSide[0] = 0;
         }
 

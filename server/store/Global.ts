@@ -11,7 +11,7 @@ export class Global {
   public static assets: loadedAssets;
   public static sockets: {
     emitAll: (eventName: string, eventArgs: any) => void;
-    emitExcept: (exceptID: string, eventName: string, eventArgs: any) => void;
+    emitExcept: (exceptID: number, eventName: string, eventArgs: any) => void;
   };
-  public static players: Map<string, Player>;
+  public static players: Map<number, Player>;
 }
