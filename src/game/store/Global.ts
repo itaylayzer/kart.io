@@ -1,7 +1,6 @@
 import { Mesh, PerspectiveCamera, Scene, WebGLRenderer } from "three";
 import { KeyboardController } from "../controller/KeyboardController";
 import { MouseController } from "../controller/MouseController";
-import { World } from "cannon-es";
 import { CameraController } from "../controller/CameraController";
 
 import CannonDebugger from "cannon-es-debugger";
@@ -17,7 +16,6 @@ export class Global {
     public static keyboardController: KeyboardController;
     public static mouseController: MouseController;
     public static scene: Scene;
-    public static world: World;
     public static container: HTMLDivElement;
     public static renderer: WebGLRenderer;
     public static camera: PerspectiveCamera;

@@ -1,6 +1,5 @@
 import { lerp } from "three/src/math/MathUtils.js";
 import { Global } from "../store/Global";
-import { CS } from "../store/codes";
 
 const HORIZONTAL = 0;
 const VERTICAL = 1;
@@ -8,40 +7,19 @@ const RAW_AXIS = 0;
 const LERPED_AXIS = 1;
 
 export class KeyboardController {
-    private keysPressed: Set<string>;
-    private keysDown: Set<string>;
-    private keysUp: Set<string>;
+    public keysDown: Set<string>;
+    public keysUp: Set<string>;
+    public keysPressed: Set<string>;
     private keysAxis: [[number, number], [number, number]];
 
-    constructor(enableOnStart: boolean = true) {
-        this.keysPressed = new Set();
+    constructor() {
         this.keysDown = new Set();
         this.keysUp = new Set();
+        this.keysPressed = new Set();
         this.keysAxis = [
             [0, 0],
             [0, 0],
         ];
-        enableOnStart && this.enable();
-    }
-
-    public enable() {
-        window.addEventListener("keydown", this.onKeyDown.bind(this));
-        window.addEventListener("keyup", this.onKeyUp.bind(this));
-    }
-    public disable() {
-        window.removeEventListener("keydown", this.onKeyDown.bind(this));
-        window.removeEventListener("keyup", this.onKeyUp.bind(this));
-    }
-
-    private onKeyDown(event: KeyboardEvent) {
-        Global.socket?.emit(CS.KEY_DOWN, event.code);
-        this.keysDown.add(event.code);
-    }
-
-    private onKeyUp(event: KeyboardEvent) {
-        Global.socket?.emit(CS.KEY_UP, event.code);
-        this.keysPressed.delete(event.code);
-        this.keysUp.add(event.code);
     }
 
     public isKeyPressed(code: string): boolean {
@@ -58,12 +36,10 @@ export class KeyboardController {
 
     public firstUpdate() {
         // Input axis processing
-        this.keysAxis[RAW_AXIS][VERTICAL] = !Global.lockController.isLocked
-            ? 0
-            : +this.isKeyPressed("KeyW") + -this.isKeyPressed("KeyS");
-        this.keysAxis[RAW_AXIS][HORIZONTAL] = !Global.lockController.isLocked
-            ? 0
-            : -this.isKeyPressed("KeyD") + +this.isKeyPressed("KeyA");
+        this.keysAxis[RAW_AXIS][VERTICAL] =
+            +this.isKeyPressed("KeyW") + -this.isKeyPressed("KeyS");
+        this.keysAxis[RAW_AXIS][HORIZONTAL] =
+            -this.isKeyPressed("KeyD") + +this.isKeyPressed("KeyA");
 
         // Smoothing inputs
         for (let index = 0; index < 2; index++) {
