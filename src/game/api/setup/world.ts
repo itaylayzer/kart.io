@@ -20,6 +20,7 @@ import { OnlinePlayer } from "../../player/OnlinePlayer";
 import { MysteryBox } from "../meshes/MysteryBox";
 import { Player } from "../../player/Player";
 import { getNameFromURL } from "../getNameFromURL";
+import msgpack from "msgpack-lite";
 
 function setupLights() {
   // createLight(
@@ -97,7 +98,7 @@ function setupScene() {
   Global.container.appendChild(Global.renderer.domElement);
   Global.scene = new THREE.Scene();
   Global.scene.background = new THREE.Color(colors.background);
-  Global.scene.fog = new THREE.Fog(Global.scene.background, 10, 30);
+  Global.scene.fog = new THREE.Fog(Global.scene.background, 10, 20);
 }
 
 function setupControllers() {
@@ -164,7 +165,7 @@ function setupSocket() {
   Global.socket = io({ hostname: "127.0.0.1", secure: false, port: 3000 });
   Global.socket.on(
     CC.INIT,
-    ([pid, players]: [string, Record<"name" | "id", string>[]]) => {
+    ([pid, players]: [number, { name: string; id: number }[]]) => {
       Global.localPlayer = new LocalPlayer(pid);
       console.log(players);
       for (const { id, name } of players) {
@@ -173,41 +174,24 @@ function setupSocket() {
     }
   );
 
-  Global.socket.on(CC.NEW_PLAYER, (xplayer: Record<"name" | "id", string>) => {
+  Global.socket.on(CC.NEW_PLAYER, (xplayer: { name: string; id: number }) => {
     new OnlinePlayer(xplayer.id, xplayer.name);
   });
-  Global.socket.on(
-    CC.UPDATE,
-    (obj: {
-      id: string;
-      velocityMagnitude: number;
-      position: THREE.Vector3Like;
-      quaternion: number[];
-      velocity: THREE.Vector3Like;
-      horizontal: number;
-    }) => {
-      const xplayer = Player.clients.get(obj.id);
-      if (xplayer === undefined) return;
-      xplayer.update(
-        new THREE.Vector3().copy(obj.position),
-        new THREE.Quaternion(
-          obj.quaternion[0],
-          obj.quaternion[1],
-          obj.quaternion[2],
-          obj.quaternion[3]
-        ),
 
-        obj.velocity,
-        obj.velocityMagnitude,
-        obj.horizontal
-      );
-    }
-  );
+  Global.socket.on(CC.UPDATE, (obj: Buffer) => {
+    const data = msgpack.decode(new Uint8Array(obj));
+    const xplayer = Player.clients.get(data[0]);
+    if (xplayer === undefined) return;
+    xplayer.update(
+      new THREE.Vector3(data[1], data[2], data[3]),
+      new THREE.Quaternion(data[4], data[5], data[6], data[7]),
+      new THREE.Vector3(data[8], data[9], data[10]),
+      data[11]
+    );
+  });
 
   Global.socket.on(CC.DISCONNECTED, (disconnectedID) => {
-    const xplayer = OnlinePlayer.clients.get(disconnectedID);
-    if (xplayer === undefined) return;
-    xplayer.disconnect();
+    OnlinePlayer.clients.get(disconnectedID)?.disconnect();
   });
 
   Global.socket.on("connect", () => {
@@ -217,11 +201,15 @@ function setupSocket() {
     Global.socket = undefined;
   });
 
-  new MysteryBox(new CANNON.Vec3(28, 0.4, 42));
-  new MysteryBox(new CANNON.Vec3(29, 0.4, 42));
-  new MysteryBox(new CANNON.Vec3(30, 0.4, 42));
-  new MysteryBox(new CANNON.Vec3(31, 0.4, 42));
-  new MysteryBox(new CANNON.Vec3(27, 0.4, 42));
+  window.addEventListener("beforeunload", () => {
+    Global.socket?.disconnect();
+  });
+
+  // new MysteryBox(new CANNON.Vec3(28, 0.4, 42));
+  // new MysteryBox(new CANNON.Vec3(29, 0.4, 42));
+  // new MysteryBox(new CANNON.Vec3(30, 0.4, 42));
+  // new MysteryBox(new CANNON.Vec3(31, 0.4, 42));
+  // new MysteryBox(new CANNON.Vec3(27, 0.4, 42));
 }
 
 export default function () {

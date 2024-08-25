@@ -11,7 +11,7 @@ export class Player extends PhysicsObject {
     public keyboard: KeyboardController;
     private driveController: DriveController;
     constructor(
-        public pid: string,
+        public pid: number,
         public socket: Socket,
         public name: string
     ) {
