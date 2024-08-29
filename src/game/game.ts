@@ -27,7 +27,7 @@ export default (assets: loadedAssets) => {
     Global.renderer.render(Global.scene, Global.camera);
     Global.world.step(2.6 * Global.deltaTime);
 
-    // Global.cannonDebugger.update();
+    Global.cannonDebugger.update();
     Global.mouseController.lastUpdate();
 
     Global.stats.update();

@@ -13,7 +13,7 @@ import { Player } from "../../player/Player";
 import { CC, CS } from "../../store/codes";
 import { Global } from "../../store/Global";
 import { MysteryBox } from "../meshes/MysteryBox";
-import { createRoad } from "./road2";
+import { createRoad, createVectorsFromNumbers } from "./road";
 import msgpack from "msgpack-lite";
 import { getNameFromURL } from "../getNameFromURL";
 import { curvePoints } from "../../constants/road";
@@ -111,7 +111,7 @@ function setupStats() {
 }
 
 function setupRoad() {
-  const [dotsM, m] = createRoad(curvePoints, 15, 0.5);
+  const [dotsM, m] = createRoad(curvePoints, 15, 0);
 
   Global.roadMesh = m;
   Global.scene.add(dotsM);
@@ -122,11 +122,21 @@ function setupSocket() {
   Global.socket = io({ hostname: "127.0.0.1", secure: false, port: 3000 });
   Global.socket.on(
     CC.INIT,
-    ([id, players]: [number, { name: string; pid: number }[]]) => {
+    ([id, players, locations]: [
+      number,
+      { name: string; pid: number }[],
+      number[]
+    ]) => {
       new LocalPlayer(id);
 
       for (const { pid, name } of players) {
         new OnlinePlayer(pid, name);
+      }
+
+      const pts = createVectorsFromNumbers(locations);
+      console.log(pts);
+      for (const [id, pt] of pts.entries()) {
+        new MysteryBox(id, new CANNON.Vec3(pt.x, pt.y, pt.z));
       }
     }
   );
@@ -170,6 +180,10 @@ function setupSocket() {
   Global.socket.on("connect", () => {
     Global.socket!.emit(CS.JOIN, getNameFromURL());
   });
+
+  Global.socket.on(CC.MYSTERY_VISIBLE, ([id, isVisible]: [number, boolean]) => {
+    MysteryBox.toggleMystery(id, isVisible);
+  });
   Global.socket.on("disconnect", () => {
     Global.socket = undefined;
   });
@@ -177,12 +191,6 @@ function setupSocket() {
   window.addEventListener("beforeunload", () => {
     Global.socket?.disconnect();
   });
-
-  new MysteryBox(new CANNON.Vec3(28, 0.4, 42));
-  new MysteryBox(new CANNON.Vec3(29, 0.4, 42));
-  new MysteryBox(new CANNON.Vec3(30, 0.4, 42));
-  new MysteryBox(new CANNON.Vec3(31, 0.4, 42));
-  new MysteryBox(new CANNON.Vec3(27, 0.4, 42));
 }
 
 export default function () {

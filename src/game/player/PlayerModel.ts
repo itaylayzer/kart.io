@@ -4,6 +4,24 @@ import { damp } from "three/src/math/MathUtils.js";
 import { Global } from "../store/Global";
 import createPlayerNameSprite from "../api/createPlayerNameSprite";
 import * as CANNON from "cannon-es";
+
+const namesToColor = [
+  "Object_43",
+  "Object_41",
+  "Object_87",
+  "Object_85",
+  "Object_68",
+  "Object_70",
+  "Object_83",
+  "Object_62",
+  "Object_66",
+  "Object_72",
+  "Object_64",
+  "Object_79",
+  "Object_89",
+  "Object_81",
+];
+
 export class PlayerModel extends THREE.Group {
   public update: () => void;
   constructor(
@@ -14,6 +32,23 @@ export class PlayerModel extends THREE.Group {
   ) {
     super();
     const model = Global.assets.gltf.car.scene.clone();
+
+    model.traverse((part) => {
+      const partAsMesh = part as THREE.Mesh;
+      if (partAsMesh) {
+        const mat = partAsMesh.material as THREE.MeshStandardMaterial;
+        if (mat) {
+          if (namesToColor.includes(partAsMesh.name)) {
+            partAsMesh.material = new THREE.MeshStandardMaterial({
+              color: tagNameColor,
+            });
+          } else {
+            mat.roughness = 1;
+            mat.metalness = 0.8;
+          }
+        }
+      }
+    });
     model.scale.multiplyScalar(0.5 / 3);
 
     const backweels = model.getObjectByName("Back_Wheels_38")!;
