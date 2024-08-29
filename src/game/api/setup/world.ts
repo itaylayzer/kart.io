@@ -122,15 +122,16 @@ function setupSocket() {
   Global.socket = io({ hostname: "127.0.0.1", secure: false, port: 3000 });
   Global.socket.on(
     CC.INIT,
-    ([id, players, locations]: [
+    ([id, transform, players, locations]: [
       number,
-      { name: string; pid: number }[],
+      number[],
+      { name: string; pid: number; transform: number[] }[],
       number[]
     ]) => {
-      new LocalPlayer(id);
+      new LocalPlayer(id).applyTransform(transform);
 
-      for (const { pid, name } of players) {
-        new OnlinePlayer(pid, name);
+      for (const { pid, name, transform: ptransform } of players) {
+        new OnlinePlayer(pid, name).applyTransform(ptransform);
       }
 
       const pts = createVectorsFromNumbers(locations);
@@ -169,9 +170,14 @@ function setupSocket() {
     xplayer?.keyboard.keysPressed.delete(key);
   });
 
-  Global.socket.on(CC.NEW_PLAYER, (xplayer: { name: string; pid: number }) => {
-    new OnlinePlayer(xplayer.pid, xplayer.name);
-  });
+  Global.socket.on(
+    CC.NEW_PLAYER,
+    (xplayer: { name: string; pid: number; transform: number[] }) => {
+      new OnlinePlayer(xplayer.pid, xplayer.name).applyTransform(
+        xplayer.transform
+      );
+    }
+  );
 
   Global.socket.on(CC.DISCONNECTED, (disconnectedID) => {
     OnlinePlayer.clients.get(disconnectedID)?.disconnect();

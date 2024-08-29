@@ -1,18 +1,7 @@
 import * as THREE from "three";
-import { curvePoints } from "../../src/game/constants/road";
 
-export function createMysteryBoxes() {
-  const pts: THREE.Vector3[] = [];
-
-  for (let i = 0; i < curvePoints.length; i += 3) {
-    pts.push(
-      new THREE.Vector3(curvePoints[i], curvePoints[i + 1], curvePoints[i + 2])
-    );
-  }
-
-  const ls = 700;
-
-  const points = new THREE.CatmullRomCurve3(pts).getPoints(ls);
+export function createMysteryBoxes(curve: THREE.CatmullRomCurve3, ls: number) {
+  const points = curve.getPoints(ls);
 
   const dummyHorizontal = new THREE.Object3D();
   const dummyVertical = new THREE.Object3D();
