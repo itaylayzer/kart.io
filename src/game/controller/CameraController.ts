@@ -34,10 +34,10 @@ export class CameraController {
   public update() {
     const player: Player = LocalPlayer.getInstance();
     if (player === undefined) return;
-    if (Global.keyboardController.isKeyDown(32)) {
-      this.driftSide[0] = Global.keyboardController.horizontalRaw * 0.6;
+    if (player.keyboard.isKeyDown(32)) {
+      this.driftSide[0] = player.keyboard.horizontalRaw * 0.6;
     }
-    if (Global.keyboardController.isKeyUp(32)) {
+    if (player.keyboard.isKeyUp(32)) {
       this.driftSide[0] = 0;
     }
 
@@ -59,7 +59,7 @@ export class CameraController {
 
     const upVec = new THREE.Vector3(0, 1, 0).applyQuaternion(player.quaternion);
     rightVec.multiplyScalar(
-      1 * (Global.keyboardController.horizontal + this.driftSide[1])
+      1 * (player.keyboard.horizontal + this.driftSide[1])
     );
     const lookVec = rightVec.clone().multiplyScalar(0.5 / 3);
 
@@ -68,7 +68,7 @@ export class CameraController {
       .add(
         forwardVec
           .clone()
-          .multiplyScalar(-1 / 2 + -Global.keyboardController.vertical / 5)
+          .multiplyScalar(-1 / 2 + -player.keyboard.vertical / 5)
       )
       .add(rightVec.clone().multiplyScalar(0.5 / 2))
       .add(upVec.clone().multiplyScalar(1 / 2));
@@ -78,7 +78,7 @@ export class CameraController {
 
     this.camera.lookAt(new THREE.Vector3().copy(lookVec));
     this.camera.rotateZ(
-      (Global.keyboardController.horizontal + this.driftSide[1]) * 0.05
+      (player.keyboard.horizontal + this.driftSide[1]) * 0.05
     );
 
     this.time += Global.deltaTime * 13;
