@@ -3,10 +3,8 @@ import { createServer } from "http";
 import { Server, Socket } from "socket.io";
 import { CC, CS } from "./store/codes";
 import cors from "cors";
-import { createMysteryBoxes } from "./api/createMysteryBoxes";
 import setup from "./api/setup";
-import { THREE } from "three-nebula";
-
+import msgpack from "msgpack-lite";
 const app = express();
 const server = createServer(app);
 const io = new Server(server);
@@ -63,12 +61,24 @@ io.on("connection", (socket) => {
     players.set(pid, local);
   });
 
+  const updatePositionBasedBuffer = (buffer: Buffer, skip = 1) => {
+    const array = msgpack.decode(new Uint8Array(buffer)) as number[];
+    for (let index = 0; index < skip; index++) {
+      array.shift();
+    }
+    if (array.length == 7) {
+      local.transform = array;
+    }
+  };
+
   socket.on(CS.KEY_DOWN, (buffer: Buffer) => {
     sockets.emitExcept(pid, CC.KEY_DOWN, { pid, buffer });
+    updatePositionBasedBuffer(buffer);
   });
 
   socket.on(CS.KEY_UP, (buffer: Buffer) => {
     sockets.emitExcept(pid, CC.KEY_UP, { pid, buffer });
+    updatePositionBasedBuffer(buffer);
   });
 
   socket.on(CS.TOUCH_MYSTERY, (id: number) => {
