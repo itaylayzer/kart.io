@@ -8,7 +8,7 @@ export class LocalPlayer extends Player {
     return this.instance;
   }
   constructor(id: number) {
-    super(id, true, getNameFromURL(), "#124eb5", new KeyboardController());
+    super(id, true, getNameFromURL(), new KeyboardController());
 
     LocalPlayer.instance = this;
   }

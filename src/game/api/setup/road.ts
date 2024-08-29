@@ -52,7 +52,7 @@ export function createRoad(
 ): [THREE.InstancedMesh, THREE.Mesh] {
   const pts: THREE.Vector3[] = createVectorsFromNumbers(curvePoints);
 
-  const ls = 700; // length segments original was 1400
+  const ls = 1400; // length segments original was 1400
   const ws = 5; // width segments
   const lss = ls + 1;
   const wss = ws + 1;

@@ -2,7 +2,12 @@ import * as CANNON from "cannon-es";
 import CannonDebugger from "cannon-es-debugger";
 import { io } from "socket.io-client";
 import * as THREE from "three";
-import { PointerLockControls } from "three/examples/jsm/Addons.js";
+import {
+  EffectComposer,
+  PointerLockControls,
+  RenderPass,
+  ShaderPass,
+} from "three/examples/jsm/Addons.js";
 import Stats from "three/examples/jsm/libs/stats.module.js";
 import { colors } from "../../constants";
 import { CameraController } from "../../controller/CameraController";
@@ -55,13 +60,17 @@ function setupObjects() {
 
 function setupScene() {
   Global.container = document.querySelector("div.gameContainer")!;
+
   Global.renderer = new THREE.WebGLRenderer({ antialias: true });
+  Global.container.appendChild(Global.renderer.domElement);
+  // Global.renderer.sortObjects = false;
+  // Global.renderer.shadowMapEnabled = true;
+  // Global.renderer.shadowMapType = THREE.PCFShadowMap;
   Global.renderer.setSize(
     Global.container.clientWidth,
     Global.container.clientHeight
   );
   Global.renderer.shadowMap.enabled = true;
-  Global.container.appendChild(Global.renderer.domElement);
   Global.scene = new THREE.Scene();
   Global.scene.background = new THREE.Color(colors.background);
   Global.scene.fog = new THREE.Fog(Global.scene.background, 10, 20);
@@ -95,13 +104,6 @@ function setupControllers() {
 function setupWindowEvents() {
   Global.container.addEventListener("contextmenu", (event) => {
     event.preventDefault();
-  });
-
-  window.addEventListener("resize", () => {
-    Global.camera.aspect = window.innerWidth / window.innerHeight;
-    Global.camera.updateProjectionMatrix();
-
-    Global.renderer.setSize(window.innerWidth, window.innerHeight);
   });
 }
 
@@ -199,6 +201,68 @@ function setupSocket() {
   });
 }
 
+function setupRenderer() {
+  const composer = new EffectComposer(Global.renderer);
+  composer.addPass(new RenderPass(Global.scene, Global.camera));
+
+  const composer2 = new EffectComposer(Global.renderer);
+  composer2.addPass(new RenderPass(Global.scene, Global.camera));
+
+  const shader = {
+    uniforms: {
+      tDiffuse: { type: "t", value: null },
+      tColor: { type: "t", value: null },
+      resolution: { type: "v2", value: new THREE.Vector2(1, 1) },
+      viewProjectionInverseMatrix: { type: "m4", value: new THREE.Matrix4() },
+      previousViewProjectionMatrix: { type: "m4", value: new THREE.Matrix4() },
+      velocityFactor: { type: "f", value: 1 },
+    },
+
+    vertexShader: document.getElementById("vs-motionBlur")!.textContent,
+    fragmentShader: document.getElementById("fs-motionBlur")!.textContent,
+  };
+
+  const pass = new ShaderPass(shader);
+  pass.renderToScreen = true;
+  // composer.addPass(pass); TODO:
+
+  window.addEventListener("resize", () => {
+    const s = 1;
+    composer.setSize(s * window.innerWidth, s * window.innerHeight);
+    composer2.setSize(s * window.innerWidth, s * window.innerHeight);
+    Global.camera.aspect = window.innerWidth / window.innerHeight;
+    Global.camera.updateProjectionMatrix();
+
+    Global.renderer.setSize(s * window.innerWidth, s * window.innerHeight);
+    pass.uniforms.resolution.value.set(
+      s * window.innerWidth,
+      s * window.innerHeight
+    );
+  });
+
+  var mCurrent = new THREE.Matrix4();
+  var mPrev = new THREE.Matrix4();
+  var tmpArray = new THREE.Matrix4();
+
+  Global.render = () => {
+    pass.material.uniforms.velocityFactor.value = 0.6;
+
+    tmpArray.copy(Global.camera.matrixWorldInverse);
+    tmpArray.multiply(Global.camera.projectionMatrix);
+    mCurrent.copy(tmpArray.clone().invert());
+
+    pass.material.uniforms.viewProjectionInverseMatrix.value.copy(mCurrent);
+    pass.material.uniforms.previousViewProjectionMatrix.value.copy(mPrev);
+
+    composer2.render();
+
+    pass.material.uniforms.tColor.value = composer2.renderTarget2;
+    composer.render();
+
+    mPrev.copy(tmpArray);
+  };
+}
+
 export default function () {
   setupScene();
   setupPhysicsWorld();
@@ -207,6 +271,7 @@ export default function () {
   setupControllers();
   setupWindowEvents();
   setupStats();
+  setupRenderer();
   setupRoad();
   setupSocket();
 }

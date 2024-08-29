@@ -12,6 +12,7 @@ function App() {
       <p id="velocity" style={styles.velocity}>
         0.00 KM/S
       </p>
+      <canvas id="map" width={500} height={500} style={styles.map} />
     </>
   );
 }
@@ -38,6 +39,15 @@ const styles = useStyles({
     padding: "2px 8px",
     borderRadius: "4px",
     fontSize: 15,
+  },
+  map: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    aspectRatio: 1,
+    width: 250,
+    zIndex: 3,
+    pointerEvents: "none",
   },
 });
 
