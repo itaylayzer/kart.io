@@ -4,16 +4,19 @@ import { Server, Socket } from "socket.io";
 import { CC, CS } from "./store/codes";
 import cors from "cors";
 import { createMysteryBoxes } from "./api/createMysteryBoxes";
+import setup from "./api/setup";
+import { THREE } from "three-nebula";
 
 const app = express();
 const server = createServer(app);
 const io = new Server(server);
 
-const mysteryLocations = createMysteryBoxes();
+const { mysteryLocations, startsLocationsGenerator } = setup();
 type Player = {
   socket: Socket;
   pid: number;
   name: string;
+  transform: number[];
 };
 
 app.use(cors());
@@ -42,15 +45,18 @@ io.on("connection", (socket) => {
   nextId++;
   let local: Player;
   socket.on(CS.JOIN, (name: string) => {
-    local = { pid, socket, name };
+    const transform = startsLocationsGenerator();
+    local = { pid, socket, name, transform };
     console.log(`User [${pid}] ${name} connected`);
 
-    sockets.emitAll(CC.NEW_PLAYER, { name, pid });
+    sockets.emitAll(CC.NEW_PLAYER, { name, pid, transform });
     local.socket.emit(CC.INIT, [
       pid,
-      Array.from(players.values()).map(({ pid, name }) => ({
+      transform,
+      Array.from(players.values()).map(({ pid, name, transform }) => ({
         pid,
         name,
+        transform,
       })),
       mysteryLocations,
     ]);
