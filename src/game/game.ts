@@ -4,6 +4,7 @@ import { Global } from "./store/Global";
 import { PhysicsObject } from "./physics/PhysicsMesh";
 import * as THREE from "three";
 import System, { SpriteRenderer } from "three-nebula";
+import { WorldMap } from "./player/WorldMap";
 
 export default (assets: loadedAssets) => {
   Global.assets = assets;
@@ -14,7 +15,8 @@ export default (assets: loadedAssets) => {
   Global.system.addRenderer(new SpriteRenderer(Global.scene, THREE));
 
   const clock = new THREE.Clock();
-  Global.lockController.lock();
+
+  const map = new WorldMap();
 
   const animate = () => {
     Global.deltaTime = clock.getDelta();
@@ -24,10 +26,12 @@ export default (assets: loadedAssets) => {
       .map((fn) => fn());
 
     Global.system.update();
-    Global.renderer.render(Global.scene, Global.camera);
+    Global.render();
     Global.world.step(2.6 * Global.deltaTime);
 
-    Global.cannonDebugger.update();
+    map.update();
+
+    // Global.cannonDebugger.update();
     Global.mouseController.lastUpdate();
 
     Global.stats.update();

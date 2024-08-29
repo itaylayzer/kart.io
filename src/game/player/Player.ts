@@ -5,6 +5,9 @@ import { DriveController } from "../controller/DriveController";
 import { PhysicsObject } from "../physics/PhysicsMesh";
 import * as CANNON from "cannon-es";
 import { PlayerModel } from "./PlayerModel";
+
+const colorArray = ["#124eb5", "#ff0000", "black", "brown", "green"];
+
 export class Player extends PhysicsObject {
   public static clients: Map<number, Player>;
 
@@ -12,15 +15,20 @@ export class Player extends PhysicsObject {
   static {
     this.clients = new Map();
   }
+  public color: string;
 
   constructor(
     public pid: number,
     isLocal: boolean,
     public name: string,
-    tagNameColor: string,
     public keyboard: IKeyboardController
   ) {
     const radius = 0.8 / 3;
+
+    const color =
+      "#" + new THREE.Color(colorArray[pid % colorArray.length]).getHexString();
+
+    console.log("color", color);
 
     super(new THREE.Object3D(), {
       shape: new CANNON.Cylinder(radius, radius, radius),
@@ -31,10 +39,11 @@ export class Player extends PhysicsObject {
       collisionFilterMask: ~0,
     });
 
+    this.color = color;
     pid !== undefined && Player.clients.set(pid, this);
 
     const engine = new DriveController(5, this, this.keyboard);
-    const model = new PlayerModel(this, keyboard, name, tagNameColor, isLocal);
+    const model = new PlayerModel(this, keyboard, name, color, isLocal);
 
     this.update = [
       () => {

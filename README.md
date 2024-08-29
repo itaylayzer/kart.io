@@ -13,6 +13,10 @@ this playground isnt perfect, it misses alot of things, but it sure is the basic
 
 https://hofk.de/main/discourse.threejs/2021/CarRacing/CarRacing.html
 
+### motion blur
+
+https://www.clicktorelease.com/tmp/threejs/mblur/
+
 ### sketchfab
 
 @Gyro - Kart \
