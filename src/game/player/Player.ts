@@ -1,87 +1,64 @@
-import createPlayerNameSprite from "../api/createPlayerNameSprite";
 import * as THREE from "three";
 import { Global } from "../store/Global";
-export class Player {
+import { IKeyboardController } from "../controller/IKeyboardController";
+import { DriveController } from "../controller/DriveController";
+import { PhysicsObject } from "../physics/PhysicsMesh";
+import * as CANNON from "cannon-es";
+import { PlayerModel } from "./PlayerModel";
+import { curvePoints } from "../constants/road";
+export class Player extends PhysicsObject {
   public static clients: Map<number, Player>;
 
-  public update: (
-    position: THREE.Vector3Like,
-    quaternion: THREE.Quaternion,
-    velocity: THREE.Vector3Like,
-    velocityMagnitude: number
-  ) => void;
-
-  public predictedUpdate: () => void;
   public disconnect: () => void;
   static {
     this.clients = new Map();
   }
-  public position: THREE.Vector3;
-  public quaternion: THREE.Quaternion;
 
-  constructor(public pid: number, public name: string, tagNameColor: string) {
-    this.position = new THREE.Vector3();
-    this.quaternion = new THREE.Quaternion();
-    Player.clients.set(pid, this);
+  constructor(
+    public pid: number,
+    isLocal: boolean,
+    public name: string,
+    tagNameColor: string,
+    public keyboard: IKeyboardController
+  ) {
+    const radius = 0.8 / 3;
 
-    const group = new THREE.Group();
-    const model = Global.assets.gltf.car.scene.clone();
-    model.scale.multiplyScalar(0.5 / 3);
+    super(new THREE.Object3D(), {
+      shape: new CANNON.Cylinder(radius, radius, radius),
+      mass: 1,
+      position: new CANNON.Vec3(
+        curvePoints[pid * 3],
+        curvePoints[pid * 3 + 1],
+        curvePoints[pid * 3 + 2]
+      ),
+      material: new CANNON.Material({ friction: 0, restitution: 0 }),
+      collisionFilterGroup: 1,
+      collisionFilterMask: ~0,
+    });
 
-    group.add(model);
-    const backweels = model.getObjectByName("Back_Wheels_38")!;
-    const frontweels = model.getObjectByName("Front_Wheels_47")!;
-    const steeringweel = model.getObjectByName("Wheel_25")!;
-    model.getObjectByName("Back_18")!.visible = false;
+    pid !== undefined && Player.clients.set(pid, this);
 
-    const nametag = createPlayerNameSprite(name, tagNameColor);
-    nametag.position.y += 0.35;
-    group.add(nametag);
-    const _vel = new THREE.Vector3();
+    const engine = new DriveController(5, this, this.keyboard);
+    const model = new PlayerModel(this, keyboard, name, tagNameColor);
 
-    const queue: Array<() => void> = [];
-
-    this.update = (position, quaternion, velocity, velocityMagnitude) => {
-      queue.push(() => {
-        group.position.copy(this.position.copy(position));
-        group.quaternion.copy(this.quaternion.copy(quaternion));
-        model.rotation.set(0, 0, 0);
-
-        _vel.copy(velocity);
-
-        backweels.rotateX(velocityMagnitude);
-        frontweels.rotation.y = Global.keyboardController.horizontal * 0.4;
-
-        for (const [id, cf] of frontweels.children.entries()) {
-          id < 2
-            ? cf.rotateY(velocityMagnitude)
-            : cf.rotateX(velocityMagnitude);
-        }
-
-        steeringweel.rotation.set(0, 0, 0);
-        steeringweel.rotateOnAxis(
-          new THREE.Vector3(0, -0.425, 1),
-          (-Global.keyboardController.horizontal * Math.PI * 2) / 3
-        );
-      });
-    };
-
-    this.predictedUpdate = () => {
-      if (queue.length === 0) {
-        this.position.copy(
-          group.position.add(_vel.clone().multiplyScalar(Global.deltaTime))
-        );
-      }
-      while (queue.length) {
-        queue.pop()!();
-      }
-    };
+    this.update = [
+      () => {
+        keyboard.firstUpdate();
+        isLocal && Global.cameraController.update();
+        engine.update();
+        model.update();
+        keyboard.lastUpdate();
+      },
+    ];
 
     this.disconnect = () => {
-      Global.scene.remove(group);
-      Player.clients.delete(pid);
+      Global.scene.remove(model);
+      Global.world.removeBody(this);
+
+      pid !== undefined && Player.clients.delete(pid);
     };
 
-    Global.scene.add(group);
+    Global.world.addBody(this);
+    Global.scene.add(model);
   }
 }

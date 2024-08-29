@@ -1,7 +1,9 @@
 import * as THREE from "three";
 import * as CANNON from "cannon-es";
-import { Action } from "@/src/hooks/useDestroy";
-export class PhysicsObject<T extends THREE.Object3D = THREE.Object3D> extends CANNON.Body {
+type Action = () => void;
+export class PhysicsObject<
+    T extends THREE.Object3D = THREE.Object3D
+> extends CANNON.Body {
     public static childrens: PhysicsObject[];
 
     static {
@@ -45,7 +47,9 @@ export class PhysicsObject<T extends THREE.Object3D = THREE.Object3D> extends CA
         PhysicsObject.childrens.push(this);
         this.update = [
             () => {
-                object3d.position.copy(this.position.clone().vadd(this.offsets.position));
+                object3d.position.copy(
+                    this.position.clone().vadd(this.offsets.position)
+                );
                 object3d.quaternion.copy(this.quaternion);
             },
         ];
