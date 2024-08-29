@@ -1,8 +1,8 @@
+import { IKeyboardController } from "../controller/IKeyboardController";
 import { Player } from "./Player";
 
 export class OnlinePlayer extends Player {
-   
-    constructor(id: number, name: string) {
-        super(id, name, "#ff0000");
-    }
+  constructor(id: number, name: string) {
+    super(id, false, name, "#ff0000", new IKeyboardController());
+  }
 }

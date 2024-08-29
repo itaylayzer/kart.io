@@ -18,7 +18,7 @@ export function createRoad(
     );
   }
 
-  const ls = 1400; // length segments
+  const ls = 300; // length segments original was 1400
   const ws = 5; // width segments
   const lss = ls + 1;
   const wss = ws + 1;

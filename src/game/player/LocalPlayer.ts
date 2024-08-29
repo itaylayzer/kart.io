@@ -1,15 +1,15 @@
 import { Player } from "./Player";
 import { getNameFromURL } from "../api/getNameFromURL";
+import { KeyboardController } from "../controller/KeyboardController";
 
 export class LocalPlayer extends Player {
   private static instance: LocalPlayer;
   static getInstance() {
     return this.instance;
   }
-  constructor(pid: number) {
-    super(pid, getNameFromURL(), "#124eb5");
+  constructor(id: number) {
+    super(id, true, getNameFromURL(), "#124eb5", new KeyboardController());
+
     LocalPlayer.instance = this;
   }
-
-  public register() {}
 }

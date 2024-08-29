@@ -6,11 +6,11 @@ const VERTICAL = 1;
 const RAW_AXIS = 0;
 const LERPED_AXIS = 1;
 
-export class KeyboardController {
+export class IKeyboardController {
   public keysDown: Set<number>;
   public keysUp: Set<number>;
   public keysPressed: Set<number>;
-  private keysAxis: [[number, number], [number, number]];
+  public keysAxis: [[number, number], [number, number]];
 
   constructor() {
     this.keysDown = new Set();
@@ -38,21 +38,18 @@ export class KeyboardController {
     // Input axis processing
     this.keysAxis[RAW_AXIS][VERTICAL] =
       +this.isKeyPressed(87) + -this.isKeyPressed(83);
-    this.keysAxis[RAW_AXIS][HORIZONTAL] = -(
-      -this.isKeyPressed(65) + +this.isKeyPressed(68)
-    );
+    this.keysAxis[RAW_AXIS][HORIZONTAL] =
+      +this.isKeyPressed(65) + -this.isKeyPressed(68);
 
-    // Smoothing inputs
     for (let index = 0; index < 2; index++) {
+      // Smoothing inputs
       this.keysAxis[LERPED_AXIS][index] = lerp(
         this.keysAxis[LERPED_AXIS][index],
         this.keysAxis[RAW_AXIS][index],
         Global.deltaTime * 7
       );
-    }
 
-    // Ignore small axis values (dead zone)
-    for (let index = 0; index < 2; index++) {
+      // Ignore small axis values (dead zone)
       if (Math.abs(this.keysAxis[LERPED_AXIS][index]) < 0.05) {
         this.keysAxis[LERPED_AXIS][index] = 0;
       }
