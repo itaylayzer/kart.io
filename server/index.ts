@@ -3,12 +3,13 @@ import { createServer } from "http";
 import { Server, Socket } from "socket.io";
 import { CC, CS } from "./store/codes";
 import cors from "cors";
-import msgpack from "msgpack-lite";
+import { createMysteryBoxes } from "./api/createMysteryBoxes";
 
 const app = express();
 const server = createServer(app);
 const io = new Server(server);
 
+const mysteryLocations = createMysteryBoxes();
 type Player = {
   socket: Socket;
   pid: number;
@@ -51,6 +52,7 @@ io.on("connection", (socket) => {
         pid,
         name,
       })),
+      mysteryLocations,
     ]);
     players.set(pid, local);
   });
@@ -61,6 +63,14 @@ io.on("connection", (socket) => {
 
   socket.on(CS.KEY_UP, (buffer: Buffer) => {
     sockets.emitExcept(pid, CC.KEY_UP, { pid, buffer });
+  });
+
+  socket.on(CS.TOUCH_MYSTERY, (id: number) => {
+    sockets.emitAll(CC.MYSTERY_VISIBLE, [id, false]);
+
+    setTimeout(() => {
+      sockets.emitAll(CC.MYSTERY_VISIBLE, [id, true]);
+    }, 1000);
   });
 
   socket.on("disconnect", () => {
