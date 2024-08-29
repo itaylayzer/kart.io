@@ -4,6 +4,7 @@ export enum CS {
   UPDATE = "u",
   KEY_DOWN = "d",
   KEY_UP = "u",
+  TOUCH_MYSTERY = "t",
 }
 
 // client codes
@@ -13,4 +14,5 @@ export enum CC {
   DISCONNECTED = "d",
   KEY_DOWN = "d",
   KEY_UP = "u",
+  MYSTERY_VISIBLE = "m",
 }

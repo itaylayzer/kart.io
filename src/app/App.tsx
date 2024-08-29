@@ -35,7 +35,8 @@ const styles = useStyles({
     margin: 0,
     color: "white",
     fontFamily: "monospace",
-    padding: "2px 4px",
+    padding: "2px 8px",
+    borderRadius: "4px",
     fontSize: 15,
   },
 });
@@ -50,7 +51,7 @@ export default () => (
       sfx_shoot: "sfx/shoot.mp3",
       txt_circle: "textures/circle.png",
       txt_road: "textures/CentralMarking.png",
-      mystery:"textures/mystery.png",
+      mystery: "textures/mystery.png",
     }}
   >
     <App />
