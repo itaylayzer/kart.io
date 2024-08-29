@@ -5,7 +5,6 @@ import { DriveController } from "../controller/DriveController";
 import { PhysicsObject } from "../physics/PhysicsMesh";
 import * as CANNON from "cannon-es";
 import { PlayerModel } from "./PlayerModel";
-import { curvePoints } from "../constants/road";
 export class Player extends PhysicsObject {
   public static clients: Map<number, Player>;
 
