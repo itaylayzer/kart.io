@@ -26,11 +26,7 @@ export class Player extends PhysicsObject {
     super(new THREE.Object3D(), {
       shape: new CANNON.Cylinder(radius, radius, radius),
       mass: 1,
-      position: new CANNON.Vec3(
-        curvePoints[pid * 3],
-        curvePoints[pid * 3 + 1],
-        curvePoints[pid * 3 + 2]
-      ),
+      position: new CANNON.Vec3(0, 0, 0),
       material: new CANNON.Material({ friction: 0, restitution: 0 }),
       collisionFilterGroup: 1,
       collisionFilterMask: ~0,
@@ -39,7 +35,7 @@ export class Player extends PhysicsObject {
     pid !== undefined && Player.clients.set(pid, this);
 
     const engine = new DriveController(5, this, this.keyboard);
-    const model = new PlayerModel(this, keyboard, name, tagNameColor);
+    const model = new PlayerModel(this, keyboard, name, tagNameColor, isLocal);
 
     this.update = [
       () => {
@@ -60,5 +56,17 @@ export class Player extends PhysicsObject {
 
     Global.world.addBody(this);
     Global.scene.add(model);
+  }
+
+  public applyTransform(transform: number[]) {
+    [
+      this.position.x,
+      this.position.y,
+      this.position.z,
+      this.quaternion.x,
+      this.quaternion.y,
+      this.quaternion.z,
+      this.quaternion.w,
+    ] = transform;
   }
 }

@@ -28,7 +28,8 @@ export class PlayerModel extends THREE.Group {
     body: CANNON.Body,
     keyboard: IKeyboardController,
     name: string,
-    tagNameColor: string
+    tagNameColor: string,
+    isLocal: boolean
   ) {
     super();
     const model = Global.assets.gltf.car.scene.clone();
@@ -104,10 +105,12 @@ export class PlayerModel extends THREE.Group {
 
       this.position.copy(body.position);
       this.quaternion.copy(body.quaternion);
-
-      document.querySelector("p#velocity")!.innerHTML = `${Math.abs(
-        velocityMagnitude
-      ).toFixed(2)} KM/S`;
+      isLocal &&
+        (document.querySelector("p#velocity")!.innerHTML = `${Math.abs(
+          velocityMagnitude
+        ).toFixed(2)} KM/S ${this.position.x.toFixed(
+          2
+        )}x ${this.position.y.toFixed(2)}y ${this.position.z.toFixed(2)}z`);
     };
   }
 }
