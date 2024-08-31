@@ -4,11 +4,12 @@ import { io } from "socket.io-client";
 import * as THREE from "three";
 import {
   EffectComposer,
+  OutputPass,
   PointerLockControls,
   RenderPass,
   ShaderPass,
+  UnrealBloomPass,
 } from "three/examples/jsm/Addons.js";
-import Stats from "three/examples/jsm/libs/stats.module.js";
 import { colors } from "../../constants";
 import { CameraController } from "../../controller/CameraController";
 import { MouseController } from "../../controller/MouseController";
@@ -20,7 +21,6 @@ import { Global } from "../../store/Global";
 import { MysteryBox } from "../meshes/MysteryBox";
 import { createRoad, createVectorsFromNumbers } from "./road";
 import msgpack from "msgpack-lite";
-import { getNameFromURL } from "../getNameFromURL";
 import { curvePoints } from "../../constants/road";
 
 function setupLights() {
@@ -107,11 +107,6 @@ function setupWindowEvents() {
   });
 }
 
-function setupStats() {
-  Global.stats = new Stats();
-  document.body.appendChild(Global.stats.dom);
-}
-
 function setupRoad() {
   const [dotsM, m] = createRoad(curvePoints, 15, 0);
 
@@ -120,9 +115,13 @@ function setupRoad() {
   Global.scene.add(m);
 }
 
-function setupSocket() {
-  Global.socket = io({ hostname: "127.0.0.1", secure: false, port: 3000 });
-  Global.socket.on(
+function setupSocket(room: number, name: string) {
+  Global.socket = io({
+    hostname: "http://127.0.0.1",
+    secure: false,
+    port: room,
+  });
+  Global.socket?.on(
     CC.INIT,
     ([id, transform, players, locations]: [
       number,
@@ -130,21 +129,20 @@ function setupSocket() {
       { name: string; pid: number; transform: number[] }[],
       number[]
     ]) => {
-      new LocalPlayer(id).applyTransform(transform);
+      new LocalPlayer(id, name).applyTransform(transform);
 
       for (const { pid, name, transform: ptransform } of players) {
         new OnlinePlayer(pid, name).applyTransform(ptransform);
       }
 
       const pts = createVectorsFromNumbers(locations);
-      console.log(pts);
       for (const [id, pt] of pts.entries()) {
         new MysteryBox(id, new CANNON.Vec3(pt.x, pt.y, pt.z));
       }
     }
   );
 
-  Global.socket.on(CC.KEY_DOWN, (args: { pid: number; buffer: Buffer }) => {
+  Global.socket?.on(CC.KEY_DOWN, (args: { pid: number; buffer: Buffer }) => {
     const xplayer = Player.clients.get(args.pid);
 
     const [key, ...data] = msgpack.decode(
@@ -158,7 +156,7 @@ function setupSocket() {
     xplayer?.keyboard.keysDown.add(key);
   });
 
-  Global.socket.on(CC.KEY_UP, (args: { pid: number; buffer: Buffer }) => {
+  Global.socket?.on(CC.KEY_UP, (args: { pid: number; buffer: Buffer }) => {
     const xplayer = Player.clients.get(args.pid);
     const [key, ...data] = msgpack.decode(
       new Uint8Array(args.buffer)
@@ -172,7 +170,7 @@ function setupSocket() {
     xplayer?.keyboard.keysPressed.delete(key);
   });
 
-  Global.socket.on(
+  Global.socket?.on(
     CC.NEW_PLAYER,
     (xplayer: { name: string; pid: number; transform: number[] }) => {
       new OnlinePlayer(xplayer.pid, xplayer.name).applyTransform(
@@ -181,22 +179,28 @@ function setupSocket() {
     }
   );
 
-  Global.socket.on(CC.DISCONNECTED, (disconnectedID) => {
+  Global.socket?.on(CC.DISCONNECTED, (disconnectedID) => {
     OnlinePlayer.clients.get(disconnectedID)?.disconnect();
   });
 
-  Global.socket.on("connect", () => {
-    Global.socket!.emit(CS.JOIN, getNameFromURL());
+  Global.socket?.on("connect", () => {
+    Global.socket!.emit(CS.JOIN, name);
   });
 
-  Global.socket.on(CC.MYSTERY_VISIBLE, ([id, isVisible]: [number, boolean]) => {
-    MysteryBox.toggleMystery(id, isVisible);
-  });
-  Global.socket.on("disconnect", () => {
+  Global.socket?.on(
+    CC.MYSTERY_VISIBLE,
+    ([id, isVisible]: [number, boolean]) => {
+      MysteryBox.toggleMystery(id, isVisible);
+    }
+  );
+  Global.socket?.on("disconnect", () => {
     Global.socket = undefined;
   });
 
   window.addEventListener("beforeunload", () => {
+    Global.socket?.disconnect();
+  });
+  window.addEventListener("unload", () => {
     Global.socket?.disconnect();
   });
 }
@@ -205,8 +209,19 @@ function setupRenderer() {
   const composer = new EffectComposer(Global.renderer);
   composer.addPass(new RenderPass(Global.scene, Global.camera));
 
+  const bloomPass = new UnrealBloomPass(
+    new THREE.Vector2(window.innerWidth, window.innerHeight),
+    1.5,
+    0.4,
+    0.85
+  );
+  bloomPass.threshold = 1;
+  bloomPass.strength = 0.5;
+  bloomPass.radius = 0;
+
   const composer2 = new EffectComposer(Global.renderer);
   composer2.addPass(new RenderPass(Global.scene, Global.camera));
+  composer2.addPass(new OutputPass());
 
   const shader = {
     uniforms: {
@@ -222,9 +237,10 @@ function setupRenderer() {
     fragmentShader: document.getElementById("fs-motionBlur")!.textContent,
   };
 
-  const pass = new ShaderPass(shader);
-  pass.renderToScreen = true;
-  // composer.addPass(pass); TODO:
+  const blurPass = new ShaderPass(shader);
+  blurPass.renderToScreen = true;
+  composer.addPass(bloomPass);
+  // composer.addPass(fastPass);
 
   window.addEventListener("resize", () => {
     const s = 1;
@@ -234,7 +250,7 @@ function setupRenderer() {
     Global.camera.updateProjectionMatrix();
 
     Global.renderer.setSize(s * window.innerWidth, s * window.innerHeight);
-    pass.uniforms.resolution.value.set(
+    blurPass.uniforms.resolution.value.set(
       s * window.innerWidth,
       s * window.innerHeight
     );
@@ -245,33 +261,32 @@ function setupRenderer() {
   var tmpArray = new THREE.Matrix4();
 
   Global.render = () => {
-    pass.material.uniforms.velocityFactor.value = 0.6;
+    blurPass.material.uniforms.velocityFactor.value = 4;
 
     tmpArray.copy(Global.camera.matrixWorldInverse);
     tmpArray.multiply(Global.camera.projectionMatrix);
     mCurrent.copy(tmpArray.clone().invert());
 
-    pass.material.uniforms.viewProjectionInverseMatrix.value.copy(mCurrent);
-    pass.material.uniforms.previousViewProjectionMatrix.value.copy(mPrev);
+    blurPass.material.uniforms.viewProjectionInverseMatrix.value.copy(mCurrent);
+    blurPass.material.uniforms.previousViewProjectionMatrix.value.copy(mPrev);
 
     composer2.render();
 
-    pass.material.uniforms.tColor.value = composer2.renderTarget2;
+    blurPass.material.uniforms.tDiffuse.value = composer2.renderTarget2;
     composer.render();
 
     mPrev.copy(tmpArray);
   };
 }
 
-export default function () {
+export default function (room: number, name: string) {
   setupScene();
   setupPhysicsWorld();
   setupLights();
   setupObjects();
   setupControllers();
   setupWindowEvents();
-  setupStats();
   setupRenderer();
   setupRoad();
-  setupSocket();
+  setupSocket(room, name);
 }

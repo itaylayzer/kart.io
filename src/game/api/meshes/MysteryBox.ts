@@ -5,20 +5,22 @@ import { Global } from "../../store/Global";
 import { randFloat } from "three/src/math/MathUtils.js";
 import { CS } from "@/server/store/codes";
 export class MysteryBox extends PhysicsObject {
-  private static boxes: Map<number, MysteryBox>;
-  private mesh: THREE.Mesh;
+  public static boxes: Map<number, MysteryBox>;
+  public mesh: THREE.Mesh;
   static {
     this.boxes = new Map();
   }
   constructor(id: number, position: CANNON.Vec3) {
-    const size = 0.5;
+    const size = 0.4;
     const mesh = new THREE.Mesh(
       new THREE.BoxGeometry(size, size, size),
       new THREE.MeshPhongMaterial({
         map: Global.assets.textures.mystery,
-        opacity: 0.8,
+        opacity: 0.2,
         transparent: true,
         side: THREE.DoubleSide,
+        emissiveIntensity: 5,
+        emissive: "orange",
       })
     );
     mesh.castShadow = true;

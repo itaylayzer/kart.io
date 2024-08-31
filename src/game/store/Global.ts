@@ -3,7 +3,6 @@ import { MouseController } from "../controller/MouseController";
 import { CameraController } from "../controller/CameraController";
 
 import CannonDebugger from "cannon-es-debugger";
-import Stats from "three/examples/jsm/libs/stats.module.js";
 import { loadedAssets } from "@/src/viewmodels/useAssetLoader";
 import { Action } from "@/src/hooks/useDestroy";
 import { EffectComposer, PointerLockControls } from "three/examples/jsm/Addons.js";
@@ -21,7 +20,6 @@ export class Global {
   public static cameraController: CameraController;
   public static cannonDebugger: ReturnType<typeof CannonDebugger>;
   public static deltaTime: number = 0;
-  public static stats: Stats;
   public static assets: loadedAssets;
   public static updates: Action[];
   public static lockController: PointerLockControls;
