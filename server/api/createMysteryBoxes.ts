@@ -10,7 +10,7 @@ export function createMysteryBoxes(curve: THREE.CatmullRomCurve3, ls: number) {
 
   const devideVertical = 10;
   const devideHorizontal = 5;
-  for (let x = 1; x < devideVertical + 1; x++) {
+  for (let x = 1  ; x < devideVertical + 1; x++) {
     const sourceIndex = Math.floor((x * ls) / (devideVertical + 1));
     const destIndex = sourceIndex + 1;
 
@@ -28,7 +28,9 @@ export function createMysteryBoxes(curve: THREE.CatmullRomCurve3, ls: number) {
           ).applyQuaternion(dummyVertical.quaternion)
         )
         .add(
-          new THREE.Vector3(0, 0.4, 0).applyQuaternion(dummyVertical.quaternion)
+          new THREE.Vector3(0, 0.35, 0).applyQuaternion(
+            dummyVertical.quaternion
+          )
         );
 
       mysteryBoxLocations.push(

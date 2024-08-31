@@ -2,13 +2,15 @@ import { createVectorsFromNumbers } from "../api/setup/road";
 import { curvePoints } from "../constants/road";
 import * as THREE from "three";
 import { Player } from "./Player";
+import { MysteryBox } from "../api/meshes/MysteryBox";
 export class WorldMap {
   public update: () => void;
 
   constructor() {
-    const points = new THREE.CatmullRomCurve3(
+    const curve = new THREE.CatmullRomCurve3(
       createVectorsFromNumbers(curvePoints)
-    ).getPoints(1400);
+    );
+    const points = curve.getPoints(500);
 
     const maxPoint = points.reduce(
       (prev, curr) =>
@@ -34,6 +36,8 @@ export class WorldMap {
     const ctx = canvasHTML.getContext("2d")!;
     const size = 500;
 
+    const flagPosition = curve.getPoints(700)[1];
+
     const padding = (ctx.lineWidth = 30);
 
     const calcPoint = (point: THREE.Vector3) => {
@@ -50,44 +54,132 @@ export class WorldMap {
       ];
     };
 
-    const renderRoad = (dontUseAlpha: boolean = false) => {
+    const renderRoad = () => {
       for (let index = 1; index < points.length; index++) {
-        ctx.beginPath();
         const pfrom = calcPoint(points[index - 1]);
-        ctx.moveTo(pfrom[0], pfrom[1]);
         const pto = calcPoint(points[index]);
-        ctx.globalAlpha = dontUseAlpha ? 1 : pto[2] * 0.5 + 0.5;
+
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.strokeStyle = "black";
+        ctx.globalAlpha = 1;
+        ctx.lineWidth = 40 + pto[2] * 5;
+
+        ctx.beginPath();
+        ctx.moveTo(pfrom[0], pfrom[1]);
         ctx.lineTo(pto[0], pto[1]);
         ctx.stroke();
+
+        ctx.globalCompositeOperation = "source-over";
+        ctx.strokeStyle = "white";
+        ctx.globalAlpha = pto[2] * 0.5 + 0.5;
+        ctx.lineWidth = 25 + pto[2] * 5;
+
+        ctx.beginPath();
+        ctx.moveTo(pfrom[0], pfrom[1]);
+        ctx.lineTo(pto[0], pto[1]);
+        ctx.stroke();
+      }
+
+      const flagRelative = calcPoint(flagPosition);
+
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = "#000000";
+      ctx.lineWidth = 10;
+      const flagSize = 6;
+      for (let x = 0; x < 3; x++) {
+        const w = 4;
+        for (let y = 0; y <= w; y++) {
+          ctx.beginPath();
+
+          ctx.fillRect(
+            flagRelative[0] - flagSize / 2 + x * flagSize,
+            flagRelative[1] - flagSize / 2 + (y - w / 2) * flagSize,
+            flagSize,
+            flagSize
+          );
+          ctx.strokeRect(
+            flagRelative[0] - flagSize / 2 + x * flagSize,
+            flagRelative[1] - flagSize / 2 + (y - w / 2) * flagSize,
+            flagSize,
+            flagSize
+          );
+          ctx.stroke();
+        }
+      }
+      ctx.globalCompositeOperation = "source-over";
+
+      for (let x = 0; x < 3; x++) {
+        const w = 4;
+        for (let y = 0; y <= w; y++) {
+          ctx.fillStyle = ["#ffffff", "#000000"][(x + y) % 2];
+          ctx.beginPath();
+
+          ctx.fillRect(
+            flagRelative[0] - flagSize / 2 + x * flagSize,
+            flagRelative[1] - flagSize / 2 + (y - w / 2) * flagSize,
+            flagSize,
+            flagSize
+          );
+          ctx.stroke();
+        }
       }
     };
 
     const dummyVec = new THREE.Vector3();
     const renderPlayers = () => {
-      for (const player of Player.clients.values()) {
-        ctx.beginPath();
-        const p = calcPoint(dummyVec.copy(player.position));
-        ctx.globalAlpha = p[2] * 0.5 + 0.5;
-        ctx.strokeStyle = "black";
-        ctx.arc(p[0], p[1], 0.7, 0, 2 * Math.PI);
-        ctx.strokeStyle = player.color;
+      function render(colors = true, basicLength = 0) {
+        for (const player of Player.clients.values()) {
+          const p = calcPoint(dummyVec.copy(player.position));
 
-        ctx.arc(p[0], p[1], 0.5, 0, 2 * Math.PI);
-        ctx.stroke();
+          ctx.globalAlpha = 1;
+          ctx.beginPath();
+          ctx.lineWidth = 25 + basicLength + p[2] * 5;
+          if (colors) ctx.strokeStyle = player.color;
+          ctx.arc(p[0], p[1], 0.5, 0, 2 * Math.PI);
+          ctx.stroke();
+        }
       }
+
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.strokeStyle = "black";
+      render(false, 10);
+      ctx.globalCompositeOperation = "source-over";
+      render(true);
+    };
+
+    const renderMysteryBoxes = () => {
+      const render = (
+        startSize: number,
+        color: string,
+        destinationOut: boolean = false
+      ) => {
+        ctx.globalCompositeOperation = (
+          ["source-over", "destination-out"] as GlobalCompositeOperation[]
+        )[+destinationOut];
+
+        for (const box of MysteryBox.boxes.values()) {
+          if (!box.mesh.visible) continue;
+          const p = calcPoint(box.mesh.getWorldPosition(dummyVec));
+
+          ctx.lineWidth = startSize + p[2] * 5;
+          ctx.globalAlpha = p[2] * 0.5 + 0.5;
+
+          ctx.beginPath();
+          ctx.strokeStyle = color;
+          ctx.arc(p[0], p[1], 0.5, 0, 2 * Math.PI);
+          ctx.stroke();
+        }
+      };
+
+      render(15, "black", true);
+      render(10, "#de7310");
     };
 
     this.update = () => {
       ctx.clearRect(0, 0, size, size);
-      // ctx.strokeStyle = "black";
-      // ctx.lineWidth = 35;
-
-      // renderRoad(true);
-      ctx.strokeStyle = "white";
-      ctx.lineWidth = 30;
-
       renderRoad();
-      ctx.lineWidth = 20;
+      renderMysteryBoxes();
       renderPlayers();
     };
   }

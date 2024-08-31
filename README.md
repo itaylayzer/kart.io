@@ -28,4 +28,5 @@ https://sketchfab.com/3d-models/kart-cf740a3e6ba2430497c2b0e15f93c5eb#download
 
 ### fonts
 
-- Signika
+- Signika - @google-fonts
+- New Super Mario Font U - https://www.cdnfonts.com/new-super-mario-font-u.font
