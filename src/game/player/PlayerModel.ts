@@ -28,7 +28,7 @@ export class PlayerModel extends THREE.Group {
     body: CANNON.Body,
     keyboard: IKeyboardController,
     name: string,
-    tagNameColor: string,
+    tagNameColor: [string, number],
     isLocal: boolean
   ) {
     super();
@@ -40,8 +40,10 @@ export class PlayerModel extends THREE.Group {
         const mat = partAsMesh.material as THREE.MeshStandardMaterial;
         if (mat) {
           if (namesToColor.includes(partAsMesh.name)) {
-            partAsMesh.material = new THREE.MeshStandardMaterial({
-              color: tagNameColor,
+            partAsMesh.material = new THREE.MeshPhongMaterial({
+              color: tagNameColor[0],
+              emissive: tagNameColor[0],
+              emissiveIntensity: tagNameColor[1],
             });
           } else {
             mat.roughness = 1;
@@ -58,10 +60,11 @@ export class PlayerModel extends THREE.Group {
     model.getObjectByName("Back_18")!.visible = false;
     super.add(model);
 
-    const nametag = createPlayerNameSprite(name, tagNameColor);
-    nametag.position.y += 0.35;
-    super.add(nametag);
-
+    if (!isLocal) {
+      const nametag = createPlayerNameSprite(name);
+      nametag.position.y += 0.35;
+      super.add(nametag);
+    }
     let driftSide = [0, 0];
 
     this.update = () => {
@@ -105,12 +108,10 @@ export class PlayerModel extends THREE.Group {
 
       this.position.copy(body.position);
       this.quaternion.copy(body.quaternion);
-      isLocal &&
-        (document.querySelector("p#velocity")!.innerHTML = `${Math.abs(
-          velocityMagnitude
-        ).toFixed(2)} KM/S ${this.position.x.toFixed(
-          2
-        )}x ${this.position.y.toFixed(2)}y ${this.position.z.toFixed(2)}z`);
+      // isLocal &&
+      //   (document.querySelector("p#velocity")!.innerHTML = `${Math.abs(
+      //     velocityMagnitude
+      //   ).toFixed(2)} KM/S`);
     };
   }
 }

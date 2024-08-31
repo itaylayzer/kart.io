@@ -1,16 +1,19 @@
 import AssetLoader from "../components/AssetLoader";
 import { useStyles } from "../hooks/useStyles";
-import { useApScreens } from "../viewmodels";
+import { usePlayScreen } from "../viewmodels";
 
-function App() {
-  useApScreens();
+function Play({ room, name }: { room: number; name: string }) {
+  usePlayScreen(room, name);
 
   return (
     <>
       <div style={styles.gameContainer} className="gameContainer"></div>
 
-      <p id="velocity" style={styles.velocity}>
-        0.00 KM/S
+      <p id="wrong" style={styles.wrong}>
+        YOUR FACING THE WRONG DIRECTION
+      </p>
+      <p id="position" style={styles.position}>
+        0
       </p>
       <canvas id="map" width={500} height={500} style={styles.map} />
     </>
@@ -27,31 +30,44 @@ const styles = useStyles({
     top: 0,
   },
 
-  velocity: {
+  position: {
     position: "absolute",
     bottom: 10,
-    left: "50%",
-    translate: "-50% 0%",
-    backgroundColor: "red",
+    left: 10,
+    backgroundColor: "#050505",
     margin: 0,
     color: "white",
-    fontFamily: "monospace",
-    padding: "2px 8px",
+    fontFamily: "New Super Mario Font U",
+    padding: "4px 16px",
     borderRadius: "4px",
-    fontSize: 15,
+    fontSize: 20,
   },
   map: {
     position: "absolute",
-    top: 10,
+    top: "50%",
+    translate: "0% -50%",
     right: 10,
     aspectRatio: 1,
     width: 250,
     zIndex: 3,
     pointerEvents: "none",
   },
+  wrong: {
+    position: "absolute",
+    top: 20,
+    left: "50%",
+    translate: "-50% 0%",
+    backgroundColor: "#111",
+    margin: 0,
+    color: "white",
+    fontFamily: "New Super Mario Font U",
+    padding: "10px 20px",
+    borderRadius: "8px",
+    fontSize: 25,
+  },
 });
 
-export default () => (
+export default ({ room, name }: { room: number; name: string }) => (
   <AssetLoader
     items={{
       car: "fbx/kart.glb",
@@ -64,6 +80,6 @@ export default () => (
       mystery: "textures/mystery.png",
     }}
   >
-    <App />
+    <Play name={name} room={room} />
   </AssetLoader>
 );

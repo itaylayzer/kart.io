@@ -6,10 +6,10 @@ import * as THREE from "three";
 import System, { SpriteRenderer } from "three-nebula";
 import { WorldMap } from "./player/WorldMap";
 
-export default (assets: loadedAssets) => {
+export default (assets: loadedAssets, room: number, name: string) => {
   Global.assets = assets;
 
-  setupWorld();
+  setupWorld(room, name);
 
   Global.system = new System();
   Global.system.addRenderer(new SpriteRenderer(Global.scene, THREE));
@@ -33,8 +33,6 @@ export default (assets: loadedAssets) => {
 
     // Global.cannonDebugger.update();
     Global.mouseController.lastUpdate();
-
-    Global.stats.update();
   };
 
   setInterval(animate, 1000 / 120);
