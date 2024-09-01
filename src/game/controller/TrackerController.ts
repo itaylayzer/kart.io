@@ -90,10 +90,12 @@ export class TrackerController {
         return t[1] === localPID;
       })[0];
 
+    const positionHTML = document
+      .querySelector("div#position")
+      ?.querySelectorAll("div")!;
     const posInMatch = rightPlayer[0] + 1;
-    document.querySelector(
-      "p#position"
-    )!.innerHTML = `${rightPlayer[2].round} / 3 [${rightPlayer[2].lastIndex}] pos ${posInMatch}`;
+    positionHTML.item(0).innerHTML = `<p>${rightPlayer[2].round} / 3</p>`;
+    positionHTML.item(1).innerHTML = `<p>${posInMatch} rd</p>`;
   }
   public static getScoreboard(): [string, number, number][] {
     return this.sortedTrackers.map(

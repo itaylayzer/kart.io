@@ -1,6 +1,6 @@
 import { ToastContainer } from "react-toastify";
 import { Listed } from "../components/Listed";
-import { useIndexScreen } from "../viewmodels/useIndexScreen";
+import { ip, useIndexScreen } from "../viewmodels/useIndexScreen";
 import { Condition } from "../components/Condition";
 import { Room } from "./Room";
 import AssetLoader from "../components/AssetLoader";
@@ -69,7 +69,7 @@ export function Index() {
               to play this game you need 2 things
               <br />
               First go into this website, and make your browser accepts this
-              domain: <a href="http://localhost:3000">localhost:3000</a> <br />
+              domain: <a href={`http://${ip}:64000`}>{ip}:64000</a> <br />
               Edit this url, and add your username at the end, after the '/'.{" "}
             </p>
           </main>,
@@ -83,7 +83,14 @@ export function Index() {
               <center>
                 {Array.isArray(rooms) ? (
                   <>
-                    <p>{rooms.length === 0 ? "no rooms founded" : ""}</p>
+                    <p
+                      style={{
+                        fontFamily: "New Super Mario Font U",
+                        fontSize: 25,
+                      }}
+                    >
+                      {rooms.length === 0 ? "No Rooms Founded" : ""}
+                    </p>
                     <div
                       style={{
                         display: "block",

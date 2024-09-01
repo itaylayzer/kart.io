@@ -3,10 +3,58 @@ import { Global } from "../store/Global";
 import { CS } from "../store/codes";
 import { IKeyboardController } from "./IKeyboardController";
 import msgpack from "msgpack-lite";
+
 export class KeyboardController extends IKeyboardController {
   constructor(enableOnStart: boolean = true) {
     super();
     enableOnStart && this.enable();
+
+    let oldButtons = new Array(16).map((_) => false);
+    this.beforeFirstUpdate = () => {
+      const gamePad = navigator.getGamepads()[0];
+      if (gamePad === null) return;
+
+      const updatedButtons = gamePad.buttons.map((v) => v.pressed);
+      for (let i = 0; i < 16; i++) {
+        if (oldButtons[i] && !updatedButtons[i]) {
+          console.log(-i - 1, "up");
+
+          this.keysUp.add(-i - 1);
+          this.keysPressed.delete(-i - 1);
+        }
+        if (!oldButtons[i] && updatedButtons[i]) {
+          console.log(-i - 1, "down");
+
+          this.keysDown.add(-i - 1);
+
+          if (!Global.lockController.isLocked) {
+            Global.lockController.lock();
+          }
+          if (i === 9 && Global.lockController.isLocked) {
+            Global.lockController.unlock();
+          }
+        }
+      }
+
+      if (gamePad.axes[0] > 0.2 && !this.keysPressed.has(-16)) {
+        this.keysDown.add(-16);
+      } else {
+        if (gamePad.axes[0] <= 0 && this.keysPressed.has(-16)) {
+          this.keysUp.add(-16);
+          this.keysPressed.delete(-16);
+        }
+      }
+      if (gamePad.axes[0] < -0.2 && !this.keysPressed.has(-15)) {
+        this.keysDown.add(-15);
+      } else {
+        if (gamePad.axes[0] >= 0 && this.keysPressed.has(-15)) {
+          this.keysUp.add(-15);
+          this.keysPressed.delete(-15);
+        }
+      }
+
+      oldButtons = updatedButtons;
+    };
   }
 
   public enable() {
