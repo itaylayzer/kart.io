@@ -32,4 +32,5 @@ export class Global {
   public static composer:EffectComposer;
   public static render:Action;
   public static curve:CatmullRomCurve3;
+  public static lateUpdates:Action[];
 }

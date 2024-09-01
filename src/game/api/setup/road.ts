@@ -46,19 +46,16 @@ export function createVectorsFromNumbers(curvePoints: number[]) {
  * @author https://hofk.de/main/discourse.threejs/2021/CarRacing/CarRacing.html
  */
 export function createRoad(
-  curvePoints: number[],
+  pts: THREE.Vector3[],
+  curve: THREE.CatmullRomCurve3,
   roadLength: number,
   size: number
 ): [THREE.InstancedMesh, THREE.Mesh] {
-  const pts: THREE.Vector3[] = createVectorsFromNumbers(curvePoints);
-
   const ls = 1400; // length segments original was 1400
   const ws = 5; // width segments
   const lss = ls + 1;
   const wss = ws + 1;
 
-  const curve = new THREE.CatmullRomCurve3(pts);
-  Global.curve = curve;
   const points = curve.getPoints(ls);
 
   const len = curve.getLength();

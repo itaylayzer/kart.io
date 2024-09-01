@@ -5,6 +5,7 @@ import { DriveController } from "../controller/DriveController";
 import { PhysicsObject } from "../physics/PhysicsMesh";
 import * as CANNON from "cannon-es";
 import { PlayerModel } from "./PlayerModel";
+import { TrackerController } from "../controller/TrackerController";
 
 const colorArray = [
   ["#124eb5", 10],
@@ -14,6 +15,7 @@ const colorArray = [
 
 export class Player extends PhysicsObject {
   public static clients: Map<number, Player>;
+  public tracker: TrackerController;
   public disconnect: () => void;
   static {
     this.clients = new Map();
@@ -40,6 +42,8 @@ export class Player extends PhysicsObject {
       collisionFilterMask: ~0,
     });
 
+    this.tracker = new TrackerController(this, isLocal);
+
     this.color = color;
     pid !== undefined && Player.clients.set(pid, this);
 
@@ -51,6 +55,7 @@ export class Player extends PhysicsObject {
         isLocal && Global.cameraController.update();
         engine.update();
         model.update();
+        this.tracker.update();
         keyboard.lastUpdate();
       },
     ];
