@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { Player } from "./Player";
 import { MysteryBox } from "../api/meshes/MysteryBox";
 import { Global } from "../store/Global";
+import * as CANNON from "cannon-es";
 export class WorldMap {
   public update: () => void;
 
@@ -128,13 +129,79 @@ export class WorldMap {
       function render(colors = true, basicLength = 0) {
         for (const player of Player.clients.values()) {
           const p = calcPoint(dummyVec.copy(player.position));
-
           ctx.globalAlpha = 1;
-          ctx.beginPath();
-          ctx.lineWidth = 25 + basicLength + p[2] * 5;
           if (colors) ctx.strokeStyle = player.color;
-          ctx.arc(p[0], p[1], 0.5, 0, 2 * Math.PI);
-          ctx.stroke();
+          if (Global.settings.useArrow) {
+            const size = 10 + basicLength;
+
+            // Define the triangle vertices
+            const vertices = [
+              { x: -size / 2, y: 0 },
+              { x: 0, y: size / 5 },
+              { x: size / 2, y: 0 },
+              { x: 0, y: size },
+            ];
+
+            // Function to draw a triangle
+            function drawTriangle(vertices: Record<"x" | "y", number>[]) {
+              ctx.beginPath();
+              ctx.moveTo(vertices[0].x, vertices[0].y);
+              ctx.lineTo(vertices[1].x, vertices[1].y);
+              ctx.lineTo(vertices[2].x, vertices[2].y);
+              ctx.lineTo(vertices[3].x, vertices[3].y);
+              ctx.closePath();
+              ctx.stroke();
+            }
+
+            // Function to rotate a point around another point
+            function rotatePoint(
+              x: number,
+              y: number,
+              centerX: number,
+              centerY: number,
+              angle: number
+            ) {
+              const cos = Math.cos(angle);
+              const sin = Math.sin(angle);
+              const dx = x - centerX;
+              const dy = y - centerY;
+              return {
+                x: centerX + dx * cos - dy * sin,
+                y: centerY + dx * sin + dy * cos,
+              };
+            }
+
+            // Function to get rotated vertices
+            function getRotatedVertices(
+              vertices: Record<"x" | "y", number>[],
+              angle: number
+            ) {
+              // Calculate the center of the triangle
+              const centerX =
+                (vertices[0].x + vertices[1].x + vertices[2].x) / 3;
+              const centerY =
+                (vertices[0].y + vertices[1].y + vertices[2].y) / 3;
+
+              // Rotate each vertex
+              return vertices.map((vertex) =>
+                rotatePoint(vertex.x, vertex.y, centerX, centerY, angle)
+              );
+            }
+            const rot = new CANNON.Vec3();
+            player.quaternion.toEuler(rot);
+            drawTriangle(
+              getRotatedVertices(vertices, -rot.y).map((v) => ({
+                x: v.x + p[0],
+                y: v.y + p[1],
+              }))
+            );
+          } else {
+            ctx.beginPath();
+            ctx.lineWidth = 25 + basicLength + p[2] * 5;
+
+            ctx.arc(p[0], p[1], 0.5, 0, 2 * Math.PI);
+            ctx.stroke();
+          }
         }
       }
 

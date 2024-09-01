@@ -164,7 +164,7 @@ function setupRoad() {
   );
   sun.position.set(500, 150, 500);
 
-  Global.scene.add(sun);
+  if (Global.settings.displaySun) Global.scene.add(sun);
 }
 
 function setupSocket(
@@ -175,8 +175,8 @@ function setupSocket(
   Global.socket = socket;
 
   for (const [id, player] of players.entries()) {
-    if (pid === id) new LocalPlayer(id, player[0]);
-    else new OnlinePlayer(id, player[0]);
+    if (pid === id) new LocalPlayer(id, player[0], player[1]);
+    else new OnlinePlayer(id, player[0],  player[1]);
   }
 
   Global.socket.on(
@@ -283,7 +283,7 @@ function setupRenderer() {
 
   const blurPass = new ShaderPass(shader);
   blurPass.renderToScreen = true;
-  composer.addPass(bloomPass);
+  if (Global.settings.useBloom) composer.addPass(bloomPass);
   // composer.addPass(fastPass);
 
   window.addEventListener("resize", () => {

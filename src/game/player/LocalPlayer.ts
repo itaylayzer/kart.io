@@ -9,8 +9,8 @@ export class LocalPlayer extends Player {
   static getInstance() {
     return this.instance;
   }
-  constructor(id: number, name: string) {
-    super(id, true, name, new KeyboardController());
+  constructor(id: number, name: string, color: string) {
+    super(id, true, name, color, new KeyboardController());
     LocalPlayer.instance = this;
     Global.lateUpdates.push(() => {
       TrackerController.update(id);
