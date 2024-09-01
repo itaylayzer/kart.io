@@ -1,16 +1,25 @@
-import AssetLoader from "../components/AssetLoader";
+import { Socket } from "socket.io-client";
 import { useStyles } from "../hooks/useStyles";
 import { usePlayScreen } from "../viewmodels";
 
-function Play({ room, name }: { room: number; name: string }) {
-  usePlayScreen(room, name);
+export function Play({
+  socket,
+  players,
+  pid,
+}: {
+  socket: Socket;
+
+  pid: number;
+  players: Map<number, [string, string, boolean]>;
+}) {
+  usePlayScreen(socket, pid, players);
 
   return (
     <>
       <div style={styles.gameContainer} className="gameContainer"></div>
 
       <p id="wrong" style={styles.wrong}>
-        YOUR FACING THE WRONG DIRECTION
+        YOU'R FACING THE WRONG DIRECTION
       </p>
       <p id="position" style={styles.position}>
         0
@@ -66,20 +75,3 @@ const styles = useStyles({
     fontSize: 25,
   },
 });
-
-export default ({ room, name }: { room: number; name: string }) => (
-  <AssetLoader
-    items={{
-      car: "fbx/kart.glb",
-      // sfx_throw:"https://soxundbible.com/mp3/kung_fu_punch-Mike_Koenig-2097967259.mp3"
-      sfx_throw: "sfx/throw.mp3",
-      sfx_exp: "sfx/exp.mp3",
-      sfx_shoot: "sfx/shoot.mp3",
-      txt_circle: "textures/circle.png",
-      txt_road: "textures/CentralMarking.png",
-      mystery: "textures/mystery.png",
-    }}
-  >
-    <Play name={name} room={room} />
-  </AssetLoader>
-);

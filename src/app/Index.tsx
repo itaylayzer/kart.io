@@ -1,11 +1,13 @@
 import { ToastContainer } from "react-toastify";
 import { Listed } from "../components/Listed";
 import { useIndexScreen } from "../viewmodels/useIndexScreen";
-import Play from "./Play";
 import { Condition } from "../components/Condition";
+import { Room } from "./Room";
+import AssetLoader from "../components/AssetLoader";
+import { FidgetSpinner } from "react-loader-spinner";
+import { BiErrorAlt } from "react-icons/bi";
 export function Index() {
   const {
-    playerName,
     createRoom,
     setRoomName,
     loadRooms,
@@ -18,7 +20,7 @@ export function Index() {
   return (
     <>
       <Condition
-        conditions={screenIndex < 4}
+        conditions={screenIndex < 3}
         onTrue={
           <>
             <div className="blocks header" />
@@ -26,7 +28,24 @@ export function Index() {
             <footer>
               <a>credits</a>
             </footer>
-            <header></header>
+            <header>
+              {" "}
+              <AssetLoader
+                items={{
+                  car: "fbx/kart.glb",
+                  // sfx_throw:"https://soxundbible.com/mp3/kung_fu_punch-Mike_Koenig-2097967259.mp3"
+                  sfx_throw: "sfx/throw.mp3",
+                  sfx_exp: "sfx/exp.mp3",
+                  sfx_shoot: "sfx/shoot.mp3",
+                  txt_circle: "textures/circle.png",
+                  txt_road: "textures/CentralMarking.png",
+                  mystery: "textures/mystery.png",
+                  block: "textures/blocks2.png",
+                }}
+              >
+                <></>{" "}
+              </AssetLoader>
+            </header>
           </>
         }
       />
@@ -37,9 +56,8 @@ export function Index() {
         newestOnTop={false}
         closeOnClick
         rtl={false}
-        pauseOnFocusLoss
-        draggable
         pauseOnHover
+        closeButton={false}
         theme="dark"
       />
       <Listed
@@ -55,95 +73,120 @@ export function Index() {
               Edit this url, and add your username at the end, after the '/'.{" "}
             </p>
           </main>,
-          <div>
-            <main>
-              <h1>Kart.IO</h1>{" "}
+          <main style={{ display: "flex" }}>
+            <div
+              style={{
+                display: "block",
+                marginBlock: "auto",
+              }}
+            >
               <center>
-                {" "}
-                <div
-                  style={{
-                    width: "fit-content",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: 10,
-                  }}
-                >
-                  <button onClick={() => setScreen(2)}>Online</button>{" "}
-                  <button onClick={() => setScreen(4)}>Local</button>
-                </div>
+                {Array.isArray(rooms) ? (
+                  <>
+                    <p>{rooms.length === 0 ? "no rooms founded" : ""}</p>
+                    <div
+                      style={{
+                        display: "block",
+                        maxHeight: (500 * 4) / 6,
+                        width: 550,
+                        overflowY: "scroll",
+                        overflowX: "hidden",
+                      }}
+                    >
+                      <center>
+                        {rooms
+                          // @ts-ignore
+                          .toSorted((a, b) => a[1].localeCompare(b[1]))
+                          // @ts-ignore
+
+                          .map((r) => (
+                            <div
+                              className="room"
+                              onClick={() => {
+                                setRoom([r[0], r[1]]);
+                                setScreen(3);
+                              }}
+                            >
+                              <table>
+                                <tr>
+                                  <th>port</th>
+                                  <th>name</th>
+                                  <th>players count</th>
+                                </tr>
+                                <tr>
+                                  <td>{r[0]}</td>
+                                  <td>{r[1]}</td>
+                                  <td>{r[2]}</td>
+                                </tr>
+                              </table>
+                            </div>
+                          ))}{" "}
+                      </center>
+                    </div>
+                  </>
+                ) : rooms === undefined ? (
+                  <FidgetSpinner
+                    visible={true}
+                    height="80"
+                    width="80"
+                    ariaLabel="fidget-spinner-loading"
+                    wrapperStyle={{}}
+                    backgroundColor="#222"
+                    ballColors={["#f00", "#444", "#a22"]}
+                    wrapperClass="fidget-spinner-wrapper"
+                  />
+                ) : (
+                  <BiErrorAlt color="#a22" size={80} />
+                )}
               </center>
+            </div>
+            <div
+              style={{
+                display: "block",
+                marginBlock: "auto",
+              }}
+            >
+              <h1
+                style={{
+                  flexGrow: 1,
+                  minWidth: "20ch",
+                  width: "100%",
+                  fontSize: 60,
+                  marginBottom: 0,
+                }}
+              >
+                Kart.IO{" "}
+              </h1>
               <h6
+                style={{ marginTop: 0, marginBottom: 40 }}
                 onClick={() => {
+                  window.open("https://itaylayzer.github.io");
+                }}
+                onAuxClick={() => {
                   window.open("https://itaylayzer.github.io", "_blank");
                 }}
               >
                 © 2024 itaylayzer
               </h6>
-            </main>
-          </div>,
-          <main>
-            <div style={{ display: "flex", gap: 5, minWidth: "100%" }}>
-              <h3 style={{ flexGrow: 1, minWidth: "20ch", width: "100%" }}>
-                Rooms{" "}
-              </h3>
-              <button className="mini" onClick={() => loadRooms()}>
-                reload
-              </button>
-              <button className="mini" onClick={() => setScreen(3)}>
-                create
-              </button>
-              <button className="mini" onClick={() => setScreen(1)}>
-                back
-              </button>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "center",
+                  gap: 5,
+                  minWidth: "100%",
+                }}
+              >
+                <button className="mini" onClick={() => loadRooms()}>
+                  reload
+                </button>
+                <button className="mini" onClick={() => setScreen(2)}>
+                  create
+                </button>
+              </div>
             </div>
-            <br />
-            {Array.isArray(rooms) ? (
-              <>
-                <p>{rooms.length === 0 ? "no rooms founded" : ""}</p>
-                <div
-                  style={{
-                    display: "block",
-                    maxHeight: 500,
-                    width: 550,
-                    overflowY: "auto",
-                    overflowX: "hidden",
-                  }}
-                >
-                  <center>
-                    {rooms
-                      .toSorted((a, b) => a[1].localeCompare(b[1]))
-                      .map((r) => (
-                        <div
-                          className="room"
-                          onClick={() => {
-                            setRoom(r[0]);
-                            setScreen(4);
-                          }}
-                        >
-                          <table>
-                            <tr>
-                              <th>port</th>
-                              <th>name</th>
-                              <th>players count</th>
-                            </tr>
-                            <tr>
-                              <td>{r[0]}</td>
-                              <td>{r[1]}</td>
-                              <td>{r[2]}</td>
-                            </tr>
-                          </table>
-                        </div>
-                      ))}{" "}
-                  </center>
-                </div>
-              </>
-            ) : rooms === undefined ? (
-              <p>loading</p>
-            ) : (
-              <p>error</p>
-            )}
           </main>,
           <main>
+            <h1>Create Room</h1>
             <input
               style={{ marginBottom: 10, width: "100%" }}
               type="text"
@@ -163,7 +206,7 @@ export function Index() {
               <div style={{ display: "flex", justifyContent: "space-around" }}>
                 <button
                   onClick={() => {
-                    setScreen(2);
+                    setScreen(1);
                   }}
                 >
                   cancel
@@ -178,7 +221,13 @@ export function Index() {
               </div>
             </center>
           </main>,
-          <Play room={room} name={playerName!} />,
+          <Room
+            roomPort={room[0]}
+            roomName={room[1]}
+            goBack={() => {
+              setScreen(1);
+            }}
+          />,
         ]}
       ></Listed>
     </>
