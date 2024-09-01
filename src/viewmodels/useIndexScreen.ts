@@ -17,6 +17,7 @@ export const useIndexScreen = () => {
   const [playerName, setPlayerName] = useState<string | undefined>(
     getNameFromURL()
   );
+  
   const [screenIndex, setScreen] = useState<number>(
     playerName === undefined || playerName.length < 3 ? 0 : 1
   );
@@ -33,7 +34,7 @@ export const useIndexScreen = () => {
         }, 5000);
 
         try {
-          const response = await fetch(`http://${ip}:${port}/list`);
+          const response = await fetch(`https://${ip}:${port}/list`);
           clearTimeout(timeout);
           resolve((await response.json()) as Room[]);
         } catch (er) {
@@ -50,7 +51,7 @@ export const useIndexScreen = () => {
 
   async function createRoom() {
     try {
-      const response = await fetch(`http://${ip}:${port}/register/${roomName}`);
+      const response = await fetch(`https://${ip}:${port}/register/${roomName}`);
       const value = await response.text();
       if (value.startsWith("p")) {
         setRoom([parseInt(value.substring(1)), roomName]);

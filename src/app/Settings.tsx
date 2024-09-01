@@ -3,8 +3,15 @@ import Slider from "@mui/material/Slider";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 export function Settings({ goBack }: { goBack: () => void }) {
-  const { loadFromCookies, saveToCookies, reset, set, useArrow, fovChange } =
-    useSettingsScreen();
+  const {
+    loadFromCookies,
+    saveToCookies,
+    reset,
+    set,
+    useArrow,
+    fovChange,
+    masterVolume,
+  } = useSettingsScreen();
 
   return (
     <main>
@@ -44,6 +51,20 @@ export function Settings({ goBack }: { goBack: () => void }) {
               onChange={(_, value) => set({ fovChange: value as number })}
             />
             <p style={{ fontFamily: "monospace" }}>{fovChange.toFixed(2)}</p>
+          </td>
+        </tr>
+        <tr>
+          <td>Master Volume</td>{" "}
+          <td style={{ display: "flex", gap: 20 }}>
+            <Slider
+              min={0}
+              step={0.01}
+              max={1}
+              style={{ width: 150 }}
+              value={masterVolume}
+              onChange={(_, value) => set({ masterVolume: value as number })}
+            />
+            <p style={{ fontFamily: "monospace" }}>{masterVolume.toFixed(2)}</p>
           </td>
         </tr>
       </table>

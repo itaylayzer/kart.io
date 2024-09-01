@@ -1,10 +1,11 @@
 import express from "express";
-import { createServer } from "http";
+import { createServer } from "https";
 import { Room } from "./room";
 import cors from "cors";
+import { credentials } from "./store/credentials";
 
 const app = express();
-const server = createServer(app);
+const server = createServer(credentials, app);
 
 const ports = new Map<number, Room | undefined>();
 let startCount = parseInt(process.argv[2] ?? "0");
