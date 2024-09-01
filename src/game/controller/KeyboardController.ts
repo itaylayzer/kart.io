@@ -19,7 +19,8 @@ export class KeyboardController extends IKeyboardController {
   }
 
   private onKeyDown(event: KeyboardEvent) {
-    if (this.keysPressed.has(event.which)) return;
+    if (!Global.lockController.isLocked || this.keysPressed.has(event.which))
+      return;
     this.keysDown.add(event.which);
 
     const data = [event.which];
@@ -38,6 +39,8 @@ export class KeyboardController extends IKeyboardController {
   }
 
   private onKeyUp(event: KeyboardEvent) {
+    if (!Global.lockController.isLocked) return;
+
     this.keysPressed.delete(event.which);
     this.keysUp.add(event.which);
 

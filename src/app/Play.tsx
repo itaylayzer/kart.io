@@ -25,6 +25,19 @@ export function Play({
         0
       </p>
       <canvas id="map" width={500} height={500} style={styles.map} />
+
+      <main>
+        <table id="scoreboard" style={{ zIndex: 11 }}></table>
+      </main>
+
+      <main>
+        <div id="pauseMenu">
+          <h5>Game Paused</h5>
+          <p>but the server, keeps playing</p>
+          <button id="resume">Resume</button>
+          <button id="disconnect">Disconnect</button>
+        </div>
+      </main>
     </>
   );
 }
