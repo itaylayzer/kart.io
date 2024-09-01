@@ -73,10 +73,10 @@ export class PlayerModel extends THREE.Group {
 
       model.rotation.set(0, 0, 0);
 
-      if (keyboard.isKeyDown(32)) {
+      if (keyboard.isKeyDown(32) || keyboard.isKeyDown(-6)) {
         driftSide[0] = keyboard.horizontalRaw * 0.6;
       }
-      if (keyboard.isKeyUp(32)) {
+      if (keyboard.isKeyUp(32) || keyboard.isKeyUp(-6)) {
         driftSide[0] = 0;
       }
 

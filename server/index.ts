@@ -2,12 +2,13 @@ import express from "express";
 import { createServer } from "http";
 import { Room } from "./room";
 import cors from "cors";
+
 const app = express();
 const server = createServer(app);
 
 const ports = new Map<number, Room | undefined>();
 let startCount = parseInt(process.argv[2] ?? "0");
-for (let index = 64000; index < 65000; index++) {
+for (let index = 5321; index < 5350; index++) {
   ports.set(
     index,
     startCount > 0
@@ -19,7 +20,7 @@ for (let index = 64000; index < 65000; index++) {
   startCount > 0 && startCount--;
 }
 
-app.use(cors());
+app.use(cors({ origin: "*" }));
 
 app.get("/", (req, res) => {
   res.status(200).send("Great! now you can play KartIO with servers");
@@ -56,7 +57,7 @@ app.get("/list", (req, res) => {
   res.status(200).send(JSON.stringify(entries));
 });
 
-server.listen(3000, () => {
-  console.log(`server is running on http://localhost:3000/`);
+const port = 5350;
+server.listen(port, () => {
+  console.log(`server is running on :${port}`);
 });
-// const room = new Room(3001, "local", () => {});

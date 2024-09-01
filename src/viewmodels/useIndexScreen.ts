@@ -4,8 +4,8 @@ import { getNameFromURL } from "../game/api/getNameFromURL";
 
 type Room = [number, string, number];
 
-const ip = "localhost"; //'151.145.86.242';
-
+export const ip = "151.145.86.242";
+const port = 5350;
 export const useIndexScreen = () => {
   const [playerName, setPlayerName] = useState<string | undefined>(
     getNameFromURL()
@@ -15,7 +15,8 @@ export const useIndexScreen = () => {
   );
   const [rooms, setRooms] = useState<Room[] | Error | undefined>();
   const [roomName, setRoomName] = useState<string>("");
-  const [room, setRoom] = useState<[number, string]>([3001, "local"]);
+  const [room, setRoom] = useState<[number, string]>([0, "local"]);
+
   async function loadRooms() {
     setRooms(undefined);
     setRooms(
@@ -25,7 +26,7 @@ export const useIndexScreen = () => {
         }, 5000);
 
         try {
-          const response = await fetch(`http://${ip}:3000/list`);
+          const response = await fetch(`http://${ip}:${port}/list`);
           clearTimeout(timeout);
           resolve((await response.json()) as Room[]);
         } catch (er) {
@@ -42,7 +43,7 @@ export const useIndexScreen = () => {
 
   async function createRoom() {
     try {
-      const response = await fetch(`http://${ip}:3000/register/${roomName}`);
+      const response = await fetch(`http://${ip}:${port}/register/${roomName}`);
       const value = await response.text();
       if (value.startsWith("p")) {
         setRoom([parseInt(value.substring(1)), roomName]);

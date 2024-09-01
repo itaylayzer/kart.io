@@ -4,6 +4,7 @@ import { useToggle } from "../hooks/useToggle";
 import { io, Socket } from "socket.io-client";
 import { CC, CS } from "@/server/store/codes";
 import { toast } from "react-toastify";
+import { ip } from "./useIndexScreen";
 
 type Player = [string, string, boolean];
 
@@ -18,7 +19,7 @@ export const useRoomScreen = (room: number, goBack: () => void) => {
   useEffect(() => {
     // join server
     const playersMap = new Map<number, Player>();
-    const socket = io(`http://127.0.0.1:${room}`, {
+    const socket = io(`http://${ip}:${room}`, {
       transports: ["websocket"],
     });
 
