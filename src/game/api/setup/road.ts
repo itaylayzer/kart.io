@@ -58,6 +58,7 @@ export function createRoad(
   const wss = ws + 1;
 
   const curve = new THREE.CatmullRomCurve3(pts);
+  Global.curve = curve;
   const points = curve.getPoints(ls);
 
   const len = curve.getLength();

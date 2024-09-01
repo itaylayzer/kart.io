@@ -1,6 +1,6 @@
 import * as CANNON from "cannon-es";
 import CannonDebugger from "cannon-es-debugger";
-import { io } from "socket.io-client";
+import { Socket } from "socket.io-client";
 import * as THREE from "three";
 import {
   EffectComposer,
@@ -113,32 +113,81 @@ function setupRoad() {
   Global.roadMesh = m;
   Global.scene.add(dotsM);
   Global.scene.add(m);
+  const texture = Global.assets.textures.block.clone();
+  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+  texture.offset.set(0, 0);
+  texture.repeat.setX(10);
+  texture.repeat.setY(2);
+
+  const flagBlock = new THREE.Mesh(new THREE.BoxGeometry(0.2, 1.5, 10), [
+    new THREE.MeshPhongMaterial({ color: "white", map: texture }),
+    new THREE.MeshPhongMaterial({ color: "white", map: texture }),
+    new THREE.MeshPhongMaterial({ color: "#1a1a1a" }),
+    new THREE.MeshPhongMaterial({ color: "#1a1a1a" }),
+    new THREE.MeshPhongMaterial({ color: "#1a1a1a" }),
+    new THREE.MeshPhongMaterial({ color: "#1a1a1a" }),
+  ]);
+  const flagPos = Global.curve.getPoints(700)[1];
+  flagBlock.position.copy(flagPos).add(new THREE.Vector3(0, 2, 0));
+
+  const rod = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.2, 0.2, 3, 10, 10),
+    new THREE.MeshPhongMaterial({ color: "#1a1a1a" })
+  );
+  rod.position
+    .copy(flagPos)
+    .add(new THREE.Vector3(0, 1.5, 0))
+    .add(new THREE.Vector3(0, 0, 5).applyQuaternion(flagBlock.quaternion));
+  Global.scene.add(flagBlock);
+  Global.scene.add(rod.clone());
+  rod.position
+    .copy(flagPos)
+    .add(new THREE.Vector3(0, 1.5, 0))
+    .add(new THREE.Vector3(0, 0, -5).applyQuaternion(flagBlock.quaternion));
+  Global.scene.add(rod);
+
+  const sun = new THREE.Mesh(
+    new THREE.SphereGeometry(50, 10, 10),
+    new THREE.MeshPhongMaterial({
+      color: "gold",
+      emissive: "gold",
+      emissiveIntensity: 150,
+      fog: false,
+      opacity: 0.3,
+      transparent: true,
+    })
+  );
+  sun.position.set(500, 150, 500);
+
+  Global.scene.add(sun);
 }
 
-function setupSocket(room: number, name: string) {
-  Global.socket = io({
-    hostname: "http://127.0.0.1",
-    secure: false,
-    port: room,
-  });
-  Global.socket?.on(
-    CC.INIT,
-    ([id, transform, players, locations]: [
-      number,
-      number[],
-      { name: string; pid: number; transform: number[] }[],
+function setupSocket(
+  socket: Socket,
+  pid: number,
+  players: Map<number, [string, string, boolean]>
+) {
+  Global.socket = socket;
+
+  for (const [id, player] of players.entries()) {
+    if (pid === id) new LocalPlayer(id, player[0]);
+    else new OnlinePlayer(id, player[0]);
+  }
+
+  Global.socket.on(
+    CC.INIT_GAME,
+    ([playerTransforms, mysteryBoxLocations]: [
+      [number, number[]][],
       number[]
     ]) => {
-      new LocalPlayer(id, name).applyTransform(transform);
-
-      for (const { pid, name, transform: ptransform } of players) {
-        new OnlinePlayer(pid, name).applyTransform(ptransform);
+      for (const [ptID, ptTransform] of playerTransforms) {
+        Player.clients.get(ptID)!.applyTransform(ptTransform);
       }
-
-      const pts = createVectorsFromNumbers(locations);
-      for (const [id, pt] of pts.entries()) {
-        new MysteryBox(id, new CANNON.Vec3(pt.x, pt.y, pt.z));
+      const pts = createVectorsFromNumbers(mysteryBoxLocations);
+      for (const [id, p] of pts.entries()) {
+        new MysteryBox(id, new CANNON.Vec3(p.x, p.y, p.z));
       }
+      LocalPlayer.getInstance().resetTracking();
     }
   );
 
@@ -170,21 +219,8 @@ function setupSocket(room: number, name: string) {
     xplayer?.keyboard.keysPressed.delete(key);
   });
 
-  Global.socket?.on(
-    CC.NEW_PLAYER,
-    (xplayer: { name: string; pid: number; transform: number[] }) => {
-      new OnlinePlayer(xplayer.pid, xplayer.name).applyTransform(
-        xplayer.transform
-      );
-    }
-  );
-
   Global.socket?.on(CC.DISCONNECTED, (disconnectedID) => {
     OnlinePlayer.clients.get(disconnectedID)?.disconnect();
-  });
-
-  Global.socket?.on("connect", () => {
-    Global.socket!.emit(CS.JOIN, name);
   });
 
   Global.socket?.on(
@@ -197,6 +233,7 @@ function setupSocket(room: number, name: string) {
     Global.socket = undefined;
   });
 
+  Global.socket.emit(CS.INIT_GAME);
   window.addEventListener("beforeunload", () => {
     Global.socket?.disconnect();
   });
@@ -279,7 +316,11 @@ function setupRenderer() {
   };
 }
 
-export default function (room: number, name: string) {
+export default function (
+  socket: Socket,
+  pid: number,
+  players: Map<number, [string, string, boolean]>
+) {
   setupScene();
   setupPhysicsWorld();
   setupLights();
@@ -288,5 +329,5 @@ export default function (room: number, name: string) {
   setupWindowEvents();
   setupRenderer();
   setupRoad();
-  setupSocket(room, name);
+  setupSocket(socket, pid, players);
 }

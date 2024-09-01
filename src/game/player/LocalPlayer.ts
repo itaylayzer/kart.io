@@ -5,6 +5,7 @@ import { createVectorsFromNumbers } from "../api/setup/road";
 import { curvePoints } from "../constants/road";
 import * as THREE from "three";
 import * as CANNON from "cannon-es";
+import { Global } from "../store/Global";
 function generateRange(
   current: number,
   limit: number,
@@ -23,6 +24,7 @@ function generateRange(
 
 export class LocalPlayer extends Player {
   private static instance: LocalPlayer;
+  public resetTracking: () => void;
 
   static getInstance() {
     return this.instance;
@@ -35,14 +37,15 @@ export class LocalPlayer extends Player {
     let round = -1;
     LocalPlayer.instance = this;
 
-    const points = new THREE.CatmullRomCurve3(
-      createVectorsFromNumbers(curvePoints)
-    ).getPoints(ls);
+    const points = Global.curve.getPoints(ls);
     points.pop();
     console.log("points.length", points.length);
 
     const dummy = new THREE.Object3D();
-
+    this.resetTracking = () => {
+      lastIndex = ls - 5;
+      round = -1;
+    };
     this.update.push(() => {
       const pos = Array.from(points.entries())
         .filter(([index]) => {
@@ -67,10 +70,9 @@ export class LocalPlayer extends Player {
         dummy.quaternion
       );
       const similarity = roadForward.dot(playerForward);
-      document.querySelector("p#position")!.innerHTML = `${Math.max(
-        round,
-        0
-      )} / 3`;
+      document.querySelector(
+        "p#position"
+      )!.innerHTML = `${round} / 3 [${lastIndex}]`;
 
       const lookWrongHTML = document.querySelector(
         "p#wrong"
