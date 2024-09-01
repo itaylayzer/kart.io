@@ -1,5 +1,5 @@
 import { ReactNode, useEffect } from "react";
-import { useAssetStore } from "../viewmodels/useAssetLoader";
+import { useAssetStore } from "../store/useAssetLoader";
 
 export default function AssetLoader({
   children,

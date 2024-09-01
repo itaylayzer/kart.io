@@ -12,6 +12,8 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.25.0",
+    "@emotion/styled": "^11.13.0",
+    "@mui/material": "^6.0.1",
     "@types/cannon": "^0.1.12",
     "@types/cli-progress": "^3.11.6",
     "@types/compression": "^1.7.5",

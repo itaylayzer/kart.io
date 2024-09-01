@@ -1,11 +1,12 @@
 import { ToastContainer } from "react-toastify";
 import { Listed } from "../components/Listed";
-import { ip, useIndexScreen } from "../viewmodels/useIndexScreen";
+import { ip, port, useIndexScreen } from "../viewmodels/useIndexScreen";
 import { Condition } from "../components/Condition";
 import { Room } from "./Room";
 import AssetLoader from "../components/AssetLoader";
 import { FidgetSpinner } from "react-loader-spinner";
 import { BiErrorAlt } from "react-icons/bi";
+import { Settings } from "./Settings";
 export function Index() {
   const {
     createRoom,
@@ -20,14 +21,12 @@ export function Index() {
   return (
     <>
       <Condition
-        conditions={screenIndex < 3}
+        conditions={screenIndex < 4}
         onTrue={
           <>
             <div className="blocks header" />
             <div className="blocks footer" />
-            <footer>
-              <a>credits</a>
-            </footer>
+            <footer></footer>
             <header>
               {" "}
               <AssetLoader
@@ -69,7 +68,11 @@ export function Index() {
               to play this game you need 2 things
               <br />
               First go into this website, and make your browser accepts this
-              domain: <a href={`http://${ip}:64000`}>{ip}:64000</a> <br />
+              domain:{" "}
+              <a href={`http://${ip}:${port}`}>
+                {ip}:{port}
+              </a>{" "}
+              <br />
               Edit this url, and add your username at the end, after the '/'.{" "}
             </p>
           </main>,
@@ -81,6 +84,12 @@ export function Index() {
               }}
             >
               <center>
+                <h1
+                  style={{ fontSize: 50, fontFamily: "New Super Mario Font U" }}
+                >
+                  Servers
+                </h1>
+
                 {Array.isArray(rooms) ? (
                   <>
                     <p
@@ -111,7 +120,7 @@ export function Index() {
                               className="room"
                               onClick={() => {
                                 setRoom([r[0], r[1]]);
-                                setScreen(3);
+                                setScreen(5);
                               }}
                             >
                               <table>
@@ -189,6 +198,12 @@ export function Index() {
                 <button className="mini" onClick={() => setScreen(2)}>
                   create
                 </button>
+                <button className="mini" onClick={() => setScreen(3)}>
+                  credits
+                </button>
+                <button className="mini" onClick={() => setScreen(4)}>
+                  settings
+                </button>
               </div>
             </div>
           </main>,
@@ -228,6 +243,69 @@ export function Index() {
               </div>
             </center>
           </main>,
+          <main>
+            <h1 style={{ fontSize: 60, marginBottom: 0 }}>credits</h1>
+            <center>
+              {" "}
+              <p
+                style={{
+                  marginTop: 0,
+                  marginBottom: 20,
+                  fontFamily: "monospace",
+                  fontWeight: 300,
+                }}
+              >
+                without your creations, this game wasn't been made
+              </p>
+            </center>
+            <div
+              style={{ display: "block", maxHeight: 300, overflowY: "scroll" }}
+            >
+              {" "}
+              <h3> road </h3>
+              <p>
+                {" "}
+                https://hofk.de/main/discourse.threejs/2021/CarRacing/CarRacing.html
+              </p>
+              <h3> motion blur </h3>
+              <p>https://www.clicktorelease.com/tmp/threejs/mblur/</p>
+              <h3> sketchfab </h3>
+              <p>
+                {" "}
+                @Gyro - Kart <br />
+                https://sketchfab.com/3d-models/kart-cf740a3e6ba2430497c2b0e15f93c5eb#download{" "}
+              </p>
+              <h3> textures </h3>
+              <p>
+                {" "}
+                txt_road =
+                https://hofk.de/main/discourse.threejs/2021/CarRacing/CentralMarking.png{" "}
+              </p>
+              <h3> fonts </h3>
+              <p> Signika - @google-fonts </p>
+              <p>
+                {" "}
+                New Super Mario Font U -
+                https://www.cdnfonts.com/new-super-mario-font-u.font{" "}
+              </p>
+            </div>
+            <br />
+            <center>
+              {" "}
+              <button
+                onClick={() => {
+                  setScreen(1);
+                }}
+              >
+                back
+              </button>
+            </center>
+          </main>,
+          <Settings
+            goBack={() => {
+              setScreen(1);
+            }}
+          ></Settings>,
           <Room
             roomPort={room[0]}
             roomName={room[1]}

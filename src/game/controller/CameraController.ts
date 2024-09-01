@@ -68,7 +68,9 @@ export class CameraController {
       .add(
         forwardVec
           .clone()
-          .multiplyScalar(-1 / 2 + -player.keyboard.vertical / 5)
+          .multiplyScalar(
+            -1 / 2 + (-player.keyboard.vertical * Global.settings.fovChange) / 5
+          )
       )
       .add(rightVec.clone().multiplyScalar(0.5 / 2))
       .add(upVec.clone().multiplyScalar(1 / 2));

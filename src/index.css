@@ -127,16 +127,28 @@ main table#scoreboard {
   font-family: "Signika";
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 50%);
 }
+table#settings {
+  padding: 10px;
+  border-radius: 10px;
+  font-family: "Signika";
+}
+table#settings,
 main table#scoreboard,
 main div.room table {
   width: 100%;
 }
 
+table#settings {
+  border-spacing: 8px;
+}
+table#settings tr td,
 main table#scoreboard tr td,
 main div.room table tr td {
   font-size: 20px;
 }
 
+table#settings tr th,
+table#settings tr td,
 main table#scoreboard tr td,
 main table#scoreboard tr th,
 main div.room table tr td,
@@ -167,7 +179,7 @@ main div.room:hover table tr td {
 main table#scoreboard tr td:nth-child(1) {
   min-width: 200px;
   font-family: "New Super Mario Font U";
-  filter: drop-shadow(0px 0px 1px #ce9178  );
+  filter: drop-shadow(0px 0px 1px #ce9178);
 }
 main table#scoreboard tr td:nth-child(1),
 main div.room table tr td:nth-child(2) {
@@ -216,7 +228,6 @@ div.blocks {
   background-image: url(images/blocks.png);
   background-repeat: repeat;
   background-size: 100px 100px;
-  z-index: 9;
 }
 
 div.blocks.header {
@@ -268,9 +279,10 @@ div#root button.mini {
 }
 
 h3 {
-  font-weight: 100;
-  font-size: 20px;
+  font-weight: 600;
+  font-size: 30px;
   margin: 0px;
+  margin-top: 20px;
 }
 
 div.player {

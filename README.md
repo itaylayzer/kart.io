@@ -2,33 +2,15 @@
 
 a kart racing game created with three.js and cannon-es, based on the [playground-kart](https://itaylayzer.github.io/playground-kart)
 
-Keys
-W,S = Accelerating
-A,D = Sterring Wheel
-Space = Drift
-Mouse 2 = Show Scoreboard
-Mouse 0 = Use Special
+## Keys
+
+| keyboard key | gamepad key                                | action              |
+| ------------ | ------------------------------------------ | ------------------- |
+| W / S        | A / B / 0 / 1                              | Accelerating        |
+| A / D        | Right Axis X Axis / Npad Right / Npad Left | Sterring Wheel      |
+| Space        | R1                                         | Drift               |
+| Mouse Right  | L1                                         | Show Scoreboard     |
+| Mouse Left   | X / Y / 2 / 3 / L2 / R2                    | Use Special         |
+| Escape       | Start                                      | Unlock / Pause Menu |
 
 ## credits
-
-### road
-
-https://hofk.de/main/discourse.threejs/2021/CarRacing/CarRacing.html
-
-### motion blur
-
-https://www.clicktorelease.com/tmp/threejs/mblur/
-
-### sketchfab
-
-@Gyro - Kart \
-https://sketchfab.com/3d-models/kart-cf740a3e6ba2430497c2b0e15f93c5eb#download
-
-### textures
-
-- txt_road = https://hofk.de/main/discourse.threejs/2021/CarRacing/CentralMarking.png
-
-### fonts
-
-- Signika - @google-fonts
-- New Super Mario Font U - https://www.cdnfonts.com/new-super-mario-font-u.font

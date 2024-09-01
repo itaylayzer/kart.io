@@ -1,12 +1,19 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { getNameFromURL } from "../game/api/getNameFromURL";
+import { useSettingsStore } from "../store/useSettingsStore";
 
 type Room = [number, string, number];
 
 export const ip = "151.145.86.242";
-const port = 5350;
+export const port = 5350;
 export const useIndexScreen = () => {
+  const settingsStore = useSettingsStore();
+
+  useEffect(() => {
+    settingsStore.loadFromCookies();
+  }, []);
+
   const [playerName, setPlayerName] = useState<string | undefined>(
     getNameFromURL()
   );
@@ -47,7 +54,7 @@ export const useIndexScreen = () => {
       const value = await response.text();
       if (value.startsWith("p")) {
         setRoom([parseInt(value.substring(1)), roomName]);
-        setScreen(3);
+        setScreen(5);
       } else {
         toast(["No More Ports to Open", "Server Error"][parseInt(value) - 1], {
           type: "error",
