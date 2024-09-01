@@ -6,6 +6,7 @@ import * as THREE from "three";
 import System, { SpriteRenderer } from "three-nebula";
 import { WorldMap } from "./player/WorldMap";
 import { Socket } from "socket.io-client";
+import { Scoreboard } from "./player/Scoreboard";
 
 export default (
   assets: loadedAssets,
@@ -15,6 +16,7 @@ export default (
 ) => {
   Global.assets = assets;
 
+  const scoreboard = new Scoreboard();
   setupWorld(socket, pid, players);
 
   Global.system = new System();
@@ -30,7 +32,10 @@ export default (
     Global.updates
       .concat(PhysicsObject.childrens.flatMap((v) => v.update))
       .map((fn) => fn());
+    Global.lateUpdates.map((f) => f());
 
+    scoreboard.update();
+    
     Global.system.update();
     Global.render();
     Global.world.step(2.6 * Global.deltaTime);

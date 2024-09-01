@@ -2,7 +2,12 @@
 
 a kart racing game created with three.js and cannon-es, based on the [playground-kart](https://itaylayzer.github.io/playground-kart)
 
-to 
+Keys
+W,S = Accelerating
+A,D = Sterring Wheel
+Space = Drift
+Mouse 2 = Show Scoreboard
+Mouse 0 = Use Special
 
 ## credits
 

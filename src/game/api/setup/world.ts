@@ -22,6 +22,7 @@ import { MysteryBox } from "../meshes/MysteryBox";
 import { createRoad, createVectorsFromNumbers } from "./road";
 import msgpack from "msgpack-lite";
 import { curvePoints } from "../../constants/road";
+import { PauseMenu } from "../../player/PauseMenu";
 
 function setupLights() {
   const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 1);
@@ -56,6 +57,8 @@ function setupLights() {
 
 function setupObjects() {
   Global.updates = [];
+  Global.lateUpdates = [];
+  new PauseMenu();
 }
 
 function setupScene() {
@@ -108,7 +111,9 @@ function setupWindowEvents() {
 }
 
 function setupRoad() {
-  const [dotsM, m] = createRoad(curvePoints, 15, 0);
+  const pts: THREE.Vector3[] = createVectorsFromNumbers(curvePoints);
+  Global.curve = new THREE.CatmullRomCurve3(pts);
+  const [dotsM, m] = createRoad(pts, Global.curve, 15, 0);
 
   Global.roadMesh = m;
   Global.scene.add(dotsM);
@@ -181,13 +186,15 @@ function setupSocket(
       number[]
     ]) => {
       for (const [ptID, ptTransform] of playerTransforms) {
-        Player.clients.get(ptID)!.applyTransform(ptTransform);
+        const xplayer = Player.clients.get(ptID);
+        if (xplayer === undefined) continue;
+        xplayer.applyTransform(ptTransform);
+        xplayer.tracker.reset();
       }
       const pts = createVectorsFromNumbers(mysteryBoxLocations);
       for (const [id, p] of pts.entries()) {
         new MysteryBox(id, new CANNON.Vec3(p.x, p.y, p.z));
       }
-      LocalPlayer.getInstance().resetTracking();
     }
   );
 
@@ -324,10 +331,11 @@ export default function (
   setupScene();
   setupPhysicsWorld();
   setupLights();
+  setupRoad();
   setupObjects();
+
   setupControllers();
   setupWindowEvents();
   setupRenderer();
-  setupRoad();
   setupSocket(socket, pid, players);
 }

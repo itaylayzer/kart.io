@@ -1,3 +1,3 @@
-export function getNameFromURL(){
-    return window.location.pathname.split('/').at(-1)!;
+export function getNameFromURL() {
+  return decodeURIComponent(window.location.pathname.split("/").at(-1)!);
 }
