@@ -14,13 +14,4 @@ export default defineConfig({
   build: {
     outDir: "docs",
   },
-  server: {
-    proxy: {
-      "/socket.io": {
-        target: "http://localhost:3001", // The address of your Socket.IO server
-        changeOrigin: true,
-        ws: true,
-      },
-    },
-  },
 });

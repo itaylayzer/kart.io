@@ -1,11 +1,8 @@
-# Playground FPS
+# kart.io
 
-a kart playeground created with three.js and cannon-es \
+a kart racing game created with three.js and cannon-es, based on the [playground-kart](https://itaylayzer.github.io/playground-kart)
 
-the reason i created this playground is beacuse i found out that creating a kart controller was difficult (couldnt find one that worked like i wanted), so i created myself. in the style of Mario Kart games.
-
-also had some use with three-nebula and mutch more. \
-this playground isnt perfect, it misses alot of things, but it sure is the basic of karting game.
+to 
 
 ## credits
 

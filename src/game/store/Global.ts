@@ -1,4 +1,4 @@
-import { LOD, Mesh, PerspectiveCamera, Scene, WebGLRenderer } from "three";
+import { CatmullRomCurve3, LOD, Mesh, PerspectiveCamera, Scene, WebGLRenderer } from "three";
 import { MouseController } from "../controller/MouseController";
 import { CameraController } from "../controller/CameraController";
 
@@ -31,4 +31,5 @@ export class Global {
   public static lod: LOD;
   public static composer:EffectComposer;
   public static render:Action;
+  public static curve:CatmullRomCurve3;
 }

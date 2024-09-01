@@ -15,27 +15,49 @@ export const useIndexScreen = () => {
   );
   const [rooms, setRooms] = useState<Room[] | Error | undefined>();
   const [roomName, setRoomName] = useState<string>("");
-  const [room, setRoom] = useState<number>(3001);
+  const [room, setRoom] = useState<[number, string]>([3001, "local"]);
   async function loadRooms() {
     setRooms(undefined);
-    try {
-      const response = await fetch(`http://${ip}:3000/list`);
-      setRooms((await response.json()) as Room[]);
-    } catch (er) {
-      setRooms(er as Error);
-    }
+    setRooms(
+      await new Promise<Room[] | Error | undefined>(async (resolve) => {
+        const timeout = setTimeout(() => {
+          resolve(new Error("timeout"));
+        }, 5000);
+
+        try {
+          const response = await fetch(`http://${ip}:3000/list`);
+          clearTimeout(timeout);
+          resolve((await response.json()) as Room[]);
+        } catch (er) {
+          toast("Cannot Connect", {
+            type: "error",
+          });
+          clearTimeout(timeout);
+
+          resolve(er as Error);
+        }
+      })
+    );
   }
 
   async function createRoom() {
-    const response = await fetch(`http://${ip}:3000/register/${roomName}`);
-    const value = await response.text();
-    if (value.startsWith("p")) {
-      toast(value);
-      setRoom(parseInt(value.substring(1)));
-      setScreen(4);
-    } else {
-      toast(["No More Ports to Open", "Server Error"][parseInt(value) - 1]);
-      setScreen(2);
+    try {
+      const response = await fetch(`http://${ip}:3000/register/${roomName}`);
+      const value = await response.text();
+      if (value.startsWith("p")) {
+        setRoom([parseInt(value.substring(1)), roomName]);
+        setScreen(3);
+      } else {
+        toast(["No More Ports to Open", "Server Error"][parseInt(value) - 1], {
+          type: "error",
+        });
+        setScreen(1);
+      }
+    } catch {
+      toast("Cannot Connect", {
+        type: "error",
+      });
+      setScreen(1);
     }
   }
 
@@ -52,7 +74,7 @@ export const useIndexScreen = () => {
     loadRooms,
     rooms,
     createRoom,
-     setRoomName,
+    setRoomName,
     setRoom,
   };
 };

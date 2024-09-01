@@ -5,11 +5,17 @@ import { PhysicsObject } from "./physics/PhysicsMesh";
 import * as THREE from "three";
 import System, { SpriteRenderer } from "three-nebula";
 import { WorldMap } from "./player/WorldMap";
+import { Socket } from "socket.io-client";
 
-export default (assets: loadedAssets, room: number, name: string) => {
+export default (
+  assets: loadedAssets,
+  socket: Socket,
+  pid: number,
+  players: Map<number, [string, string, boolean]>
+) => {
   Global.assets = assets;
 
-  setupWorld(room, name);
+  setupWorld(socket, pid, players);
 
   Global.system = new System();
   Global.system.addRenderer(new SpriteRenderer(Global.scene, THREE));

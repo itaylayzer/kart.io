@@ -14,7 +14,6 @@ const colorArray = [
 
 export class Player extends PhysicsObject {
   public static clients: Map<number, Player>;
-
   public disconnect: () => void;
   static {
     this.clients = new Map();
@@ -46,7 +45,6 @@ export class Player extends PhysicsObject {
 
     const engine = new DriveController(5, this, this.keyboard);
     const model = new PlayerModel(this, keyboard, name, colorSet, isLocal);
-
     this.update = [
       () => {
         keyboard.firstUpdate();

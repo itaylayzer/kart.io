@@ -20,7 +20,7 @@ export default function () {
   const startsLocationsGenerator = createStartLocationsGenerator(
     curve.getPoints(1000),
     1000,
-    0
+    990
   );
   return { mysteryLocations, startsLocationsGenerator };
 }

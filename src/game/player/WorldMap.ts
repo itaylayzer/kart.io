@@ -1,15 +1,12 @@
-import { createVectorsFromNumbers } from "../api/setup/road";
-import { curvePoints } from "../constants/road";
 import * as THREE from "three";
 import { Player } from "./Player";
 import { MysteryBox } from "../api/meshes/MysteryBox";
+import { Global } from "../store/Global";
 export class WorldMap {
   public update: () => void;
 
   constructor() {
-    const curve = new THREE.CatmullRomCurve3(
-      createVectorsFromNumbers(curvePoints)
-    );
+    const curve = Global.curve;
     const points = curve.getPoints(500);
 
     const maxPoint = points.reduce(
