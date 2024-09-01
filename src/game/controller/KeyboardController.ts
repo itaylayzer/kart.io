@@ -35,6 +35,9 @@ export class KeyboardController extends IKeyboardController {
           }
         }
       }
+      oldButtons = updatedButtons;
+
+      if (updatedButtons[14] || updatedButtons[15]) return;
 
       if (gamePad.axes[0] > 0.2 && !this.keysPressed.has(-16)) {
         this.keysDown.add(-16);
@@ -52,8 +55,6 @@ export class KeyboardController extends IKeyboardController {
           this.keysPressed.delete(-15);
         }
       }
-
-      oldButtons = updatedButtons;
     };
   }
 

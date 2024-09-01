@@ -1,4 +1,4 @@
-import { loadedAssets } from "../viewmodels/useAssetLoader";
+import { loadedAssets } from "../store/useAssetLoader";
 import setupWorld from "./api/setup/world";
 import { Global } from "./store/Global";
 import { PhysicsObject } from "./physics/PhysicsMesh";
@@ -7,14 +7,17 @@ import System, { SpriteRenderer } from "three-nebula";
 import { WorldMap } from "./player/WorldMap";
 import { Socket } from "socket.io-client";
 import { Scoreboard } from "./player/Scoreboard";
+import { settingsType } from "../store/useSettingsStore";
 
 export default (
   assets: loadedAssets,
   socket: Socket,
   pid: number,
-  players: Map<number, [string, string, boolean]>
+  players: Map<number, [string, string, boolean]>,
+  settings: settingsType = { fovChange: 0.5, useArrow: false }
 ) => {
   Global.assets = assets;
+  Global.settings = settings;
 
   const scoreboard = new Scoreboard();
   setupWorld(socket, pid, players);
@@ -25,7 +28,7 @@ export default (
   const clock = new THREE.Clock();
 
   const map = new WorldMap();
-
+  Global.lockController.lock();
   const animate = () => {
     Global.deltaTime = clock.getDelta();
 
@@ -35,7 +38,7 @@ export default (
     Global.lateUpdates.map((f) => f());
 
     scoreboard.update();
-    
+
     Global.system.update();
     Global.render();
     Global.world.step(2.6 * Global.deltaTime);
