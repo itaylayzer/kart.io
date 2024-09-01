@@ -33,9 +33,6 @@ export function Index() {
                 items={{
                   car: "fbx/kart.glb",
                   // sfx_throw:"https://soxundbible.com/mp3/kung_fu_punch-Mike_Koenig-2097967259.mp3"
-                  sfx_throw: "sfx/throw.mp3",
-                  sfx_exp: "sfx/exp.mp3",
-                  sfx_shoot: "sfx/shoot.mp3",
                   txt_circle: "textures/circle.png",
                   txt_road: "textures/CentralMarking.png",
                   mystery: "textures/mystery.png",
@@ -69,7 +66,7 @@ export function Index() {
               <br />
               First go into this website, and make your browser accepts this
               domain:{" "}
-              <a href={`http://${ip}:${port}`}>
+              <a href={`https://${ip}:${port}`}>
                 {ip}:{port}
               </a>{" "}
               <br />

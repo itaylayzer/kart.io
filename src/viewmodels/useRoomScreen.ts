@@ -19,8 +19,9 @@ export const useRoomScreen = (room: number, goBack: () => void) => {
   useEffect(() => {
     // join server
     const playersMap = new Map<number, Player>();
-    const socket = io(`http://${ip}:${room}`, {
+    const socket = io(`wss://${ip}:${room}`, {
       transports: ["websocket"],
+      secure: true,
     });
 
     socket.on("connect", () => {

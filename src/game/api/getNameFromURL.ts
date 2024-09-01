@@ -1,3 +1,4 @@
 export function getNameFromURL() {
-  return decodeURIComponent(window.location.pathname.split("/").at(-1)!);
+  const name = new URLSearchParams(window.location.search).get("name")!;
+  return name ?? "";
 }

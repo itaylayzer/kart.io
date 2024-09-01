@@ -3,11 +3,13 @@ import { create } from "zustand";
 export type settingsType = {
   useArrow: boolean;
   fovChange: number; // between 0 to 1
+  masterVolume: number; // between 0 to 1
 };
 
 const defualtValue: settingsType = {
   useArrow: false,
   fovChange: 0.5,
+  masterVolume: 1,
 };
 
 type SettingsStore = settingsType & {

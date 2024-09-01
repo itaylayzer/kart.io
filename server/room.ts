@@ -1,10 +1,11 @@
 import express from "express";
-import { createServer } from "http";
+import { createServer } from "https";
 import { Server, Socket } from "socket.io";
 import { CC, CS } from "./store/codes";
 import cors from "cors";
 import setup from "./api/setup";
 import msgpack from "msgpack-lite";
+import { credentials } from "./store/credentials";
 
 type Player = {
   socket: Socket;
@@ -22,7 +23,7 @@ export class Room {
   public isGameStarted: () => boolean;
   constructor(port: number, public name, removeFromList: () => void) {
     const app = express();
-    const server = createServer(app);
+    const server = createServer(credentials, app);
     const io = new Server(server, {
       transports: ["websocket"],
       cors: { origin: "*" },
