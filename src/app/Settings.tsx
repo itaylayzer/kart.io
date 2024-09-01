@@ -2,6 +2,7 @@ import { useSettingsScreen } from "../viewmodels/useSettingsScreen";
 import Slider from "@mui/material/Slider";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
+import Switch from "@mui/material/Switch";
 export function Settings({ goBack }: { goBack: () => void }) {
   const {
     loadFromCookies,
@@ -11,6 +12,9 @@ export function Settings({ goBack }: { goBack: () => void }) {
     useArrow,
     fovChange,
     masterVolume,
+    displaySun,
+    useBloom,
+    renderColliders,
   } = useSettingsScreen();
 
   return (
@@ -54,7 +58,7 @@ export function Settings({ goBack }: { goBack: () => void }) {
           </td>
         </tr>
         <tr>
-          <td>Master Volume</td>{" "}
+          <td>Master Volume</td>
           <td style={{ display: "flex", gap: 20 }}>
             <Slider
               min={0}
@@ -65,6 +69,33 @@ export function Settings({ goBack }: { goBack: () => void }) {
               onChange={(_, value) => set({ masterVolume: value as number })}
             />
             <p style={{ fontFamily: "monospace" }}>{masterVolume.toFixed(2)}</p>
+          </td>
+        </tr>
+        <tr>
+          <td>Display Sun</td>
+          <td style={{ display: "flex", justifyContent: "end", width: 215 }}>
+            <Switch
+              checked={displaySun}
+              onChange={(_, value) => set({ displaySun: value })}
+            />
+          </td>
+        </tr>
+        <tr>
+          <td>Use Bloom</td>
+          <td style={{ display: "flex", justifyContent: "end", width: 215 }}>
+            <Switch
+              checked={useBloom}
+              onChange={(_, value) => set({ useBloom: value })}
+            />
+          </td>
+        </tr>
+        <tr>
+          <td>Render Colliders</td>
+          <td style={{ display: "flex", justifyContent: "end", width: 215 }}>
+            <Switch
+              checked={renderColliders}
+              onChange={(_, value) => set({ renderColliders: value })}
+            />
           </td>
         </tr>
       </table>

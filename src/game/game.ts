@@ -14,7 +14,7 @@ export default (
   socket: Socket,
   pid: number,
   players: Map<number, [string, string, boolean]>,
-  settings: settingsType = { fovChange: 0.5, useArrow: false }
+  settings: settingsType
 ) => {
   Global.assets = assets;
   Global.settings = settings;
@@ -45,7 +45,7 @@ export default (
 
     map.update();
 
-    // Global.cannonDebugger.update();
+    if (Global.settings.renderColliders) Global.cannonDebugger.update();
     Global.mouseController.lastUpdate();
   };
 

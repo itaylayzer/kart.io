@@ -49,7 +49,7 @@ function updateCanvas(name: string) {
 
 // Create a texture from the canvas
 function createNameTexture(
-  name: string,
+  name: string
 ): [THREE.CanvasTexture, number, number] {
   const [updatedCanvas, width, height] = updateCanvas(name);
   const texture = new THREE.CanvasTexture(updatedCanvas);
@@ -59,9 +59,7 @@ function createNameTexture(
 }
 
 // Create the sprite
-function createNameSprite(
-  name: string,
-): [THREE.Sprite, number, number] {
+function createNameSprite(name: string): [THREE.Sprite, number, number] {
   const [texture, width, height] = createNameTexture(name);
   const spriteMaterial = new THREE.SpriteMaterial({
     map: texture,
@@ -73,7 +71,6 @@ function createNameSprite(
 
   return [sprite, width, height];
 }
-
 
 export default function (name: string) {
   const group = new THREE.Group();
