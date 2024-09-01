@@ -7,11 +7,11 @@ import * as CANNON from "cannon-es";
 import { PlayerModel } from "./PlayerModel";
 import { TrackerController } from "../controller/TrackerController";
 
-const colorArray = [
-  ["#124eb5", 10],
-  ["#ff0000", 4],
-  ["green", 10],
-] as Array<[string, number]>;
+const colorArray = {
+  "#124eb5": 10,
+  "#ff0000": 4,
+  "#00ff00": 10,
+};
 
 export class Player extends PhysicsObject {
   public static clients: Map<number, Player>;
@@ -26,12 +26,15 @@ export class Player extends PhysicsObject {
     public pid: number,
     isLocal: boolean,
     public name: string,
+    public colorFromServer: string,
     public keyboard: IKeyboardController
   ) {
     const radius = 0.8 / 3;
 
-    const colorSet = colorArray[pid % colorArray.length];
-    const color = "#" + new THREE.Color(colorSet[0]).getHexString();
+    const colorSetEmissive =
+      colorArray[colorFromServer as keyof typeof colorArray]!;
+    console.log(colorSetEmissive);
+    const color = "#" + new THREE.Color(colorFromServer).getHexString();
 
     super(new THREE.Object3D(), {
       shape: new CANNON.Cylinder(radius, radius, radius),
@@ -48,7 +51,13 @@ export class Player extends PhysicsObject {
     pid !== undefined && Player.clients.set(pid, this);
 
     const engine = new DriveController(5, this, this.keyboard);
-    const model = new PlayerModel(this, keyboard, name, colorSet, isLocal);
+    const model = new PlayerModel(
+      this,
+      keyboard,
+      name,
+      [color, colorSetEmissive],
+      isLocal
+    );
     this.update = [
       () => {
         keyboard.firstUpdate();

@@ -16,7 +16,7 @@ type Player = {
   ready: boolean;
 };
 
-const COLORS = ["red", "blue", "green", "white"];
+const COLORS = ["#124eb5", "#ff0000", "#00ff00"];
 export class Room {
   public close: () => void;
   public players: Map<number, Player>;
