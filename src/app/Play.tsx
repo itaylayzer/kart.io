@@ -21,9 +21,12 @@ export function Play({
       <p id="wrong" style={styles.wrong}>
         YOU'R FACING THE WRONG DIRECTION
       </p>
-      <p id="position" style={styles.position}>
-        0
-      </p>
+      <div
+        id="position"
+        style={{ bottom: 10, zIndex: 10, position: "absolute", gap: 10 }}
+      >
+        <div style={styles.position}></div> <div style={styles.position}></div>
+      </div>
       <canvas id="map" width={500} height={500} style={styles.map} />
 
       <main>
@@ -53,16 +56,10 @@ const styles = useStyles({
   },
 
   position: {
-    position: "absolute",
-    bottom: 10,
-    left: 10,
     backgroundColor: "#050505",
-    margin: 0,
-    color: "white",
-    fontFamily: "New Super Mario Font U",
-    padding: "4px 16px",
-    borderRadius: "4px",
-    fontSize: 20,
+    paddingBlock: 4,
+    paddingInline: 16,
+    borderRadius: 4,
   },
   map: {
     position: "absolute",

@@ -25,6 +25,7 @@ export class Room {
     const server = createServer(app);
     const io = new Server(server, {
       transports: ["websocket"],
+      cors: { origin: "*" },
     });
 
     const players = new Map<number, Player>();
@@ -39,7 +40,7 @@ export class Room {
       return COLORS[colorIndex++ % COLORS.length];
     };
 
-    app.use(cors());
+    app.use(cors({ origin: "*" }));
 
     app.get("/", (req, res) => {
       res.status(200).send("hi");

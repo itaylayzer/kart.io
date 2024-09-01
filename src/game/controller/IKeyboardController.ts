@@ -1,5 +1,6 @@
 import { lerp } from "three/src/math/MathUtils.js";
 import { Global } from "../store/Global";
+import clamp from "../api/clamp";
 
 const HORIZONTAL = 0;
 const VERTICAL = 1;
@@ -11,7 +12,7 @@ export class IKeyboardController {
   public keysUp: Set<number>;
   public keysPressed: Set<number>;
   public keysAxis: [[number, number], [number, number]];
-
+  public beforeFirstUpdate: () => void;
   constructor() {
     this.keysDown = new Set();
     this.keysUp = new Set();
@@ -20,6 +21,7 @@ export class IKeyboardController {
       [0, 0],
       [0, 0],
     ];
+    this.beforeFirstUpdate = () => {};
   }
 
   public isKeyPressed(code: number): boolean {
@@ -35,11 +37,25 @@ export class IKeyboardController {
   }
 
   public firstUpdate() {
+    this.beforeFirstUpdate();
+
     // Input axis processing
-    this.keysAxis[RAW_AXIS][VERTICAL] =
-      +this.isKeyPressed(87) + -this.isKeyPressed(83);
-    this.keysAxis[RAW_AXIS][HORIZONTAL] =
-      +this.isKeyPressed(65) + -this.isKeyPressed(68);
+    this.keysAxis[RAW_AXIS][VERTICAL] = clamp(
+      +this.isKeyPressed(87) +
+        -this.isKeyPressed(83) +
+        +this.isKeyPressed(-1) +
+        -this.isKeyPressed(-2),
+      -1,
+      1
+    );
+    this.keysAxis[RAW_AXIS][HORIZONTAL] = clamp(
+      +this.isKeyPressed(65) +
+        -this.isKeyPressed(68) +
+        +this.isKeyPressed(-15) +
+        -this.isKeyPressed(-16),
+      -1,
+      1
+    );
 
     for (let index = 0; index < 2; index++) {
       // Smoothing inputs

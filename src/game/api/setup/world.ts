@@ -152,7 +152,7 @@ function setupRoad() {
   Global.scene.add(rod);
 
   const sun = new THREE.Mesh(
-    new THREE.SphereGeometry(50, 10, 10),
+    new THREE.SphereGeometry(25, 10, 10),
     new THREE.MeshPhongMaterial({
       color: "gold",
       emissive: "gold",

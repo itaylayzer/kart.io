@@ -138,10 +138,10 @@ export class DriveController {
   }
 
   update() {
-    if (this.keyboard.isKeyDown(32)) {
+    if (this.keyboard.isKeyDown(32) || this.keyboard.isKeyDown(-6)) {
       this.driftSide[0] = this.keyboard.horizontalRaw * 0.6;
     }
-    if (this.keyboard.isKeyUp(32)) {
+    if (this.keyboard.isKeyUp(32) || this.keyboard.isKeyUp(-6)) {
       this.driftSide[0] = 0;
     }
 

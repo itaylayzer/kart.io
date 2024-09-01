@@ -1,5 +1,6 @@
 import { TrackerController } from "../controller/TrackerController";
 import { Global } from "../store/Global";
+import { LocalPlayer } from "./LocalPlayer";
 
 export class Scoreboard {
   public update: () => void;
@@ -11,7 +12,8 @@ export class Scoreboard {
     this.update = () => {
       const showing =
         Global.lockController.isLocked &&
-        Global.mouseController.isMousePressed(2);
+        (Global.mouseController.isMousePressed(2) ||
+          LocalPlayer.getInstance().keyboard.isKeyPressed(-5));
       tableHTML.style.visibility = ["hidden", "visible"][+showing];
       tableHTML.style.pointerEvents = ["none", "all"][+showing];
 
