@@ -1,3 +1,4 @@
+import { audio } from "@/src/lib/AudioContainer";
 import { Global } from "../store/Global";
 
 export class PauseMenu {
@@ -21,10 +22,20 @@ export class PauseMenu {
       window.location.reload();
     };
 
+    let lastShowing = false;
+    audio().setCentered(true);
+
     Global.updates.push(() => {
       const showing = !Global.lockController.isLocked;
+
+      if (lastShowing !== showing) {
+        audio().setVisible(showing);
+      }
+
       pauseMenu.style.visibility = ["hidden", "visible"][+showing];
       pauseMenu.style.pointerEvents = ["none", "all"][+showing];
+
+      lastShowing = showing;
     });
   }
 }

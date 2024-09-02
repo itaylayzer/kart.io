@@ -9,6 +9,7 @@ import { BiErrorAlt } from "react-icons/bi";
 import { Settings } from "./Settings";
 import "react-tooltip/dist/react-tooltip.css";
 import { Tooltip } from "react-tooltip";
+import { AudioContainer } from "../lib/AudioContainer";
 
 export function Index() {
   const {
@@ -21,6 +22,7 @@ export function Index() {
     room,
     setRoom,
   } = useIndexScreen();
+
   return (
     <>
       <Condition
@@ -54,6 +56,9 @@ export function Index() {
           backgroundColor: "#020202",
           zIndex: 3,
           fontFamily: "monospace",
+          color: "white",
+          opacity: 1,
+          fontWeight: 400,
         }}
       />
       <ToastContainer
@@ -67,6 +72,7 @@ export function Index() {
         closeButton={false}
         theme="dark"
       />
+      <AudioContainer />
       <Listed
         index={screenIndex}
         childrens={[
@@ -204,7 +210,7 @@ export function Index() {
                 <button
                   data-tooltip-id="t"
                   data-tooltip-content={"Reload Rooms"}
-                  className="mini"
+                  className="r mini"
                   onClick={() => loadRooms()}
                 >
                   reload
@@ -212,7 +218,7 @@ export function Index() {
                 <button
                   data-tooltip-id="t"
                   data-tooltip-content={"Create Room"}
-                  className="mini"
+                  className="r mini"
                   onClick={() => setScreen(2)}
                 >
                   create
@@ -220,7 +226,7 @@ export function Index() {
                 <button
                   data-tooltip-id="t"
                   data-tooltip-content={"Credits Page"}
-                  className="mini"
+                  className="r mini"
                   onClick={() => setScreen(3)}
                 >
                   credits
@@ -228,7 +234,7 @@ export function Index() {
                 <button
                   data-tooltip-id="t"
                   data-tooltip-content={"Settings Page"}
-                  className="mini"
+                  className="r mini"
                   onClick={() => setScreen(4)}
                 >
                   settings
@@ -256,6 +262,7 @@ export function Index() {
               <br />
               <div style={{ display: "flex", justifyContent: "space-around" }}>
                 <button
+                  className="r"
                   onClick={() => {
                     setScreen(1);
                   }}
@@ -263,6 +270,7 @@ export function Index() {
                   cancel
                 </button>
                 <button
+                  className="r"
                   onClick={() => {
                     createRoom();
                   }}
@@ -317,11 +325,19 @@ export function Index() {
                 New Super Mario Font U -
                 https://www.cdnfonts.com/new-super-mario-font-u.font{" "}
               </p>
+              <h3>Music by Zane Little Music</h3>
+              <p> barriers - https://opengameart.org/content/barriers</p>
+              <p>
+                {" "}
+                rhythm factory - https://opengameart.org/content/rhythm-factory
+              </p>
+              <p> apple cider - https://opengameart.org/content/apple-cider</p>
             </div>
             <br />
             <center>
               {" "}
               <button
+                className="r"
                 onClick={() => {
                   setScreen(1);
                 }}

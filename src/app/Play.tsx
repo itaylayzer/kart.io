@@ -37,8 +37,8 @@ export function Play({
         <div id="pauseMenu">
           <h5>Game Paused</h5>
           <p>but the server, keeps playing</p>
-          <button id="resume">Resume</button>
-          <button id="disconnect">Disconnect</button>
+          <button className="r" id="resume">Resume</button>
+          <button className="r" id="disconnect">Disconnect</button>
         </div>
       </main>
 
