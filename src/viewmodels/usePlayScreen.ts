@@ -8,7 +8,7 @@ import { useSettingsStore } from "../store/useSettingsStore";
 export const usePlayScreen = (
   socket: Socket,
   pid: number,
-  players: Map<number, [string, string, boolean]>
+  players: Map<number, [string, number, boolean]>
 ) => {
   const assets = useAssetStore();
   const settings = useSettingsStore();

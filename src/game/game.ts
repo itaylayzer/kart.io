@@ -13,7 +13,7 @@ export default (
   assets: loadedAssets,
   socket: Socket,
   pid: number,
-  players: Map<number, [string, string, boolean]>,
+  players: Map<number, [string, number, boolean]>,
   settings: settingsType
 ) => {
   Global.assets = assets;
@@ -30,25 +30,32 @@ export default (
   const map = new WorldMap();
   Global.lockController.lock();
   const animate = () => {
-    Global.deltaTime = clock.getDelta();
+    try {
+      Global.deltaTime = clock.getDelta();
 
-    Global.updates
-      .concat(PhysicsObject.childrens.flatMap((v) => v.update))
-      .map((fn) => fn());
-    Global.lateUpdates.map((f) => f());
+      Global.updates
+        .concat(PhysicsObject.childrens.flatMap((v) => v.update))
+        .map((fn) => fn());
+      Global.lateUpdates.map((f) => f());
 
-    scoreboard.update();
+      scoreboard.update();
 
-    Global.system.update();
-    Global.render();
-    Global.world.step(2.6 * Global.deltaTime);
+      Global.system.update();
+      Global.render();
+      try {
+        Global.world.step(2.6 * Global.deltaTime);
+      } catch (er) {
+        console.error(er);
+      }
 
-    map.update();
+      map.update();
 
-    if (Global.settings.renderColliders) Global.cannonDebugger.update();
-    Global.mouseController.lastUpdate();
+      if (Global.settings.renderColliders) Global.cannonDebugger.update();
+      Global.mouseController.lastUpdate();
+    } catch (er) {
+      console.error(er);
+    }
   };
-
   setInterval(animate, 1000 / 120);
 
   return {

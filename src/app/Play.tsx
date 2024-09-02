@@ -10,7 +10,7 @@ export function Play({
   socket: Socket;
 
   pid: number;
-  players: Map<number, [string, string, boolean]>;
+  players: Map<number, [string, number, boolean]>;
 }) {
   usePlayScreen(socket, pid, players);
 

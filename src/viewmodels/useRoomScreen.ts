@@ -6,7 +6,7 @@ import { CC, CS } from "@/server/store/codes";
 import { toast } from "react-toastify";
 import { ip } from "./useIndexScreen";
 
-type Player = [string, string, boolean];
+type Player = [string, number, boolean];
 
 export const useRoomScreen = (room: number, goBack: () => void) => {
   const [players, setPlayers] = useState<Map<number, Player>>();
@@ -34,7 +34,7 @@ export const useRoomScreen = (room: number, goBack: () => void) => {
     });
     socket.on(
       CC.INIT,
-      (data: false | [number, string, [number, ...Player][]]) => {
+      (data: false | [number, number, [number, ...Player][]]) => {
         if (data === false) {
           toast("Game Started", { type: "error" });
           goBack();
@@ -53,7 +53,7 @@ export const useRoomScreen = (room: number, goBack: () => void) => {
       }
     );
 
-    socket.on(CC.NEW_PLAYER, ([pid, name, color]: [number, string, string]) => {
+    socket.on(CC.NEW_PLAYER, ([pid, name, color]: [number, string, number]) => {
       playersMap.set(pid, [name, color, false]);
 
       setPlayers(new Map(playersMap));

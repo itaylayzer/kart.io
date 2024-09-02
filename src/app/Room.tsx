@@ -1,4 +1,5 @@
 import { Condition } from "../components/Condition";
+import { COLORS } from "../game/player/Player";
 import { useRoomScreen } from "../viewmodels/useRoomScreen";
 import { Play } from "./Play";
 import { GoDotFill } from "react-icons/go";
@@ -67,7 +68,7 @@ export function Room({
                       >
                         <div>
                           <GoDotFill
-                            color={p[1]}
+                            color={COLORS[p[1]]}
                             style={{ marginBlock: "auto" }}
                           />
                           <p> {p[0]}</p>{" "}
