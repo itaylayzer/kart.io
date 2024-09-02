@@ -12,11 +12,11 @@ type Player = {
   pid: number;
   name: string;
   transform: number[];
-  color: string;
+  color: number;
   ready: boolean;
 };
 
-const COLORS = ["#124eb5", "#ff0000", "#00ff00"];
+const COLORS_LENGTH = 3;
 export class Room {
   public close: () => void;
   public players: Map<number, Player>;
@@ -38,7 +38,7 @@ export class Room {
     let nextId = 0;
 
     const randomColor = () => {
-      return COLORS[colorIndex++ % COLORS.length];
+      return colorIndex++ % COLORS_LENGTH;
     };
 
     app.use(cors({ origin: "*" }));

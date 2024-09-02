@@ -169,14 +169,14 @@ function setupRoad() {
 
 function setupSocket(
   socket: Socket,
-  pid: number,
-  players: Map<number, [string, string, boolean]>
+  localID: number,
+  players: Map<number, [string, number, boolean]>
 ) {
   Global.socket = socket;
 
-  for (const [id, player] of players.entries()) {
-    if (pid === id) new LocalPlayer(id, player[0], player[1]);
-    else new OnlinePlayer(id, player[0],  player[1]);
+  for (const [playerID, playerInfo] of players.entries()) {
+    if (localID === playerID) new LocalPlayer(playerID, playerInfo[0], playerInfo[1]);
+    else new OnlinePlayer(playerID, playerInfo[0], playerInfo[1]);
   }
 
   Global.socket.on(
@@ -185,8 +185,8 @@ function setupSocket(
       [number, number[]][],
       number[]
     ]) => {
-      for (const [ptID, ptTransform] of playerTransforms) {
-        const xplayer = Player.clients.get(ptID);
+      for (const [playerID, ptTransform] of playerTransforms) {
+        const xplayer = Player.clients.get(playerID);
         if (xplayer === undefined) continue;
         xplayer.applyTransform(ptTransform);
         xplayer.tracker.reset();
@@ -326,7 +326,7 @@ function setupRenderer() {
 export default function (
   socket: Socket,
   pid: number,
-  players: Map<number, [string, string, boolean]>
+  players: Map<number, [string, number, boolean]>
 ) {
   setupScene();
   setupPhysicsWorld();
@@ -337,5 +337,6 @@ export default function (
   setupControllers();
   setupWindowEvents();
   setupRenderer();
-  setupSocket(socket, pid, players);
+  
+  requestAnimationFrame(() => setupSocket(socket, pid, players));
 }
