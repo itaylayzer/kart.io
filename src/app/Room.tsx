@@ -99,8 +99,8 @@ export function Room({
 
                     <br />
                     <div style={{ display: "flex", gap: 10 }}>
-                      <button onClick={() => disconnect()}>Disconnect</button>
-                      <button onClick={() => toggleReady()}>
+                      <button className="r" onClick={() => disconnect()}>Disconnect</button>
+                      <button className="r" onClick={() => toggleReady()}>
                         {["Ready", "Unready"][+ready]}
                       </button>
                     </div>

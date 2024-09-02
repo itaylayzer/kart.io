@@ -4,22 +4,28 @@ export type settingsType = {
   useArrow: boolean;
   fovChange: number; // between 0 to 1
   masterVolume: number; // between 0 to 1
+  musicVolume: number;
+  sfxVolume: number;
   useBloom: boolean;
   displaySun: boolean;
   displayVelocity: boolean;
   renderColliders: boolean;
   Antialiasing: boolean;
+  displayAudio: boolean;
 };
 
 const defualtValue: settingsType = {
   useArrow: false,
   fovChange: 0.5,
-  masterVolume: 1,
+  masterVolume: 0.5,
   useBloom: true,
   displaySun: true,
   renderColliders: false,
   displayVelocity: true,
   Antialiasing: true,
+  musicVolume: 0.5,
+  sfxVolume: 1,
+  displayAudio: true,
 };
 
 type SettingsStore = settingsType & {

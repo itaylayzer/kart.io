@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { getNameFromURL } from "../game/api/getNameFromURL";
 import { useSettingsStore } from "../store/useSettingsStore";
+import { audio } from "../lib/AudioContainer";
 
 type Room = [number, string, number];
 
@@ -11,13 +12,17 @@ export const useIndexScreen = () => {
   const settingsStore = useSettingsStore();
 
   useEffect(() => {
+    audio().play(
+      ["Rhythm Factory", "Zane Little Music"],
+      "./audios/rhythm_factory.mp3"
+    );
     settingsStore.loadFromCookies();
   }, []);
 
   const [playerName, setPlayerName] = useState<string | undefined>(
     getNameFromURL()
   );
-  
+
   const [screenIndex, setScreen] = useState<number>(
     playerName === undefined || playerName.length < 3 ? 0 : 1
   );
@@ -51,7 +56,9 @@ export const useIndexScreen = () => {
 
   async function createRoom() {
     try {
-      const response = await fetch(`https://${ip}:${port}/register/${roomName}`);
+      const response = await fetch(
+        `https://${ip}:${port}/register/${roomName}`
+      );
       const value = await response.text();
       if (value.startsWith("p")) {
         setRoom([parseInt(value.substring(1)), roomName]);
