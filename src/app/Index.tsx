@@ -7,6 +7,9 @@ import AssetLoader from "../components/AssetLoader";
 import { FidgetSpinner } from "react-loader-spinner";
 import { BiErrorAlt } from "react-icons/bi";
 import { Settings } from "./Settings";
+import "react-tooltip/dist/react-tooltip.css";
+import { Tooltip } from "react-tooltip";
+
 export function Index() {
   const {
     createRoom,
@@ -44,6 +47,14 @@ export function Index() {
             </header>
           </>
         }
+      />
+      <Tooltip
+        id="t"
+        style={{
+          backgroundColor: "#020202",
+          zIndex: 3,
+          fontFamily: "monospace",
+        }}
       />
       <ToastContainer
         position="bottom-right"
@@ -190,16 +201,36 @@ export function Index() {
                   minWidth: "100%",
                 }}
               >
-                <button className="mini" onClick={() => loadRooms()}>
+                <button
+                  data-tooltip-id="t"
+                  data-tooltip-content={"Reload Rooms"}
+                  className="mini"
+                  onClick={() => loadRooms()}
+                >
                   reload
                 </button>
-                <button className="mini" onClick={() => setScreen(2)}>
+                <button
+                  data-tooltip-id="t"
+                  data-tooltip-content={"Create Room"}
+                  className="mini"
+                  onClick={() => setScreen(2)}
+                >
                   create
                 </button>
-                <button className="mini" onClick={() => setScreen(3)}>
+                <button
+                  data-tooltip-id="t"
+                  data-tooltip-content={"Credits Page"}
+                  className="mini"
+                  onClick={() => setScreen(3)}
+                >
                   credits
                 </button>
-                <button className="mini" onClick={() => setScreen(4)}>
+                <button
+                  data-tooltip-id="t"
+                  data-tooltip-content={"Settings Page"}
+                  className="mini"
+                  onClick={() => setScreen(4)}
+                >
                   settings
                 </button>
               </div>

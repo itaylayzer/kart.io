@@ -41,6 +41,10 @@ export function Play({
           <button id="disconnect">Disconnect</button>
         </div>
       </main>
+
+      <p id="velocity" style={styles.velocity}>
+        0.00 KM/S
+      </p>
     </>
   );
 }
@@ -83,5 +87,16 @@ const styles = useStyles({
     padding: "10px 20px",
     borderRadius: "8px",
     fontSize: 25,
+  },
+  velocity: {
+    position: "absolute",
+    bottom: 10,
+    right: 10,
+    zIndex: 3,
+    backgroundColor: "#050505",
+    paddingBlock: 4,
+    paddingInline: 16,
+    borderRadius: 4,
+    fontFamily: "New Super Mario Font U",
   },
 });

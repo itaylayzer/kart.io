@@ -4,6 +4,7 @@ import { Global } from "../store/Global";
 import * as THREE from "three";
 import { damp } from "three/src/math/MathUtils.js";
 import { IKeyboardController } from "./IKeyboardController";
+import clamp from "../api/clamp";
 
 const maxDistance = 1;
 export class DriveController {
@@ -12,16 +13,21 @@ export class DriveController {
   private raycaster: THREE.Raycaster;
   private last: CANNON.Vec3;
   private driftSide: [number, number];
+  private driftTime: number;
+  private speedTime: number;
   constructor(
     public maxSpeed: number,
     private body: CANNON.Body,
-    private keyboard: IKeyboardController
+    private keyboard: IKeyboardController,
+    private islocal: boolean
   ) {
     this.steeringAngle = 0;
     this.maxSteeringAngle = 30; // Limit steering angle (30 degrees)
     this.raycaster = new THREE.Raycaster();
     this.last = new CANNON.Vec3();
+    this.driftTime = 0;
     this.driftSide = [0, 0];
+    this.speedTime = 0;
   }
 
   putToGround() {
@@ -140,10 +146,23 @@ export class DriveController {
   update() {
     if (this.keyboard.isKeyDown(32) || this.keyboard.isKeyDown(-6)) {
       this.driftSide[0] = this.keyboard.horizontalRaw * 0.6;
+      this.driftTime = 0;
+    }
+    if (
+      this.driftSide[0] !== 0 &&
+      (this.keyboard.isKeyPressed(32) || this.keyboard.isKeyPressed(-6))
+    ) {
+      this.driftTime += Global.deltaTime;
     }
     if (this.keyboard.isKeyUp(32) || this.keyboard.isKeyUp(-6)) {
       this.driftSide[0] = 0;
+      this.driftTime = 0;
     }
+
+    if (this.keyboard.horizontalRaw !== 0) {
+      this.speedTime = 0;
+    }
+    this.speedTime += Global.deltaTime;
 
     this.driftSide[1] = damp(
       this.driftSide[1],
@@ -152,13 +171,20 @@ export class DriveController {
       Global.deltaTime * 7
     );
 
+    const driftSpeedMultiplier =
+      this.driftTime < 1 ? Math.sqrt(this.driftTime) : 5;
+
+    const timeSpeedMultiplier = clamp((this.speedTime - 1) / 3, 0, 5);
+
     // Determine forward direction
     const forward = new CANNON.Vec3(0, 0, 1);
     this.body.quaternion.vmult(forward, forward);
 
     // Apply forward/reverse force
     const drivingForce = forward.scale(
-      this.keyboard.vertical * this.maxSpeed * 2
+      this.keyboard.vertical *
+        (this.maxSpeed + driftSpeedMultiplier + timeSpeedMultiplier) *
+        2
     );
 
     // Calculate and apply friction (simplified)
@@ -190,5 +216,17 @@ export class DriveController {
     this.body.angularVelocity.scale(angularDamping, this.body.angularVelocity);
 
     this.putToGround();
+
+    const velocityMagnitude = Math.abs(
+      this.body.velocity.dot(
+        this.body.quaternion.vmult(new CANNON.Vec3(0, 0, 1))
+      )
+    );
+
+    this.islocal &&
+      Global.settings.displayVelocity &&
+      (document.querySelector(
+        "p#velocity"
+      )!.innerHTML = `${velocityMagnitude.toFixed(2)} KM/S`);
   }
 }

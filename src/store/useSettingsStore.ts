@@ -6,7 +6,9 @@ export type settingsType = {
   masterVolume: number; // between 0 to 1
   useBloom: boolean;
   displaySun: boolean;
+  displayVelocity: boolean;
   renderColliders: boolean;
+  Antialiasing: boolean;
 };
 
 const defualtValue: settingsType = {
@@ -16,6 +18,8 @@ const defualtValue: settingsType = {
   useBloom: true,
   displaySun: true,
   renderColliders: false,
+  displayVelocity: true,
+  Antialiasing: true,
 };
 
 type SettingsStore = settingsType & {
