@@ -7,12 +7,8 @@ import * as CANNON from "cannon-es";
 import { PlayerModel } from "./PlayerModel";
 import { TrackerController } from "../controller/TrackerController";
 
-const colorArray = {
-  "#124eb5": 10,
-  "#ff0000": 4,
-  "#00ff00": 10,
-};
-
+export const COLORS = ["#124eb5", "#ff0000", "#00ff00"];
+const COLORSEMISSIVE = [10, 4, 10];
 export class Player extends PhysicsObject {
   public static clients: Map<number, Player>;
   public tracker: TrackerController;
@@ -26,20 +22,19 @@ export class Player extends PhysicsObject {
     public pid: number,
     isLocal: boolean,
     public name: string,
-    public colorFromServer: string,
+    public colorFromServer: number,
     public keyboard: IKeyboardController
   ) {
     const radius = 0.8 / 3;
 
-    const colorSetEmissive =
-      colorArray[colorFromServer as keyof typeof colorArray]!;
+    const colorSetEmissive = COLORSEMISSIVE[colorFromServer];
     console.log(colorSetEmissive);
-    const color = "#" + new THREE.Color(colorFromServer).getHexString();
+    const color = "#" + new THREE.Color(COLORS[colorFromServer]).getHexString();
 
     super(new THREE.Object3D(), {
       shape: new CANNON.Cylinder(radius, radius, radius),
       mass: 1,
-      position: new CANNON.Vec3(0, 0, 0),
+      position: new CANNON.Vec3(pid * 10, pid * 10, pid * 10),
       material: new CANNON.Material({ friction: 0, restitution: 0 }),
       collisionFilterGroup: 1,
       collisionFilterMask: ~0,
@@ -48,7 +43,7 @@ export class Player extends PhysicsObject {
     this.tracker = new TrackerController(this, isLocal);
 
     this.color = color;
-    pid !== undefined && Player.clients.set(pid, this);
+    Player.clients.set(pid, this);
 
     const engine = new DriveController(5, this, this.keyboard);
     const model = new PlayerModel(
@@ -73,7 +68,7 @@ export class Player extends PhysicsObject {
       Global.scene.remove(model);
       Global.world.removeBody(this);
 
-      pid !== undefined && Player.clients.delete(pid);
+      Player.clients.delete(pid);
     };
 
     Global.world.addBody(this);
@@ -90,5 +85,8 @@ export class Player extends PhysicsObject {
       this.quaternion.z,
       this.quaternion.w,
     ] = transform;
+
+    this.velocity.setZero();
+    this.force.setZero();
   }
 }

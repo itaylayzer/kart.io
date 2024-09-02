@@ -9,7 +9,7 @@ export class LocalPlayer extends Player {
   static getInstance() {
     return this.instance;
   }
-  constructor(id: number, name: string, color: string) {
+  constructor(id: number, name: string, color: number) {
     super(id, true, name, color, new KeyboardController());
     LocalPlayer.instance = this;
     Global.lateUpdates.push(() => {

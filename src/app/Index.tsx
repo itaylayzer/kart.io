@@ -70,7 +70,8 @@ export function Index() {
                 {ip}:{port}
               </a>{" "}
               <br />
-              Edit this url, and add your username at the end, after the '/'.{" "}
+              Edit this url, and add the string '?name=' and after that your
+              username at the end. for example /kart.io/?name=MyName
             </p>
           </main>,
           <main style={{ display: "flex" }}>
