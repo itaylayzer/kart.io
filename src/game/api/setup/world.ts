@@ -64,7 +64,9 @@ function setupObjects() {
 function setupScene() {
   Global.container = document.querySelector("div.gameContainer")!;
 
-  Global.renderer = new THREE.WebGLRenderer({ antialias: true });
+  Global.renderer = new THREE.WebGLRenderer({
+    antialias: Global.settings.Antialiasing,
+  });
   Global.container.appendChild(Global.renderer.domElement);
   // Global.renderer.sortObjects = false;
   // Global.renderer.shadowMapEnabled = true;
@@ -175,7 +177,8 @@ function setupSocket(
   Global.socket = socket;
 
   for (const [playerID, playerInfo] of players.entries()) {
-    if (localID === playerID) new LocalPlayer(playerID, playerInfo[0], playerInfo[1]);
+    if (localID === playerID)
+      new LocalPlayer(playerID, playerInfo[0], playerInfo[1]);
     else new OnlinePlayer(playerID, playerInfo[0], playerInfo[1]);
   }
 
@@ -337,6 +340,6 @@ export default function (
   setupControllers();
   setupWindowEvents();
   setupRenderer();
-  
+
   requestAnimationFrame(() => setupSocket(socket, pid, players));
 }
