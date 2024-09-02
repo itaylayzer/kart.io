@@ -1,7 +1,8 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSettingsStore } from "../store/useSettingsStore";
 
 export function useSettingsScreen() {
+  const [nav, setNav] = useState<number>(0);
   const settingsStore =
     useSettingsStore();
 
@@ -9,5 +10,5 @@ export function useSettingsScreen() {
         settingsStore.loadFromCookies();
       }, []);
     
-  return settingsStore;
+  return {...settingsStore, nav, setNav};
 }

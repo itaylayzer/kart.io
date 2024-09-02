@@ -45,7 +45,7 @@ export class Player extends PhysicsObject {
     this.color = color;
     Player.clients.set(pid, this);
 
-    const engine = new DriveController(5, this, this.keyboard);
+    const engine = new DriveController(5, this, this.keyboard, isLocal);
     const model = new PlayerModel(
       this,
       keyboard,
@@ -60,6 +60,8 @@ export class Player extends PhysicsObject {
         engine.update();
         model.update();
         this.tracker.update();
+
+
         keyboard.lastUpdate();
       },
     ];
