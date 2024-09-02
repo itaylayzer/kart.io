@@ -17,13 +17,11 @@ export class KeyboardController extends IKeyboardController {
       const updatedButtons = gamePad.buttons.map((v) => v.pressed);
       for (let i = 0; i < 16; i++) {
         if (oldButtons[i] && !updatedButtons[i]) {
-          console.log(-i - 1, "up");
 
           this.keysUp.add(-i - 1);
           this.keysPressed.delete(-i - 1);
         }
         if (!oldButtons[i] && updatedButtons[i]) {
-          console.log(-i - 1, "down");
 
           this.keysDown.add(-i - 1);
 

@@ -28,7 +28,6 @@ export class Player extends PhysicsObject {
     const radius = 0.8 / 3;
 
     const colorSetEmissive = COLORSEMISSIVE[colorFromServer];
-    console.log(colorSetEmissive);
     const color = "#" + new THREE.Color(COLORS[colorFromServer]).getHexString();
 
     super(new THREE.Object3D(), {

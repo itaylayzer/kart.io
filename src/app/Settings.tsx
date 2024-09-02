@@ -3,11 +3,12 @@ import Slider from "@mui/material/Slider";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Switch from "@mui/material/Switch";
-import { Button, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { AiFillSound } from "react-icons/ai";
 import { IoIosSettings } from "react-icons/io";
 import { PiGraphicsCardFill } from "react-icons/pi";
 import { Listed } from "../components/Listed";
+import { audio } from "../lib/AudioContainer";
 export function Settings({ goBack }: { goBack: () => void }) {
   const {
     loadFromCookies,
@@ -24,6 +25,9 @@ export function Settings({ goBack }: { goBack: () => void }) {
     setNav,
     nav,
     Antialiasing,
+    musicVolume,
+    sfxVolume,
+    displayAudio,
   } = useSettingsScreen();
 
   return (
@@ -36,7 +40,6 @@ export function Settings({ goBack }: { goBack: () => void }) {
           exclusive
           onChange={(_, i) => {
             if (i === null) return;
-            console.log(i);
             setNav(i as number);
           }}
         >
@@ -44,7 +47,7 @@ export function Settings({ goBack }: { goBack: () => void }) {
             data-tooltip-id="t"
             data-tooltip-content={"Game Settings"}
             value={0}
-            className="mini"
+            className="r mini"
           >
             <IoIosSettings size={30} color="white" />
           </ToggleButton>
@@ -52,7 +55,7 @@ export function Settings({ goBack }: { goBack: () => void }) {
             data-tooltip-id="t"
             data-tooltip-content={"Audio Settings"}
             value={1}
-            className="mini"
+            className="r mini"
           >
             <AiFillSound size={30} color="white" />
           </ToggleButton>
@@ -60,7 +63,7 @@ export function Settings({ goBack }: { goBack: () => void }) {
             data-tooltip-id="t"
             data-tooltip-content={"Graphics Settings"}
             value={2}
-            className="mini"
+            className="r mini"
           >
             <PiGraphicsCardFill size={30} color="white" />
           </ToggleButton>
@@ -132,25 +135,81 @@ export function Settings({ goBack }: { goBack: () => void }) {
                   </td>
                 </tr>{" "}
               </>,
-              <tr>
-                <td>Master Volume</td>
-                <td style={{ display: "flex", gap: 20 }}>
-                  <Slider
-                    key={"masterVolume"}
-                    min={0}
-                    step={0.01}
-                    max={1}
-                    style={{ width: 150 }}
-                    value={masterVolume}
-                    onChange={(_, value) =>
-                      set({ masterVolume: value as number })
-                    }
-                  />
-                  <p style={{ fontFamily: "monospace" }}>
-                    {masterVolume.toFixed(2)}
-                  </p>
-                </td>
-              </tr>,
+              <>
+                <tr>
+                  <td>Master Volume</td>
+                  <td style={{ display: "flex", gap: 20 }}>
+                    <Slider
+                      key={"masterVolume"}
+                      min={0}
+                      step={0.01}
+                      max={1}
+                      style={{ width: 150 }}
+                      value={masterVolume}
+                      onChange={(_, value) => {
+                        set({ masterVolume: value as number });
+                      }}
+                    />
+                    <p style={{ fontFamily: "monospace" }}>
+                      {masterVolume.toFixed(2)}
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Music Volume</td>
+                  <td style={{ display: "flex", gap: 20 }}>
+                    <Slider
+                      key={"musicVolume"}
+                      min={0}
+                      step={0.01}
+                      max={1}
+                      style={{ width: 150 }}
+                      value={musicVolume}
+                      onChange={(_, value) => {
+                        set({ musicVolume: value as number });
+                      }}
+                    />
+                    <p style={{ fontFamily: "monospace" }}>
+                      {musicVolume.toFixed(2)}
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td>SFX Volume</td>
+                  <td style={{ display: "flex", gap: 20 }}>
+                    <Slider
+                      key={"sfxVolume"}
+                      min={0}
+                      step={0.01}
+                      max={1}
+                      style={{ width: 150 }}
+                      value={sfxVolume}
+                      onChange={(_, value) => {
+                        set({ sfxVolume: value as number });
+                      }}
+                    />
+                    <p style={{ fontFamily: "monospace" }}>
+                      {sfxVolume.toFixed(2)}
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Display Audio Bar</td>
+                  <td
+                    style={{
+                      display: "flex",
+                      justifyContent: "end",
+                      width: 215,
+                    }}
+                  >
+                    <Switch
+                      key={"displayAudio"}
+                      checked={displayAudio}
+                      onChange={(_, value) => set({ displayAudio: value })}
+                    />
+                  </td>
+                </tr>{" "}
+              </>,
               <>
                 <tr>
                   <td>Display Sun</td>
@@ -222,8 +281,11 @@ export function Settings({ goBack }: { goBack: () => void }) {
       </div>
       <br />
       <br />
-      <button onClick={() => goBack()}>Back</button>
+      <button className="r" onClick={() => goBack()}>
+        Back
+      </button>
       <button
+        className="r"
         data-tooltip-id="t"
         data-tooltip-content={"Load From Cookies"}
         onClick={() => loadFromCookies()}
@@ -231,6 +293,7 @@ export function Settings({ goBack }: { goBack: () => void }) {
         Load
       </button>
       <button
+        className="r"
         data-tooltip-id="t"
         data-tooltip-content={"Save to Cookies"}
         onClick={() => saveToCookies()}
@@ -238,6 +301,7 @@ export function Settings({ goBack }: { goBack: () => void }) {
         Save
       </button>
       <button
+        className="r"
         data-tooltip-id="t"
         data-tooltip-content={"Reset to defaults"}
         onClick={() => reset()}
