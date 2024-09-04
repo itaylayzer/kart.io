@@ -55,11 +55,11 @@ export class Player extends PhysicsObject {
     this.update = [
       () => {
         keyboard.firstUpdate();
+
         isLocal && Global.cameraController.update();
         engine.update();
         model.update();
         this.tracker.update();
-
 
         keyboard.lastUpdate();
       },

@@ -1,3 +1,4 @@
+import { toast } from "react-toastify";
 import { create } from "zustand";
 
 export type settingsType = {
@@ -12,6 +13,8 @@ export type settingsType = {
   renderColliders: boolean;
   Antialiasing: boolean;
   displayAudio: boolean;
+  fps: number;
+  useSTATS: boolean;
 };
 
 const defualtValue: settingsType = {
@@ -26,6 +29,8 @@ const defualtValue: settingsType = {
   musicVolume: 0.5,
   sfxVolume: 1,
   displayAudio: true,
+  fps: 60,
+  useSTATS: false,
 };
 
 type SettingsStore = settingsType & {
@@ -36,15 +41,15 @@ type SettingsStore = settingsType & {
       | ((state: settingsType) => settingsType | Partial<settingsType>),
     replace?: boolean | undefined
   ) => void;
-  loadFromCookies: () => void;
-  saveToCookies: () => void;
+  loadFromCookies: (dotoast: boolean) => void;
+  saveToCookies: (dotoast: boolean) => void;
   reset: () => void;
 };
 
 export const useSettingsStore = create<SettingsStore>((set) => ({
   ...defualtValue,
   set,
-  loadFromCookies() {
+  loadFromCookies(dotoast = false) {
     const storedSettings = document.cookie
       .split("; ")
       .find((row) => row.startsWith("settings="))
@@ -52,14 +57,18 @@ export const useSettingsStore = create<SettingsStore>((set) => ({
 
     if (storedSettings) {
       set(JSON.parse(decodeURIComponent(storedSettings)));
+      dotoast && toast("Loaded", { type: "success" });
     }
   },
 
-  saveToCookies() {
+  saveToCookies(dotoast = false) {
     set((state) => {
       document.cookie = `settings=${encodeURIComponent(
         JSON.stringify(state)
       )}; path=/; max-age=31536000`; // 1 year expiry
+
+      dotoast && toast("Saved", { type: "success" });
+
       return state;
     });
   },

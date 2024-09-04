@@ -37,11 +37,12 @@ export function Index() {
               <AssetLoader
                 items={{
                   car: "fbx/kart.glb",
-                  // sfx_throw:"https://soxundbible.com/mp3/kung_fu_punch-Mike_Koenig-2097967259.mp3"
-                  txt_circle: "textures/circle.png",
                   txt_road: "textures/CentralMarking.png",
                   mystery: "textures/mystery.png",
                   block: "textures/blocks2.png",
+                  sfx_slow: "sfx/engine_heavy_slow_loop.mp3",
+                  sfx_fast: "sfx/engine_heavy_fast_loop.mp3",
+                  sfx_avg: "sfx/engine_heavy_average_loop.mp3",
                 }}
               >
                 <></>{" "}
@@ -69,6 +70,7 @@ export function Index() {
         closeOnClick
         rtl={false}
         pauseOnHover
+        pauseOnFocusLoss={false}
         closeButton={false}
         theme="dark"
       />

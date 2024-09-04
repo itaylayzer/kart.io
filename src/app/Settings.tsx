@@ -8,8 +8,18 @@ import { AiFillSound } from "react-icons/ai";
 import { IoIosSettings } from "react-icons/io";
 import { PiGraphicsCardFill } from "react-icons/pi";
 import { Listed } from "../components/Listed";
-import { audio } from "../lib/AudioContainer";
-export function Settings({ goBack }: { goBack: () => void }) {
+import { Condition } from "../components/Condition";
+import { CSSProperties } from "react";
+
+export function Settings({
+  goBack,
+  style,
+  backButtonID,
+}: {
+  goBack?: () => void;
+  backButtonID?: string;
+  style?: CSSProperties;
+}) {
   const {
     loadFromCookies,
     saveToCookies,
@@ -28,10 +38,12 @@ export function Settings({ goBack }: { goBack: () => void }) {
     musicVolume,
     sfxVolume,
     displayAudio,
+    fps,
+    useSTATS,
   } = useSettingsScreen();
 
   return (
-    <main>
+    <main style={style}>
       <h1 style={{ fontSize: 60 }}>Settings</h1>
       <center>
         <ToggleButtonGroup
@@ -212,6 +224,43 @@ export function Settings({ goBack }: { goBack: () => void }) {
               </>,
               <>
                 <tr>
+                  <td>FPS</td>
+                  <td style={{ display: "flex", gap: 20 }}>
+                    <Slider
+                      key={"fps"}
+                      min={15}
+                      step={5}
+                      max={120}
+                      style={{ width: 150 }}
+                      value={fps}
+                      onChange={(_, value) => {
+                        set({ fps: value as number });
+                      }}
+                    />
+                    <p style={{ fontFamily: "monospace" }}>
+                      {fps.toString().padStart(3, " ")}
+                    </p>
+                  </td>
+                </tr>
+                <tr>
+                  <td data-tooltip-id="t" data-tooltip-content="FPS, MS, MB">
+                    Display Stats
+                  </td>
+                  <td
+                    style={{
+                      display: "flex",
+                      justifyContent: "end",
+                      width: 215,
+                    }}
+                  >
+                    <Switch
+                      key={"useSTATS"}
+                      checked={useSTATS}
+                      onChange={(_, value) => set({ useSTATS: value })}
+                    />
+                  </td>
+                </tr>
+                <tr>
                   <td>Display Sun</td>
                   <td
                     style={{
@@ -281,14 +330,26 @@ export function Settings({ goBack }: { goBack: () => void }) {
       </div>
       <br />
       <br />
-      <button className="r" onClick={() => goBack()}>
-        Back
-      </button>
+
+      <Condition
+        conditions={goBack === undefined}
+        onTrue={
+          <button className="r" id={backButtonID}>
+            Back
+          </button>
+        }
+        onFalse={
+          <button className="r" onClick={() => goBack!()}>
+            Back
+          </button>
+        }
+      />
+
       <button
         className="r"
         data-tooltip-id="t"
         data-tooltip-content={"Load From Cookies"}
-        onClick={() => loadFromCookies()}
+        onClick={() => loadFromCookies(true)}
       >
         Load
       </button>
@@ -296,7 +357,7 @@ export function Settings({ goBack }: { goBack: () => void }) {
         className="r"
         data-tooltip-id="t"
         data-tooltip-content={"Save to Cookies"}
-        onClick={() => saveToCookies()}
+        onClick={() => saveToCookies(true)}
       >
         Save
       </button>
