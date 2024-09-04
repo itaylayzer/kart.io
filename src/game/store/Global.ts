@@ -37,7 +37,7 @@ export class Global {
   public static lockController: PointerLockControls;
   public static localPlayer: LocalPlayer;
   public static system: System;
-  public static roadMesh: Mesh;
+  public static roadMesh: Mesh[];
   public static socket: Socket | undefined;
   public static world: CANNON.World;
   public static lod: LOD;

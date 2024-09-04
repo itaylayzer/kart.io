@@ -49,131 +49,116 @@ export function createRoad(
   pts: THREE.Vector3[],
   curve: THREE.CatmullRomCurve3,
   roadLength: number,
-  size: number
-): [THREE.InstancedMesh, THREE.Mesh] {
+  size: number,
+  segmentCount: number = 10 // Number of segments
+): [THREE.InstancedMesh, THREE.Mesh[]] {
   const ls = 1400; // length segments original was 1400
   const ws = 5; // width segments
   const lss = ls + 1;
   const wss = ws + 1;
 
   const points = curve.getPoints(ls);
-
   const len = curve.getLength();
   const lenList = curve.getLengths(ls);
 
   const faceCount = ls * ws * 2;
   const vertexCount = lss * wss;
 
-  const indices = new Uint32Array(faceCount * 3);
-  const vertices = new Float32Array(vertexCount * 3);
-  const uvs = new Float32Array(vertexCount * 2);
+  // Split logic
+  const segmentLength = Math.floor(ls / segmentCount);
+  const segmentMeshes: THREE.Mesh[] = [];
 
-  const g = new THREE.BufferGeometry();
-  g.setIndex(new THREE.BufferAttribute(indices, 1));
-  g.setAttribute("position", new THREE.BufferAttribute(vertices, 3));
-  g.setAttribute("uv", new THREE.BufferAttribute(uvs, 2));
+  for (let segmentIndex = 0; segmentIndex < segmentCount; segmentIndex++) {
+    const startIdx = segmentIndex * segmentLength;
+    const endIdx = (segmentIndex + 1) * segmentLength;
 
-  let idxCount = 0;
-  let a, b1, c1, c2;
+    const segmentGeometry = new THREE.BufferGeometry();
 
-  for (let j = 0; j < ls; j++) {
-    for (let i = 0; i < ws; i++) {
-      // 2 faces / segment,  3 vertex indices
-      a = wss * j + i;
-      b1 = wss * (j + 1) + i; // right-bottom
-      c1 = wss * (j + 1) + 1 + i;
-      //  b2 = c1							// left-top
-      c2 = wss * j + 1 + i;
+    const indices = new Uint32Array(segmentLength * ws * 6); // Each segment has its own index array
+    const vertices = new Float32Array((segmentLength + 1) * wss * 3);
+    const uvs = new Float32Array((segmentLength + 1) * wss * 2);
 
-      indices[idxCount] = a; // right-bottom
-      indices[idxCount + 1] = b1;
-      indices[idxCount + 2] = c1;
+    segmentGeometry.setIndex(new THREE.BufferAttribute(indices, 1));
+    segmentGeometry.setAttribute(
+      "position",
+      new THREE.BufferAttribute(vertices, 3)
+    );
+    segmentGeometry.setAttribute("uv", new THREE.BufferAttribute(uvs, 2));
 
-      indices[idxCount + 3] = a; // left-top
-      indices[idxCount + 4] = c1; // = b2,
-      indices[idxCount + 5] = c2;
+    let idxCount = 0;
+    let posIdx = 0;
+    let uvIdxCount = 0;
 
-      g.addGroup(idxCount, 6, i); // write group for multi material
+    for (let j = startIdx; j < endIdx; j++) {
+      for (let i = 0; i < ws; i++) {
+        const a = wss * (j - startIdx) + i;
+        const b1 = wss * (j - startIdx + 1) + i;
+        const c1 = wss * (j - startIdx + 1) + 1 + i;
+        const c2 = wss * (j - startIdx) + 1 + i;
 
-      idxCount += 6;
+        indices[idxCount] = a;
+        indices[idxCount + 1] = b1;
+        indices[idxCount + 2] = c1;
+
+        indices[idxCount + 3] = a;
+        indices[idxCount + 4] = c1;
+        indices[idxCount + 5] = c2;
+
+        segmentGeometry.addGroup(idxCount, 6, i);
+        idxCount += 6;
+      }
+
+      for (let i = 0; i < wss; i++) {
+        uvs[uvIdxCount] = lenList[j] / len;
+        uvs[uvIdxCount + 1] = i / ws;
+        uvIdxCount += 2;
+      }
     }
-  }
 
-  let uvIdxCount = 0;
-  for (let j = 0; j < lss; j++) {
-    for (let i = 0; i < wss; i++) {
-      uvs[uvIdxCount] = lenList[j] / len;
-      uvs[uvIdxCount + 1] = i / ws;
+    const dw = [-0.36, -0.34, -0.01, 0.01, 0.34, 0.36];
 
-      uvIdxCount += 2;
+    for (let j = startIdx; j <= endIdx; j++) {
+      const tangent = curve.getTangent(j / ls);
+      const normal = new THREE.Vector3();
+      const binormal = new THREE.Vector3(0, 1, 0);
+
+      normal.crossVectors(tangent, binormal);
+      normal.y = 0;
+      normal.normalize();
+
+      binormal.crossVectors(normal, tangent);
+
+      for (let i = 0; i < wss; i++) {
+        const x = points[j].x + dw[i] * roadLength * normal.x;
+        const y = points[j].y;
+        const z = points[j].z + dw[i] * roadLength * normal.z;
+
+        vertices[posIdx] = x;
+        vertices[posIdx + 1] = y;
+        vertices[posIdx + 2] = z;
+        posIdx += 3;
+      }
     }
+
+    // const tex = Global.assets.textures.txt_road;
+    // tex.wrapS = THREE.RepeatWrapping;
+    // tex.repeat.set(segmentLength * 2, 1);
+
+    const material = [
+      new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide }),
+      new THREE.MeshBasicMaterial({ color: 0x111111, side: THREE.DoubleSide }),
+      new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide }),
+      new THREE.MeshBasicMaterial({ color: 0x111111, side: THREE.DoubleSide }),
+      new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide }),
+    ];
+
+    segmentGeometry.computeBoundingBox();
+    segmentGeometry.computeVertexNormals();
+
+    const segmentMesh = new THREE.Mesh(segmentGeometry, material);
+    segmentMeshes.push(segmentMesh);
   }
-
-  let x, y, z;
-  let posIdx = 0; // position index
-
-  let tangent;
-  const normal = new THREE.Vector3();
-  const binormal = new THREE.Vector3(0, 1, 0);
-
-  const t: THREE.Vector3[] = []; // tangents
-  const n: THREE.Vector3[] = []; // normals
-  const b: THREE.Vector3[] = []; // binormals
-
-  for (let j = 0; j < lss; j++) {
-    // to the points
-
-    tangent = curve.getTangent(j / ls);
-    t.push(tangent.clone());
-
-    normal.crossVectors(tangent, binormal);
-
-    normal.y = 0; // to prevent lateral slope of the road
-
-    normal.normalize();
-    n.push(normal.clone());
-
-    binormal.crossVectors(normal, tangent); // new binormal
-    b.push(binormal.clone());
-  }
-
-  const dw = [-0.36, -0.34, -0.01, 0.01, 0.34, 0.36]; // width from the center line
-
-  for (let j = 0; j < lss; j++) {
-    // length
-
-    for (let i = 0; i < wss; i++) {
-      // width
-
-      x = points[j].x + dw[i] * roadLength * n[j].x;
-      y = points[j].y;
-      z = points[j].z + dw[i] * roadLength * n[j].z;
-
-      vertices[posIdx] = x;
-      vertices[posIdx + 1] = y;
-      vertices[posIdx + 2] = z;
-
-      posIdx += 3;
-    }
-  }
-
-  const tex = Global.assets.textures.txt_road;
-  tex.wrapS = THREE.RepeatWrapping;
-  tex.repeat.set(ls * 2, 1);
-
-  const material = [
-    new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide }),
-    new THREE.MeshBasicMaterial({ color: 0x111111, side: THREE.DoubleSide }),
-    new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide }),
-    new THREE.MeshBasicMaterial({ color: 0x111111, side: THREE.DoubleSide }),
-    new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide }),
-  ];
-
-  g.computeBoundingBox();
-  g.computeVertexNormals();
-
-  const roadMesh = new THREE.Mesh(g, material);
 
   const dotsMesh = buildPoints(pts, size);
-  return [dotsMesh, roadMesh];
+  return [dotsMesh, segmentMeshes];
 }

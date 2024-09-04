@@ -117,12 +117,14 @@ function setupWindowEvents() {
 function setupRoad() {
   const pts: THREE.Vector3[] = createVectorsFromNumbers(curvePoints);
   Global.curve = new THREE.CatmullRomCurve3(pts);
-  const [dotsM, m] = createRoad(pts, Global.curve, 15, 0);
+  const [dotsM, m] = createRoad(pts, Global.curve, 15, 0.1, 100);
 
-  m.visible = false;
   Global.roadMesh = m;
-  Global.scene.add(dotsM);
-  Global.scene.add(m);
+  Global.lod.add(dotsM);
+  for (const mm of m) {
+    mm.frustumCulled = true;
+    Global.lod.add(mm);
+  }
   const texture = Global.assets.textures.block.clone();
   texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
   texture.offset.set(0, 0);
@@ -148,13 +150,13 @@ function setupRoad() {
     .copy(flagPos)
     .add(new THREE.Vector3(0, 1.5, 0))
     .add(new THREE.Vector3(0, 0, 5).applyQuaternion(flagBlock.quaternion));
-  Global.scene.add(flagBlock);
-  Global.scene.add(rod.clone());
+  Global.lod.add(flagBlock);
+  Global.lod.add(rod.clone());
   rod.position
     .copy(flagPos)
     .add(new THREE.Vector3(0, 1.5, 0))
     .add(new THREE.Vector3(0, 0, -5).applyQuaternion(flagBlock.quaternion));
-  Global.scene.add(rod);
+  Global.lod.add(rod);
 
   const sun = new THREE.Mesh(
     new THREE.SphereGeometry(25, 5, 5),
@@ -169,7 +171,7 @@ function setupRoad() {
   );
   sun.position.set(500, 150, 500);
 
-  if (Global.settings.displaySun) Global.scene.add(sun);
+  if (Global.settings.displaySun) Global.lod.add(sun);
 }
 
 function setupSocket(

@@ -37,7 +37,6 @@ export function Index() {
               <AssetLoader
                 items={{
                   car: "fbx/kart.glb",
-                  txt_road: "textures/CentralMarking.png",
                   mystery: "textures/mystery.png",
                   block: "textures/blocks2.png",
                   sfx_slow: "sfx/engine_heavy_slow_loop.mp3",

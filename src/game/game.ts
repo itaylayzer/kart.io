@@ -60,7 +60,9 @@ export default (
       console.error(er);
     }
   };
-  setInterval(animate, 1000 / Global.settings.fps);
+
+  if (Global.settings.useVsync) Global.renderer.setAnimationLoop(animate);
+  else setInterval(animate, 1000 / Global.settings.fps);
 
   return {
     destroyer: () => {

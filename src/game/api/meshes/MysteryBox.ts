@@ -39,7 +39,7 @@ export class MysteryBox extends PhysicsObject {
 
     this.mesh = mesh;
 
-    Global.scene.add(mesh);
+    Global.lod.add(mesh);
 
     mesh.position.copy(position);
     this.position.set(position.x, position.y, position.z);
