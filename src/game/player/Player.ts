@@ -66,14 +66,14 @@ export class Player extends PhysicsObject {
     ];
 
     this.disconnect = () => {
-      Global.scene.remove(model);
+      Global.lod.remove(model);
       Global.world.removeBody(this);
 
       Player.clients.delete(pid);
     };
 
     Global.world.addBody(this);
-    Global.scene.add(model);
+    Global.lod.add(model);
   }
 
   public applyTransform(transform: number[]) {
