@@ -16,7 +16,7 @@ export const useIndexScreen = () => {
       ["Rhythm Factory", "Zane Little Music"],
       "./audios/rhythm_factory.mp3"
     );
-    settingsStore.loadFromCookies();
+    settingsStore.loadFromCookies(false);
   }, []);
 
   const [playerName, setPlayerName] = useState<string | undefined>(

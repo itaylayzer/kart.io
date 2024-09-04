@@ -5,6 +5,7 @@ import * as THREE from "three";
 import { damp } from "three/src/math/MathUtils.js";
 import { IKeyboardController } from "./IKeyboardController";
 import clamp from "../api/clamp";
+import { AudioController } from "./AudioController";
 
 const maxDistance = 1;
 export class DriveController {
@@ -228,5 +229,10 @@ export class DriveController {
       (document.querySelector(
         "p#velocity"
       )!.innerHTML = `${velocityMagnitude.toFixed(2)} KM/S`);
+
+    if (this.islocal) {
+      AudioController.localUpdate(this.body.quaternion, this.body.position);
+    }
+    AudioController.update(velocityMagnitude, this.body.quaternion, this.body.position);
   }
 }
