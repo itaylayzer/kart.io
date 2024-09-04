@@ -14,6 +14,7 @@ export type settingsType = {
   Antialiasing: boolean;
   displayAudio: boolean;
   fps: number;
+  useVsync: boolean;
   useSTATS: boolean;
 };
 
@@ -31,6 +32,7 @@ const defualtValue: settingsType = {
   displayAudio: true,
   fps: 60,
   useSTATS: false,
+  useVsync: true,
 };
 
 type SettingsStore = settingsType & {

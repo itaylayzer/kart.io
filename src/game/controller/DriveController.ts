@@ -38,7 +38,7 @@ export class DriveController {
         .add(new THREE.Vector3(0, 0.2, 0)),
       new THREE.Vector3(0, -1, 0).applyQuaternion(this.body.quaternion)
     );
-    const intercetions = this.raycaster.intersectObject(Global.roadMesh);
+    const intercetions = this.raycaster.intersectObjects(Global.roadMesh);
 
     const closestIntersection =
       intercetions.length === 0
@@ -115,7 +115,7 @@ export class DriveController {
     const compare = (middle: number) => {
       this.raycaster.set(getPos(middle), downVec);
 
-      const intersects = this.raycaster.intersectObject(Global.roadMesh);
+      const intersects = this.raycaster.intersectObjects(Global.roadMesh);
 
       return (
         intersects.length > 0 &&
@@ -233,6 +233,10 @@ export class DriveController {
     if (this.islocal) {
       AudioController.localUpdate(this.body.quaternion, this.body.position);
     }
-    AudioController.update(velocityMagnitude, this.body.quaternion, this.body.position);
+    AudioController.update(
+      velocityMagnitude,
+      this.body.quaternion,
+      this.body.position
+    );
   }
 }

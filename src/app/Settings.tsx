@@ -40,6 +40,7 @@ export function Settings({
     displayAudio,
     fps,
     useSTATS,
+    useVsync,
   } = useSettingsScreen();
 
   return (
@@ -223,7 +224,12 @@ export function Settings({
                 </tr>{" "}
               </>,
               <>
-                <tr>
+                <tr
+                  style={{
+                    opacity: `${0.5 + 0.5 * +!useVsync}`,
+                    transition: "opacity .2s",
+                  }}
+                >
                   <td>FPS</td>
                   <td style={{ display: "flex", gap: 20 }}>
                     <Slider
@@ -242,6 +248,22 @@ export function Settings({
                     </p>
                   </td>
                 </tr>
+                <tr>
+                  <td>VSync</td>
+                  <td
+                    style={{
+                      display: "flex",
+                      justifyContent: "end",
+                      width: 215,
+                    }}
+                  >
+                    <Switch
+                      key={"useVsync"}
+                      checked={useVsync}
+                      onChange={(_, value) => set({ useVsync: value })}
+                    />
+                  </td>
+                </tr>{" "}
                 <tr>
                   <td data-tooltip-id="t" data-tooltip-content="FPS, MS, MB">
                     Display Stats
