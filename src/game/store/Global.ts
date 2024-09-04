@@ -21,6 +21,7 @@ import System from "three-nebula";
 import { Socket } from "socket.io-client";
 import * as CANNON from "cannon-es";
 import { settingsType } from "@/src/store/useSettingsStore";
+import Stats from "three/examples/jsm/libs/stats.module.js";
 
 export class Global {
   public static mouseController: MouseController;
@@ -45,4 +46,5 @@ export class Global {
   public static curve: CatmullRomCurve3;
   public static lateUpdates: Action[];
   public static settings: settingsType;
+  public static stats: Stats;
 }

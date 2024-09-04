@@ -64,6 +64,8 @@ div#root button.r {
   scale: 0.92;
   padding: 10px 50px;
 }
+
+div#root button.r[aria-pressed="true"],
 div#root button.r:hover {
   scale: 1;
 
@@ -127,26 +129,32 @@ main table#scoreboard {
   font-family: "Signika";
   box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 50%);
 }
+table.instructions,
 table#settings {
   padding: 10px;
   border-radius: 10px;
   font-family: "Signika";
 }
+table.instructions,
 table#settings,
 main table#scoreboard,
 main div.room table {
   width: 100%;
 }
 
+table.instructions,
 table#settings {
   border-spacing: 8px;
 }
+table.instructions,
 table#settings tr td,
 main table#scoreboard tr td,
 main div.room table tr td {
   font-size: 20px;
 }
 
+table.instructions tr th,
+table.instructions tr td,
 table#settings tr th,
 table#settings tr td,
 main table#scoreboard tr td,
@@ -156,6 +164,7 @@ main div.room table tr th {
   padding-inline: 5px;
 }
 
+table.instructions tr th,
 main table#scoreboard tr th,
 main div.room table tr th {
   text-align: left;
@@ -169,7 +178,9 @@ main div.room table tr th:nth-child(1) {
 main div.room table tr th:nth-child(3) {
   width: 11ch;
 }
-
+table.instructions tr td {
+  font-size: 18px;
+}
 main div.room table tr td {
   opacity: 0.8;
 }

@@ -52,11 +52,15 @@ export default (
 
       if (Global.settings.renderColliders) Global.cannonDebugger.update();
       Global.mouseController.lastUpdate();
+
+      if (Global.settings.useSTATS) {
+        Global.stats.update();
+      }
     } catch (er) {
       console.error(er);
     }
   };
-  setInterval(animate, 1000 / 120);
+  setInterval(animate, 1000 / Global.settings.fps);
 
   return {
     destroyer: () => {

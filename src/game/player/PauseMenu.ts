@@ -24,6 +24,7 @@ export class PauseMenu {
 
     let lastShowing = false;
     audio().setCentered(true);
+    audio().setVisible(false);
 
     Global.updates.push(() => {
       const showing = !Global.lockController.isLocked;

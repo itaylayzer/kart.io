@@ -36,7 +36,7 @@ export class TrackerController {
     };
 
     this.update = () => {
-      const pos = Array.from(TrackerController.points.entries())
+      const forwardPos = Array.from(TrackerController.points.entries())
         .filter(([index]) => {
           return generateRange(
             this.lastIndex,
@@ -52,13 +52,16 @@ export class TrackerController {
           return [indexA, vecA];
         });
 
-      if (pos[0] === 1 && this.lastIndex === 0) {
+      if (forwardPos[0] === 1 && this.lastIndex === 0) {
         this.round++;
       }
-      this.lastIndex = pos[0];
-      dummy.position.copy(pos[1]);
+      if (forwardPos[0] === 0 && this.lastIndex === 1) {
+        this.round--;
+      }
+      this.lastIndex = forwardPos[0];
+      dummy.position.copy(forwardPos[1]);
       dummy.lookAt(
-        TrackerController.points[(pos[0] + 1) % TrackerController.points.length]
+        TrackerController.points[(forwardPos[0] + 1) % TrackerController.points.length]
       );
 
       const playerForward = player.quaternion.vmult(new CANNON.Vec3(0, 0, 1));
@@ -66,12 +69,13 @@ export class TrackerController {
         dummy.quaternion
       );
       const similarity = roadForward.dot(playerForward);
+      const lookingRightWay = similarity >= 0;
 
       if (isLocal) {
         const lookWrongHTML = document.querySelector(
           "p#wrong"
         )! as HTMLParagraphElement;
-        lookWrongHTML.style.visibility = similarity >= 0 ? "hidden" : "visible";
+        lookWrongHTML.style.visibility = lookingRightWay ? "hidden" : "visible";
       }
     };
   }

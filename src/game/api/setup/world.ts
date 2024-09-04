@@ -23,6 +23,8 @@ import { createRoad, createVectorsFromNumbers } from "./road";
 import msgpack from "msgpack-lite";
 import { curvePoints } from "../../constants/road";
 import { PauseMenu } from "../../player/PauseMenu";
+import { AudioController } from "../../controller/AudioController";
+import Stats from "three/examples/jsm/libs/stats.module.js";
 
 function setupLights() {
   const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 1);
@@ -117,6 +119,7 @@ function setupRoad() {
   Global.curve = new THREE.CatmullRomCurve3(pts);
   const [dotsM, m] = createRoad(pts, Global.curve, 15, 0);
 
+  m.visible = false;
   Global.roadMesh = m;
   Global.scene.add(dotsM);
   Global.scene.add(m);
@@ -194,6 +197,8 @@ function setupSocket(
         xplayer.applyTransform(ptTransform);
         xplayer.tracker.reset();
       }
+      AudioController.init();
+
       const pts = createVectorsFromNumbers(mysteryBoxLocations);
       for (const [id, p] of pts.entries()) {
         new MysteryBox(id, new CANNON.Vec3(p.x, p.y, p.z));
@@ -326,6 +331,12 @@ function setupRenderer() {
   };
 }
 
+function setupSTATS() {
+  if (Global.settings.useSTATS) {
+    document.body.appendChild((Global.stats = new Stats()).dom);
+  }
+}
+
 export default function (
   socket: Socket,
   pid: number,
@@ -340,6 +351,8 @@ export default function (
   setupControllers();
   setupWindowEvents();
   setupRenderer();
+
+  setupSTATS();
 
   requestAnimationFrame(() => setupSocket(socket, pid, players));
 }
