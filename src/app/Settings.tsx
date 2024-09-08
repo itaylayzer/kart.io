@@ -1,8 +1,7 @@
 import { useSettingsScreen } from "../viewmodels/useSettingsScreen";
 import Slider from "@mui/material/Slider";
 import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import Switch from "@mui/material/Switch";
+import { MenuItem, Input, Switch } from "@mui/material";
 import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { AiFillSound } from "react-icons/ai";
 import { IoIosSettings } from "react-icons/io";
@@ -41,6 +40,7 @@ export function Settings({
     fps,
     useSTATS,
     useVsync,
+    playerName,
   } = useSettingsScreen();
 
   return (
@@ -82,13 +82,33 @@ export function Settings({
           </ToggleButton>
         </ToggleButtonGroup>
       </center>
-      <div style={{ minHeight: 300 }}>
+      <div style={{ minHeight: 400 }}>
         <table id="settings">
           <Listed
             index={nav}
             childrens={[
               <>
                 {" "}
+                <tr>
+                  <td>Player Name</td>
+                  <td>
+                    <Input
+                      style={{
+                        display: "inline-block",
+                        width: 250,
+                      }}
+                      size="small"
+                      data-tooltip-id="t"
+                      data-tooltip-content={"Player Name"}
+                      placeholder="Enter Player Name"
+                      key={"playerName"}
+                      value={playerName}
+                      onChange={(a) =>
+                        set({ playerName: a.currentTarget.value })
+                      }
+                    />
+                  </td>
+                </tr>
                 <tr>
                   <td>Display Players</td>{" "}
                   <td>

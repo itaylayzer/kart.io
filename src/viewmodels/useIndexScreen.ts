@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { getNameFromURL } from "../game/api/getNameFromURL";
 import { useSettingsStore } from "../store/useSettingsStore";
 import { audio } from "../lib/AudioContainer";
 
@@ -12,20 +11,13 @@ export const useIndexScreen = () => {
   const settingsStore = useSettingsStore();
 
   useEffect(() => {
-    audio().play(
-      ["Rhythm Factory", "Zane Little Music"],
-      "./audios/rhythm_factory.mp3"
-    );
     settingsStore.loadFromCookies(false);
   }, []);
 
-  const [playerName, setPlayerName] = useState<string | undefined>(
-    getNameFromURL()
-  );
+  const { playerName, set } = settingsStore;
+  const setPlayerName = (playerName: string) => set({ playerName });
 
-  const [screenIndex, setScreen] = useState<number>(
-    playerName === undefined || playerName.length < 3 ? 0 : 1
-  );
+  const [screenIndex, setScreen] = useState<number>(0);
   const [rooms, setRooms] = useState<Room[] | Error | undefined>();
   const [roomName, setRoomName] = useState<string>("");
   const [room, setRoom] = useState<[number, string]>([0, "local"]);
@@ -78,7 +70,13 @@ export const useIndexScreen = () => {
   }
 
   useEffect(() => {
-    if (screenIndex === 1) loadRooms();
+    if (screenIndex === 1) {
+      loadRooms();
+      audio().play(
+        ["Rhythm Factory", "Zane Little Music"],
+        "./audios/rhythm_factory.mp3"
+      );
+    }
   }, [screenIndex]);
 
   return {

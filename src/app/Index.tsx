@@ -1,7 +1,6 @@
 import { ToastContainer } from "react-toastify";
 import { Listed } from "../components/Listed";
 import { ip, port, useIndexScreen } from "../viewmodels/useIndexScreen";
-import { Condition } from "../components/Condition";
 import { Room } from "./Room";
 import AssetLoader from "../components/AssetLoader";
 import { FidgetSpinner } from "react-loader-spinner";
@@ -10,6 +9,7 @@ import { Settings } from "./Settings";
 import "react-tooltip/dist/react-tooltip.css";
 import { Tooltip } from "react-tooltip";
 import { AudioContainer } from "../lib/AudioContainer";
+import { Button, TextField } from "@mui/material";
 
 export function Index() {
   const {
@@ -21,35 +21,29 @@ export function Index() {
     setScreen,
     room,
     setRoom,
+    playerName,
+    setPlayerName,
   } = useIndexScreen();
 
   return (
     <>
-      <Condition
-        conditions={screenIndex < 4}
-        onTrue={
-          <>
-            <div className="blocks header" />
-            <div className="blocks footer" />
-            <footer></footer>
-            <header>
-              {" "}
-              <AssetLoader
-                items={{
-                  car: "fbx/kart.glb",
-                  mystery: "textures/mystery.png",
-                  block: "textures/blocks2.png",
-                  sfx_slow: "sfx/engine_heavy_slow_loop.mp3",
-                  sfx_fast: "sfx/engine_heavy_fast_loop.mp3",
-                  sfx_avg: "sfx/engine_heavy_average_loop.mp3",
-                }}
-              >
-                <></>{" "}
-              </AssetLoader>
-            </header>
-          </>
-        }
-      />
+      <footer></footer>
+      <header>
+        {" "}
+        <AssetLoader
+          items={{
+            car: "fbx/kart.glb",
+            mystery: "textures/mystery.png",
+            block: "textures/blocks2.png",
+            sfx_slow: "sfx/engine_heavy_slow_loop.mp3",
+            sfx_fast: "sfx/engine_heavy_fast_loop.mp3",
+            sfx_avg: "sfx/engine_heavy_average_loop.mp3",
+          }}
+        >
+          <></>{" "}
+        </AssetLoader>
+      </header>
+
       <Tooltip
         id="t"
         style={{
@@ -78,19 +72,74 @@ export function Index() {
         index={screenIndex}
         childrens={[
           <main>
-            <h2>welcome to</h2> <h1>Kart.IO</h1>
-            <p>
-              to play this game you need 2 things
-              <br />
-              First go into this website, and make your browser accepts this
-              domain:{" "}
-              <a href={`https://${ip}:${port}`}>
-                {ip}:{port}
-              </a>{" "}
-              <br />
-              Edit this url, and add the string '?name=' and after that your
-              username at the end. for example /kart.io/?name=MyName
-            </p>
+            <table className="instructions">
+              <tr>
+                {" "}
+                <th>keyboard key</th> <th>gamepad key</th> <th>action</th>{" "}
+              </tr>
+              <tr>
+                {" "}
+                <td> W / S </td> <td>A / B / 0 / 1 </td> <td>Accelerating </td>{" "}
+              </tr>
+              <tr>
+                {" "}
+                <td> A / D </td>{" "}
+                <td>Right Axis X Axis / Npad Right / Npad Left </td>
+                <td>Sterring Wheel </td>{" "}
+              </tr>
+              <tr>
+                {" "}
+                <td> Space </td> <td>R1 </td> <td>Drift </td>{" "}
+              </tr>
+              <tr>
+                {" "}
+                <td> Mouse Right </td> <td>L1 </td> <td>Show Scoreboard </td>{" "}
+              </tr>
+              <tr>
+                {" "}
+                <td> Mouse Left </td> <td>X / Y / 2 / 3 / L2 / R2 </td>{" "}
+                <td>Use Special </td>{" "}
+              </tr>
+              <tr>
+                {" "}
+                <td> Escape </td> <td>Start </td> <td>Unlock / Pause Menu </td>{" "}
+              </tr>
+            </table>
+            <br />
+            <center
+              style={{ display: "flex", gap: 10, justifyContent: "center" }}
+            >
+              <Button
+                data-tooltip-id="t"
+                data-tooltip-content={
+                  "you need to visit this page to allow your browser reach the servers"
+                }
+                onClick={() => window.open(`https://${ip}:${port}`, "_blank")}
+                className="r mini"
+              >
+                Servers Page
+              </Button>
+              <TextField
+                data-tooltip-id="t"
+                data-tooltip-content={"Player Name"}
+                variant="outlined"
+                placeholder="Enter Player Name"
+                value={playerName}
+                onChange={(a) => setPlayerName(a.currentTarget.value)}
+              />
+            </center>
+            <br />
+            <br />
+            <center>
+              <Button
+                className="r"
+                onClick={() => {
+                  setScreen(1);
+                }}
+              >
+                Play
+              </Button>
+            </center>
           </main>,
           <main style={{ display: "flex" }}>
             <div
@@ -100,18 +149,14 @@ export function Index() {
               }}
             >
               <center>
-                <h1
-                  style={{ fontSize: 50, fontFamily: "New Super Mario Font U" }}
-                >
-                  Servers
-                </h1>
+                <h1 style={{ fontSize: 50 }}>Servers</h1>
 
                 {Array.isArray(rooms) ? (
                   <>
                     <p
                       style={{
-                        fontFamily: "New Super Mario Font U",
                         fontSize: 25,
+                        opacity: 0.3,
                       }}
                     >
                       {rooms.length === 0 ? "No Rooms Founded" : ""}

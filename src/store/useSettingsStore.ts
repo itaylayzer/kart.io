@@ -15,11 +15,12 @@ export type settingsType = {
   displayAudio: boolean;
   fps: number;
   useVsync: boolean;
+  playerName: string;
   useSTATS: boolean;
 };
 
 const defualtValue: settingsType = {
-  useArrow: false,
+  useArrow: true,
   fovChange: 0.5,
   masterVolume: 0.5,
   useBloom: true,
@@ -33,6 +34,7 @@ const defualtValue: settingsType = {
   fps: 60,
   useSTATS: false,
   useVsync: true,
+  playerName: "Guest",
 };
 
 type SettingsStore = settingsType & {

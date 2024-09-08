@@ -8,7 +8,7 @@ export class TrackerController {
   public update: () => void;
 
   private lastIndex: number = 0;
-  private round: number = 0;
+  public round: number = 0;
 
   static sortedTrackers: [number, TrackerController][];
   static readonly ls = 700;
@@ -58,10 +58,13 @@ export class TrackerController {
       if (forwardPos[0] === 0 && this.lastIndex === 1) {
         this.round--;
       }
+
       this.lastIndex = forwardPos[0];
       dummy.position.copy(forwardPos[1]);
       dummy.lookAt(
-        TrackerController.points[(forwardPos[0] + 1) % TrackerController.points.length]
+        TrackerController.points[
+          (forwardPos[0] + 1) % TrackerController.points.length
+        ]
       );
 
       const playerForward = player.quaternion.vmult(new CANNON.Vec3(0, 0, 1));
