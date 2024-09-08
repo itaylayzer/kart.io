@@ -8,8 +8,17 @@ import { PlayerModel } from "./PlayerModel";
 import { TrackerController } from "../controller/TrackerController";
 import { AudioController } from "../controller/AudioController";
 
-export const COLORS = ["#124eb5", "#ff0000", "#00ff00"];
-const COLORSEMISSIVE = [10, 4, 10];
+export const COLORS = [
+  "#f56505",
+  "#f5ed05",
+  "#0591f5",
+  "#b105f5",
+  "#f50575",
+  "#00ff00",
+  "#124eb5",
+  "#ff0000",
+];
+const COLORSEMISSIVE = [5, 5, 4, 5, 6, 3, 10, 4];
 export class Player extends PhysicsObject {
   public static clients: Map<number, Player>;
   public tracker: TrackerController;

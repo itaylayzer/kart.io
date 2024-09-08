@@ -10,6 +10,7 @@ import "react-tooltip/dist/react-tooltip.css";
 import { Tooltip } from "react-tooltip";
 import { AudioContainer } from "../lib/AudioContainer";
 import { Button, TextField } from "@mui/material";
+import { FaLock } from "react-icons/fa";
 
 export function Index() {
   const {
@@ -23,6 +24,7 @@ export function Index() {
     setRoom,
     playerName,
     setPlayerName,
+    setRoomPassword
   } = useIndexScreen();
 
   return (
@@ -180,17 +182,25 @@ export function Index() {
                             <div
                               className="room"
                               onClick={() => {
-                                setRoom([r[0], r[1]]);
+                                setRoom([r[0], r[1], r[3], undefined]);
                                 setScreen(5);
                               }}
                             >
                               <table>
                                 <tr>
+                                  <th></th>
                                   <th>port</th>
                                   <th>name</th>
                                   <th>players count</th>
                                 </tr>
                                 <tr>
+                                  <tr>
+                                    <FaLock
+                                      opacity={+r[3]}
+                                      color="white"
+                                      size={10}
+                                    />
+                                  </tr>
                                   <td>{r[0]}</td>
                                   <td>{r[1]}</td>
                                   <td>{r[2]}</td>
@@ -301,6 +311,7 @@ export function Index() {
               style={{ width: "100%" }}
               type="password"
               placeholder="Room's Password"
+              onChange={(e) => setRoomPassword(e.currentTarget.value)}
             />
             <br />
             <center>
@@ -400,6 +411,8 @@ export function Index() {
           <Room
             roomPort={room[0]}
             roomName={room[1]}
+            needPassword={room[2]}
+            tryPassword={room[3]}
             goBack={() => {
               setScreen(1);
             }}
