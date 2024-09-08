@@ -1,11 +1,11 @@
 InGame:
 
 - Special System
-- Room Settings: Map Indexing, Password, Private Rooms
+- Room Settings: Map Indexing
+- Win Senerio, Switching Cameras
 
 Optional:
 
-- Win Senerio
 - Map: Fances, Generated Grass
 
 maybe

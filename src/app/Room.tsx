@@ -9,9 +9,13 @@ export function Room({
   roomName,
   roomPort,
   goBack,
+  needPassword,
+  tryPassword
 }: {
   roomPort: number;
   roomName: string;
+  needPassword:boolean;
+  tryPassword:string | undefined
   goBack: () => void;
 }) {
   const {
@@ -23,7 +27,7 @@ export function Room({
     pid,
     socket,
     disconnect,
-  } = useRoomScreen(roomPort, goBack);
+  } = useRoomScreen(roomPort, goBack, needPassword, tryPassword);
   return (
     <Condition
       conditions={startGameScreen}
