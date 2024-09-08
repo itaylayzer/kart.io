@@ -24,6 +24,7 @@ import {
   createRoad,
   createFencesPilars,
   createVectorsFromNumbers,
+  createWater,
 } from "./road";
 import msgpack from "msgpack-lite";
 import { curvePoints } from "../../constants/road";
@@ -124,24 +125,26 @@ function setupRoad() {
   Global.curve = new THREE.CatmullRomCurve3(pts);
   const roadsSegments = createRoad(Global.curve, 5, 100, 1400);
   Global.lod.add(...roadsSegments);
-
-  const ground = new THREE.Mesh(
-    new THREE.PlaneGeometry(300, 300),
-    new THREE.MeshLambertMaterial({ color: "#4287f5", side: THREE.DoubleSide })
-  );
-  ground.position.y -= 1;
-  ground.rotateX(Math.PI / 2);
-  Global.lod.add(ground);
-
-  const fences = createFences(Global.curve, 5, 100, 1400);
-  const tiles = createFencesPilars(Global.curve, 5.1, 100, 1400, roadsSegments);
-
   Global.roadMesh = roadsSegments;
-
   for (const mm of roadsSegments) {
     mm.frustumCulled = true;
   }
-  Global.lod.add(...fences, ...tiles);
+
+  if (Global.settings.displayFences) {
+    const fences = createFences(Global.curve, 5, 100, 1400);
+    Global.lod.add(...fences);
+  }
+
+  if (Global.settings.displayPillars) {
+    const tiles = createFencesPilars(
+      Global.curve,
+      5.1,
+      100,
+      1400,
+      roadsSegments
+    );
+    Global.lod.add(...tiles);
+  }
 
   const texture = Global.assets.textures.block.clone();
   texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
@@ -179,8 +182,8 @@ function setupRoad() {
   const sun = new THREE.Mesh(
     new THREE.SphereGeometry(25, 5, 5),
     new THREE.MeshPhongMaterial({
-      color: "gold",
-      emissive: "gold",
+      color: "#f56505",
+      emissive: "#f56505",
       emissiveIntensity: 150,
       fog: false,
       opacity: 0.3,
@@ -332,7 +335,18 @@ function setupRenderer() {
   var mPrev = new THREE.Matrix4();
   var tmpArray = new THREE.Matrix4();
 
+  let beforeUpdate = () => {};
+  if (Global.settings.displayWater) {
+    const [waterGround, _beforeUpdate] = createWater(500, 500, 10, 10);
+    for (const water of waterGround) {
+      water.position.y -= 1;
+    }
+    beforeUpdate = _beforeUpdate;
+    Global.lod.add(...waterGround);
+  }
+
   Global.render = () => {
+    beforeUpdate();
     blurPass.material.uniforms.velocityFactor.value = 4;
 
     tmpArray.copy(Global.camera.matrixWorldInverse);

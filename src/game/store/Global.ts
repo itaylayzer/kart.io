@@ -32,6 +32,7 @@ export class Global {
   public static cameraController: CameraController;
   public static cannonDebugger: ReturnType<typeof CannonDebugger>;
   public static deltaTime: number = 0;
+  public static elapsedTime: number = 0;
   public static assets: loadedAssets;
   public static updates: Action[];
   public static lockController: PointerLockControls;
