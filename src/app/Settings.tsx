@@ -6,6 +6,7 @@ import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { AiFillSound } from "react-icons/ai";
 import { IoIosSettings } from "react-icons/io";
 import { PiGraphicsCardFill } from "react-icons/pi";
+import { IoMdEye } from "react-icons/io";
 import { Listed } from "../components/Listed";
 import { Condition } from "../components/Condition";
 import { CSSProperties } from "react";
@@ -41,6 +42,9 @@ export function Settings({
     useSTATS,
     useVsync,
     playerName,
+    displayFences,
+    displayPillars,
+    displayWater,
   } = useSettingsScreen();
 
   return (
@@ -79,6 +83,14 @@ export function Settings({
             className="r mini"
           >
             <PiGraphicsCardFill size={30} color="white" />
+          </ToggleButton>
+          <ToggleButton
+            data-tooltip-id="t"
+            data-tooltip-content={"Hide/Show Elements"}
+            value={3}
+            className="r mini"
+          >
+            <IoMdEye size={30} color="white" />
           </ToggleButton>
         </ToggleButtonGroup>
       </center>
@@ -303,22 +315,6 @@ export function Settings({
                   </td>
                 </tr>
                 <tr>
-                  <td>Display Sun</td>
-                  <td
-                    style={{
-                      display: "flex",
-                      justifyContent: "end",
-                      width: 215,
-                    }}
-                  >
-                    <Switch
-                      key={"displaySun"}
-                      checked={displaySun}
-                      onChange={(_, value) => set({ displaySun: value })}
-                    />
-                  </td>
-                </tr>
-                <tr>
                   <td>Use Bloom</td>
                   <td
                     style={{
@@ -362,6 +358,72 @@ export function Settings({
                     <Switch
                       checked={renderColliders}
                       onChange={(_, value) => set({ renderColliders: value })}
+                    />
+                  </td>
+                </tr>
+              </>,
+              <>
+                <tr>
+                  <td>Display Sun</td>
+                  <td
+                    style={{
+                      display: "flex",
+                      justifyContent: "end",
+                      width: 215,
+                    }}
+                  >
+                    <Switch
+                      key={"displaySun"}
+                      checked={displaySun}
+                      onChange={(_, value) => set({ displaySun: value })}
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td>Display Fences</td>
+                  <td
+                    style={{
+                      display: "flex",
+                      justifyContent: "end",
+                      width: 215,
+                    }}
+                  >
+                    <Switch
+                      key={"displayFences"}
+                      checked={displayFences}
+                      onChange={(_, value) => set({ displayFences: value })}
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td>Display Fences Pillars</td>
+                  <td
+                    style={{
+                      display: "flex",
+                      justifyContent: "end",
+                      width: 215,
+                    }}
+                  >
+                    <Switch
+                      key={"displayPillars"}
+                      checked={displayPillars}
+                      onChange={(_, value) => set({ displayPillars: value })}
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td>Display Water</td>
+                  <td
+                    style={{
+                      display: "flex",
+                      justifyContent: "end",
+                      width: 215,
+                    }}
+                  >
+                    <Switch
+                      key={"displayWater"}
+                      checked={displayWater}
+                      onChange={(_, value) => set({ displayWater: value })}
                     />
                   </td>
                 </tr>

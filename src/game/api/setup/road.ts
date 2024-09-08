@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { Global } from "../../store/Global";
 
 export function buildPoints(
   points: THREE.Vector3[],
@@ -302,7 +303,7 @@ export function createFencesPilars(
         continue;
       }
 
-      const extraHeight = 5;
+      const extraHeight = 1 - 0.8 / 2;
 
       const mesh = new THREE.Mesh(
         new THREE.CylinderGeometry(0.1, 0.1, 0.8 + extraHeight + point.y, 5, 5),
@@ -318,4 +319,116 @@ export function createFencesPilars(
   }
 
   return fenceMeshes;
+}
+
+/** @author https://codesandbox.io/p/sandbox/eager-ganguly-x4fl4?file=%2Fsrc%2Findex.js%3A99%2C47 */
+export function createWater(
+  sizeX: number,
+  sizeY: number,
+  segmentX: number,
+  segmentY: number
+) {
+  const segmentWidth = sizeX / segmentX;
+  const segmentHeight = sizeY / segmentY;
+
+  const pixelRatio = Global.renderer.getPixelRatio();
+  const renderTarget = new THREE.WebGLRenderTarget(
+    window.innerWidth * pixelRatio,
+    window.innerHeight * pixelRatio
+  );
+
+  const supportsDepthTextureExtension = !!Global.renderer.extensions.get(
+    "WEBGL_depth_texture"
+  );
+
+  const waterUniforms = {
+    time: { value: 0 },
+    threshold: { value: 0.3 },
+    tDudv: { value: null },
+    tDepth: { value: null },
+    cameraNear: { value: 0 },
+    cameraFar: { value: 0 },
+    resolution: { value: new THREE.Vector2() },
+    foamColor: { value: new THREE.Color(0x1b4c87) },
+    waterColor: { value: new THREE.Color(0x1b5fa7) },
+  };
+
+  const waterMaterial = new THREE.ShaderMaterial({
+    defines: {
+      DEPTH_PACKING: supportsDepthTextureExtension === true ? 0 : 1,
+      ORTHOGRAPHIC_CAMERA: 0,
+    },
+    uniforms: THREE.UniformsUtils.merge([
+      THREE.UniformsLib["fog"],
+      waterUniforms,
+    ]),
+    vertexShader: document.getElementById("vertexShaderWater")!.textContent!,
+    fragmentShader: document.getElementById("fragmentShaderWater")!
+      .textContent!,
+    fog: true,
+  });
+
+  waterMaterial.uniforms.cameraNear.value = Global.camera.near;
+  waterMaterial.uniforms.cameraFar.value = Global.camera.far;
+  waterMaterial.uniforms.resolution.value.set(
+    window.innerWidth * pixelRatio,
+    window.innerHeight * pixelRatio
+  );
+
+  const { dudvMap } = Global.assets.textures;
+  dudvMap.wrapS = dudvMap.wrapT = THREE.RepeatWrapping;
+  waterMaterial.uniforms.tDudv.value = dudvMap;
+  waterMaterial.uniforms.tDepth.value =
+    supportsDepthTextureExtension === true
+      ? renderTarget.depthTexture
+      : renderTarget.texture;
+
+  const waterMeshes: THREE.Mesh[] = [];
+  const depthMaterial = new THREE.MeshDepthMaterial();
+  depthMaterial.depthPacking = THREE.RGBADepthPacking;
+  depthMaterial.blending = THREE.NoBlending;
+
+  for (let i = 0; i < segmentX; i++) {
+    for (let j = 0; j < segmentY; j++) {
+      const waterGeometry = new THREE.PlaneGeometry(
+        segmentWidth,
+        segmentHeight
+      );
+      const water = new THREE.Mesh(waterGeometry, waterMaterial);
+      water.rotation.x = -Math.PI * 0.5;
+      water.position.set(
+        i * segmentWidth - sizeX / 2 + segmentWidth / 2,
+        0,
+        j * segmentHeight - sizeY / 2 + segmentHeight / 2
+      );
+      water.frustumCulled = true;
+      waterMeshes.push(water);
+    }
+  }
+
+  const beforeUpdate = () => {
+    renderTarget.setSize(
+      window.innerWidth * pixelRatio,
+      window.innerHeight * pixelRatio
+    );
+
+    waterMeshes.forEach((water) => {
+      water.visible = false; // we don't want the depth of the water
+    });
+    Global.scene.overrideMaterial = depthMaterial;
+
+    Global.renderer.setRenderTarget(renderTarget);
+    Global.renderer.render(Global.scene, Global.camera);
+    Global.renderer.setRenderTarget(null);
+
+    Global.scene.overrideMaterial = null;
+    waterMeshes.forEach((water) => {
+      water.visible = true;
+
+      (water.material as THREE.ShaderMaterial).uniforms.time.value =
+        Global.elapsedTime * 0.1;
+    });
+  };
+
+  return [waterMeshes, beforeUpdate] as [THREE.Mesh[], () => void];
 }

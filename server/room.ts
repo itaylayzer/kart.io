@@ -16,7 +16,7 @@ type Player = {
   ready: boolean;
 };
 
-const COLORS_LENGTH = 3;
+const COLORS_LENGTH = 8;
 export class Room {
   public close: () => void;
   public players: Map<number, Player>;
