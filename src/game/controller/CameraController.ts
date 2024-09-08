@@ -69,7 +69,10 @@ export class CameraController {
         forwardVec
           .clone()
           .multiplyScalar(
-            -1 / 2 + (-player.keyboard.vertical * Global.settings.fovChange) / 5
+            -1 / 2 +
+              (-(player.keyboard.vertical + Math.abs(this.driftSide[1])) *
+                Global.settings.fovChange) /
+                5
           )
       )
       .add(rightVec.clone().multiplyScalar(0.5 / 2))
