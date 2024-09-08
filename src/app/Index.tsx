@@ -40,6 +40,7 @@ export function Index() {
             sfx_slow: "sfx/engine_heavy_slow_loop.mp3",
             sfx_fast: "sfx/engine_heavy_fast_loop.mp3",
             sfx_avg: "sfx/engine_heavy_average_loop.mp3",
+            dudvMap: "https://i.imgur.com/hOIsXiZ.png",
           }}
         >
           <></>{" "}

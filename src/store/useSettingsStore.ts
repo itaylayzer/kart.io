@@ -17,6 +17,9 @@ export type settingsType = {
   useVsync: boolean;
   playerName: string;
   useSTATS: boolean;
+  displayWater:boolean;
+  displayFences:boolean;
+  displayPillars:boolean;
 };
 
 const defualtValue: settingsType = {
@@ -35,6 +38,9 @@ const defualtValue: settingsType = {
   useSTATS: false,
   useVsync: true,
   playerName: "Guest",
+  displayFences:true,
+  displayPillars:true,
+  displayWater:true
 };
 
 type SettingsStore = settingsType & {

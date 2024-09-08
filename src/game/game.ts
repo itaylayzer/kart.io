@@ -32,6 +32,7 @@ export default (
   const animate = () => {
     try {
       Global.deltaTime = clock.getDelta();
+      Global.elapsedTime = clock.getElapsedTime();
 
       Global.updates
         .concat(PhysicsObject.childrens.flatMap((v) => v.update))
