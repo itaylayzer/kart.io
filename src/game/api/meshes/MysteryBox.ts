@@ -42,7 +42,7 @@ export class MysteryBox extends PhysicsObject {
     Global.lod.add(mesh);
 
     mesh.position.copy(position);
-    this.position.set(position.x, position.y, position.z);
+    this.position.set(position.x, position.y - 0.25, position.z);
 
     let x = randFloat(-2, 2);
     let y = randFloat(-2, 2);
@@ -50,12 +50,10 @@ export class MysteryBox extends PhysicsObject {
 
     this.update = [
       () => {
-        mesh.position.copy(this.position);
+        mesh.position.copy(this.position).add(new THREE.Vector3(0, 0.25, 0));
         mesh.rotateX(x * Global.deltaTime);
         mesh.rotateY(y * Global.deltaTime);
         mesh.rotateZ(z * Global.deltaTime);
-        // @ts-ignore
-        this.quaternion.copy(mesh.quaternion);
       },
     ];
 

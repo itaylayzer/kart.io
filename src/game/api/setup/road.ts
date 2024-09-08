@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { Global } from "../../store/Global";
 
 export function buildPoints(
   points: THREE.Vector3[],
@@ -46,23 +45,17 @@ export function createVectorsFromNumbers(curvePoints: number[]) {
  * @author https://hofk.de/main/discourse.threejs/2021/CarRacing/CarRacing.html
  */
 export function createRoad(
-  pts: THREE.Vector3[],
   curve: THREE.CatmullRomCurve3,
   roadLength: number,
-  size: number,
-  segmentCount: number = 10 // Number of segments
-): [THREE.InstancedMesh, THREE.Mesh[]] {
-  const ls = 1400; // length segments original was 1400
+  segmentCount: number = 10, // Number of segments
+  ls: number = 1400
+): THREE.Mesh[] {
   const ws = 5; // width segments
-  const lss = ls + 1;
   const wss = ws + 1;
 
   const points = curve.getPoints(ls);
   const len = curve.getLength();
   const lenList = curve.getLengths(ls);
-
-  const faceCount = ls * ws * 2;
-  const vertexCount = lss * wss;
 
   // Split logic
   const segmentLength = Math.floor(ls / segmentCount);
@@ -115,7 +108,7 @@ export function createRoad(
       }
     }
 
-    const dw = [-0.36, -0.34, -0.01, 0.01, 0.34, 0.36];
+    const dw = [-1, -0.95, -0.025, 0.025, 0.95, 1];
 
     for (let j = startIdx; j <= endIdx; j++) {
       const tangent = curve.getTangent(j / ls);
@@ -140,10 +133,6 @@ export function createRoad(
       }
     }
 
-    // const tex = Global.assets.textures.txt_road;
-    // tex.wrapS = THREE.RepeatWrapping;
-    // tex.repeat.set(segmentLength * 2, 1);
-
     const material = [
       new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide }),
       new THREE.MeshBasicMaterial({ color: 0x111111, side: THREE.DoubleSide }),
@@ -159,6 +148,5 @@ export function createRoad(
     segmentMeshes.push(segmentMesh);
   }
 
-  const dotsMesh = buildPoints(pts, size);
-  return [dotsMesh, segmentMeshes];
+  return segmentMeshes;
 }

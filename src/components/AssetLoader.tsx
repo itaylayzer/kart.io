@@ -1,8 +1,8 @@
 import { ReactNode, useEffect } from "react";
 import { useAssetStore } from "../store/useAssetLoader";
+import { LinearProgress } from "@mui/material";
 
 export default function AssetLoader({
-  children,
   items,
 }: {
   children: ReactNode;
@@ -18,9 +18,17 @@ export default function AssetLoader({
     return () => {};
   }, []);
 
-  return progress >= 2 ? (
-    children
-  ) : (
-    <progress value={progress} max={1}></progress>
+  return (
+    <LinearProgress
+      style={{
+        width: 500,
+        marginTop: 10,
+        opacity: 0.2 * +(progress <= 1),
+        transition: "opacity 1s ease-out",
+      }}
+      variant="determinate"
+      color="inherit"
+      value={Math.min(progress, 1) * 100}
+    />
   );
 }

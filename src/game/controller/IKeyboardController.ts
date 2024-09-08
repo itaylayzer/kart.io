@@ -13,7 +13,10 @@ export class IKeyboardController {
   public keysPressed: Set<number>;
   public keysAxis: [[number, number], [number, number]];
   public beforeFirstUpdate: () => void;
+  public isLocked: boolean;
+
   constructor() {
+    this.isLocked = false;
     this.keysDown = new Set();
     this.keysUp = new Set();
     this.keysPressed = new Set();
@@ -69,6 +72,15 @@ export class IKeyboardController {
       if (Math.abs(this.keysAxis[LERPED_AXIS][index]) < 0.05) {
         this.keysAxis[LERPED_AXIS][index] = 0;
       }
+    }
+
+    if (this.isLocked) {
+      for (let index = 0; index < 2; index++)
+        this.keysAxis[RAW_AXIS][index] = 0;
+
+      this.keysDown.clear();
+      this.keysUp.clear();
+      this.keysPressed.clear();
     }
   }
 

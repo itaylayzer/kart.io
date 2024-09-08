@@ -260,7 +260,7 @@ footer {
   z-index: 10;
 }
 header {
-  background-color: black;
+  background-color: rgba(0, 0, 0, 0);
   top: 0;
   left: 0;
   min-height: 18px;
@@ -278,11 +278,7 @@ footer a {
   cursor: pointer;
 }
 
-progress {
-  height: 3px;
-  margin-block: auto;
-  width: 500px;
-}
+
 div#root button.mini {
   padding: 4px 16px;
   font-size: 20px;

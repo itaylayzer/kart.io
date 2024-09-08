@@ -2,28 +2,27 @@ import * as THREE from "three";
 import { Global } from "../store/Global";
 import clamp from "../api/clamp";
 
-export class AudioController {
+const maxVolume = 0.3;
+
+export class AudioController extends THREE.Group {
   public static listener: THREE.AudioListener;
 
-  public static update: (
-    speed: number,
-    quaternion: THREE.QuaternionLike,
-    position: THREE.Vector3Like
-  ) => void;
+  public update: (speed: number) => void;
 
-  public static localUpdate: (
-    quaternion: THREE.QuaternionLike,
-    position: THREE.Vector3Like
-  ) => void;
-
-  public static playerPos: THREE.Vector3;
+  static {
+    this.listener = new THREE.AudioListener();
+    this.listener.setMasterVolume(0);
+  }
 
   public static init() {
-    this.playerPos = new THREE.Vector3();
-    Global.camera.add((this.listener = new THREE.AudioListener()));
+    Global.camera.add(this.listener);
     this.listener.setMasterVolume(
-      30 * Global.settings.masterVolume * Global.settings.sfxVolume
+      maxVolume * Global.settings.masterVolume * Global.settings.sfxVolume
     );
+  }
+
+  constructor() {
+    super();
     const clips = [
       new THREE.PositionalAudio(AudioController.listener).setBuffer(
         Global.assets.sfx.sfx_slow
@@ -36,28 +35,26 @@ export class AudioController {
       ),
     ];
 
-    for (const clip of clips) {
-      clip.play();
-      clip.setLoop(true);
+    for (const c of clips) {
+      c.setLoop(true);
+      c.position.set(0, 0, 0);
+      c.play();
     }
-    this.localUpdate = (quaternion, position) => {
-      this.playerPos.copy(position);
-      this.listener.position.copy(this.playerPos);
-      this.listener.quaternion.copy(quaternion);
+
+    const updateVolumes = (speed: number) => {
+      clips[0].setVolume(
+        (clamp(speed, 0, 1) * 0.5 + 0.5) * clamp((-speed + 5) / 10, 0, 1)
+      );
+      clips[1].setVolume(clamp((speed < 5 ? speed : 10 - speed) / 7, 0, 1));
+      clips[2].setVolume(clamp((speed - 5) / 5, 0, 1));
     };
-    this.update = (speed, quaternion, position) => {
-      try {
-        for (const clip of clips) {
-          clip.position.copy(position);
-          clip.quaternion.copy(quaternion);
-          //   clip.setRefDistance(
-          //     100 / new THREE.Vector3().copy(position).distanceTo(this.playerPos)
-          //   );
-        }
-        clips[0].setVolume(clamp((-speed + 5) / 10, 0, 1));
-        clips[1].setVolume(clamp((speed < 5 ? speed : 10 - speed) / 7, 0, 1));
-        clips[2].setVolume(clamp((speed - 5) / 5, 0, 1));
-      } catch {}
+
+    updateVolumes(0);
+
+    this.update = (speed) => {
+      updateVolumes(speed);
     };
+
+    super.add(...clips);
   }
 }

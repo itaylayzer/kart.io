@@ -16,10 +16,13 @@ export class DriveController {
   private driftSide: [number, number];
   private driftTime: number;
   private speedTime: number;
+
   constructor(
     public maxSpeed: number,
     private body: CANNON.Body,
     private keyboard: IKeyboardController,
+    private audio: AudioController,
+
     private islocal: boolean
   ) {
     this.steeringAngle = 0;
@@ -230,13 +233,6 @@ export class DriveController {
         "p#velocity"
       )!.innerHTML = `${velocityMagnitude.toFixed(2)} KM/S`);
 
-    if (this.islocal) {
-      AudioController.localUpdate(this.body.quaternion, this.body.position);
-    }
-    AudioController.update(
-      velocityMagnitude,
-      this.body.quaternion,
-      this.body.position
-    );
+    this.audio.update(velocityMagnitude);
   }
 }
