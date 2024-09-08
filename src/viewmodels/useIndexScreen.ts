@@ -3,7 +3,7 @@ import { toast } from "react-toastify";
 import { useSettingsStore } from "../store/useSettingsStore";
 import { audio } from "../lib/AudioContainer";
 
-type Room = [number, string, number];
+type Room = [number, string, number, boolean];
 
 export const ip = "151.145.86.242";
 export const port = 5350;
@@ -20,7 +20,10 @@ export const useIndexScreen = () => {
   const [screenIndex, setScreen] = useState<number>(0);
   const [rooms, setRooms] = useState<Room[] | Error | undefined>();
   const [roomName, setRoomName] = useState<string>("");
-  const [room, setRoom] = useState<[number, string]>([0, "local"]);
+  const [roomPassword, setRoomPassword] = useState<string>("");
+  const [room, setRoom] = useState<
+    [number, string, boolean, string | undefined]
+  >([0, "local", false, undefined]);
 
   async function loadRooms() {
     setRooms(undefined);
@@ -49,11 +52,19 @@ export const useIndexScreen = () => {
   async function createRoom() {
     try {
       const response = await fetch(
-        `https://${ip}:${port}/register/${roomName}`
+        [
+          `https://${ip}:${port}/register/${roomName}`,
+          `https://${ip}:${port}/registerpass/${roomName}/${roomPassword}`,
+        ][+(roomPassword.length > 0)]
       );
       const value = await response.text();
       if (value.startsWith("p")) {
-        setRoom([parseInt(value.substring(1)), roomName]);
+        setRoom([
+          parseInt(value.substring(1)),
+          roomName,
+          roomPassword.length > 0,
+          roomPassword,
+        ]);
         setScreen(5);
       } else {
         toast(["No More Ports to Open", "Server Error"][parseInt(value) - 1], {
@@ -90,5 +101,6 @@ export const useIndexScreen = () => {
     createRoom,
     setRoomName,
     setRoom,
+    setRoomPassword,
   };
 };

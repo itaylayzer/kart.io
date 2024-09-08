@@ -21,7 +21,13 @@ export class Room {
   public close: () => void;
   public players: Map<number, Player>;
   public isGameStarted: () => boolean;
-  constructor(port: number, public name, removeFromList: () => void) {
+
+  constructor(
+    port: number,
+    public name,
+    removeFromList: () => void,
+    public password: string | undefined = undefined
+  ) {
     const app = express();
     const server = createServer(credentials, app);
     const io = new Server(server, {
@@ -79,6 +85,14 @@ export class Room {
       socket.on(CS.JOIN, (name: string) => {
         if (gameStarted) {
           socket.emit(CC.INIT, false);
+          socket.disconnect();
+          return;
+        }
+        if (
+          this.password !== undefined &&
+          socket.handshake.query.password !== this.password
+        ) {
+          socket.emit(CC.INIT, true);
           socket.disconnect();
           return;
         }

@@ -8,7 +8,12 @@ import { useSettingsStore } from "../store/useSettingsStore";
 
 type Player = [string, number, boolean];
 
-export const useRoomScreen = (room: number, goBack: () => void) => {
+export const useRoomScreen = (
+  room: number,
+  goBack: () => void,
+  needPassword: boolean,
+  tryPassword: string | undefined
+) => {
   const [players, setPlayers] = useState<Map<number, Player>>();
   const [ready, toggleReady] = useToggle(false);
   const [socket, setSocket] = useState<Socket>();
@@ -20,9 +25,18 @@ export const useRoomScreen = (room: number, goBack: () => void) => {
   useEffect(() => {
     // join server
     const playersMap = new Map<number, Player>();
+
+    let password = "";
+    if (needPassword) {
+      if (tryPassword === undefined) {
+        password = prompt("Room password") ?? "";
+      } else {
+        password = tryPassword;
+      }
+    }
     const socket = io(`wss://${ip}:${room}`, {
       transports: ["websocket"],
-      secure: true,
+      query: [undefined, { password }][+needPassword],
     });
 
     socket.on("connect", () => {
@@ -35,9 +49,15 @@ export const useRoomScreen = (room: number, goBack: () => void) => {
     });
     socket.on(
       CC.INIT,
-      (data: false | [number, number, [number, ...Player][]]) => {
+      (data: false | true | [number, number, [number, ...Player][]]) => {
         if (data === false) {
           toast("Game Started", { type: "error" });
+          goBack();
+          return;
+        }
+
+        if (typeof data === "boolean") {
+          toast("Password Incorrect", { type: "error" });
           goBack();
           return;
         }

@@ -27,7 +27,7 @@ app.get("/", (req, res) => {
   res.status(200).send("Great! now you can play KartIO with servers");
 });
 
-app.get("/register/:name", (req, res) => {
+function register(res, name: string, password: string | undefined) {
   try {
     const entries = Array.from(ports.entries());
     const openPortObj = entries.filter((v) => v[1] === undefined).pop();
@@ -39,21 +39,46 @@ app.get("/register/:name", (req, res) => {
 
     ports.set(
       portNum,
-      new Room(portNum, req.params.name, () => {
-        ports.set(portNum, undefined);
-      })
+      new Room(
+        portNum,
+        name,
+        () => {
+          ports.set(portNum, undefined);
+        },
+        password
+      )
     );
     res.status(200).send(`p${portNum}`);
   } catch (er) {
     res.status(200).send("2");
     console.error(er);
   }
+}
+
+app.get("/registerpass/:name/:password", (req, res) => {
+  console.log("registerpass");
+  console.log(
+    "req.params.password",
+    req.params.password.substring(1),
+    req.params.name
+  );
+  register(res, req.params.name, req.params.password);
+});
+app.get("/register/:name", (req, res) => {
+  console.log("register");
+
+  register(res, req.params.name, undefined);
 });
 
 app.get("/list", (req, res) => {
   const entries = Array.from(ports.entries())
     .filter((v) => v[1] !== undefined && !v[1].isGameStarted())
-    .map(([port, room]) => [port, room!.name, room!.players.size]);
+    .map(([port, room]) => [
+      port,
+      room!.name,
+      room!.players.size,
+      room!.password !== undefined,
+    ]);
 
   res.status(200).send(JSON.stringify(entries));
 });
