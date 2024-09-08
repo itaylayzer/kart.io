@@ -6,6 +6,7 @@ import { damp } from "three/src/math/MathUtils.js";
 import { IKeyboardController } from "./IKeyboardController";
 import clamp from "../api/clamp";
 import { AudioController } from "./AudioController";
+import { Player } from "../player/Player";
 
 const maxDistance = 1;
 export class DriveController {
@@ -19,14 +20,14 @@ export class DriveController {
 
   constructor(
     public maxSpeed: number,
-    private body: CANNON.Body,
+    private body: Player,
     private keyboard: IKeyboardController,
     private audio: AudioController,
 
     private islocal: boolean
   ) {
     this.steeringAngle = 0;
-    this.maxSteeringAngle = 30; // Limit steering angle (30 degrees)
+    this.maxSteeringAngle = 15; // Limit steering angle (30 degrees)
     this.raycaster = new THREE.Raycaster();
     this.last = new CANNON.Vec3();
     this.driftTime = 0;
@@ -54,14 +55,27 @@ export class DriveController {
       closestIntersection === undefined ||
       closestIntersection.distance > maxDistance
     ) {
-      this.body.position.copy(this.last);
+      // this.body.position.copy(this.last);
 
-      const forwardVec = this.body.quaternion.vmult(new CANNON.Vec3(0, 0, 1));
-      this.body.applyImpulse(
-        forwardVec.scale(
-          -15 * (this.body.velocity.dot(forwardVec) < 0 ? -1 : 1)
-        )
+      const releventTransfer =
+        this.body.tracker.getPointTransform() as THREE.Object3D;
+
+      const A = new THREE.Vector3()
+        .copy(this.body.position)
+        .sub(releventTransfer.position);
+      const B = new THREE.Vector3(1, 0, 0).applyQuaternion(
+        releventTransfer.quaternion
       );
+
+      let impulse = B.clone();
+
+      if (A.dot(B) > 0) {
+        impulse.negate();
+      }
+
+      impulse.multiplyScalar(5);
+
+      this.body.applyImpulse(new CANNON.Vec3(impulse.x, impulse.y, impulse.z));
       return;
     }
     this.last.copy(this.body.position);
@@ -149,7 +163,7 @@ export class DriveController {
 
   update() {
     if (this.keyboard.isKeyDown(32) || this.keyboard.isKeyDown(-6)) {
-      this.driftSide[0] = this.keyboard.horizontalRaw * 0.6;
+      this.driftSide[0] = this.keyboard.horizontalRaw * 1;
       this.driftTime = 0;
     }
     if (
