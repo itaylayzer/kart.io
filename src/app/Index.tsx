@@ -24,7 +24,7 @@ export function Index() {
     setRoom,
     playerName,
     setPlayerName,
-    setRoomPassword
+    setRoomPassword,
   } = useIndexScreen();
 
   return (
@@ -360,6 +360,10 @@ export function Index() {
               <p>
                 {" "}
                 https://hofk.de/main/discourse.threejs/2021/CarRacing/CarRacing.html
+              </p>
+              <h3>water</h3>
+              <p>
+                https://codesandbox.io/p/sandbox/eager-ganguly-x4fl4?file=%2Fsrc%2Findex.js%3A99%2C47
               </p>
               <h3> motion blur </h3>
               <p>https://www.clicktorelease.com/tmp/threejs/mblur/</p>
