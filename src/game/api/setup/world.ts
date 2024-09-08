@@ -19,7 +19,12 @@ import { Player } from "../../player/Player";
 import { CC, CS } from "../../store/codes";
 import { Global } from "../../store/Global";
 import { MysteryBox } from "../meshes/MysteryBox";
-import { createRoad, createVectorsFromNumbers } from "./road";
+import {
+  createFences,
+  createRoad,
+  createFencesPilars,
+  createVectorsFromNumbers,
+} from "./road";
 import msgpack from "msgpack-lite";
 import { curvePoints } from "../../constants/road";
 import { PauseMenu } from "../../player/PauseMenu";
@@ -118,12 +123,26 @@ function setupRoad() {
   const pts: THREE.Vector3[] = createVectorsFromNumbers(curvePoints);
   Global.curve = new THREE.CatmullRomCurve3(pts);
   const roadsSegments = createRoad(Global.curve, 5, 100, 1400);
+  Global.lod.add(...roadsSegments);
+
+  const ground = new THREE.Mesh(
+    new THREE.PlaneGeometry(300, 300),
+    new THREE.MeshLambertMaterial({ color: "#4287f5", side: THREE.DoubleSide })
+  );
+  ground.position.y -= 1;
+  ground.rotateX(Math.PI / 2);
+  Global.lod.add(ground);
+
+  const fences = createFences(Global.curve, 5, 100, 1400);
+  const tiles = createFencesPilars(Global.curve, 5.1, 100, 1400, roadsSegments);
 
   Global.roadMesh = roadsSegments;
+
   for (const mm of roadsSegments) {
     mm.frustumCulled = true;
-    Global.lod.add(mm);
   }
+  Global.lod.add(...fences, ...tiles);
+
   const texture = Global.assets.textures.block.clone();
   texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
   texture.offset.set(0, 0);
