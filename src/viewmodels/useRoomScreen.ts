@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { getNameFromURL } from "../game/api/getNameFromURL";
 import { useToggle } from "../hooks/useToggle";
 import { io, Socket } from "socket.io-client";
 import { CC, CS } from "@/server/store/codes";
 import { toast } from "react-toastify";
 import { ip } from "./useIndexScreen";
+import { useSettingsStore } from "../store/useSettingsStore";
 
 type Player = [string, number, boolean];
 
@@ -13,6 +13,7 @@ export const useRoomScreen = (room: number, goBack: () => void) => {
   const [ready, toggleReady] = useToggle(false);
   const [socket, setSocket] = useState<Socket>();
   const [startGameScreen, setStartGameScreen] = useState(false);
+  const { playerName } = useSettingsStore();
   const [pid, setPID] = useState<number>(0);
   const isConnected = socket !== undefined;
 
@@ -26,7 +27,7 @@ export const useRoomScreen = (room: number, goBack: () => void) => {
 
     socket.on("connect", () => {
       setSocket(socket);
-      socket.emit(CS.JOIN, getNameFromURL());
+      socket.emit(CS.JOIN, playerName);
     });
     socket.on("error", () => {
       toast("Couldnt Connect", { type: "error" });
@@ -43,7 +44,7 @@ export const useRoomScreen = (room: number, goBack: () => void) => {
 
         const [selfId, selfColor, players] = data;
         setPID(selfId);
-        playersMap.set(selfId, [getNameFromURL(), selfColor, false]);
+        playersMap.set(selfId, [playerName, selfColor, false]);
 
         for (const [pid, pname, pcolor, pready] of players) {
           playersMap.set(pid, [pname, pcolor, pready]);

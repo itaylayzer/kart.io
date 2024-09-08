@@ -1,10 +1,12 @@
 InGame:
 
-- Audio - https://opengameart.org/content/engine-loop-heavy-vehicletank
-- Win Senerio
 - Special System
-- Room Settings: Map Indexing, Password
-- Map: Fances, Generated Grass, Split into sections to use LOD
+- Room Settings: Map Indexing, Password, Private Rooms
+
+Optional:
+
+- Win Senerio
+- Map: Fances, Generated Grass
 
 maybe
 https://opengameart.org/content/racing-kart

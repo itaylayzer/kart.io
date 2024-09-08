@@ -39,7 +39,7 @@ export default (
       Global.lateUpdates.map((f) => f());
 
       scoreboard.update();
-
+      Global.lod.update(Global.camera);
       Global.system.update();
       Global.render();
       try {

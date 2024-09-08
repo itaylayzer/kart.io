@@ -6,6 +6,7 @@ import { PhysicsObject } from "../physics/PhysicsMesh";
 import * as CANNON from "cannon-es";
 import { PlayerModel } from "./PlayerModel";
 import { TrackerController } from "../controller/TrackerController";
+import { AudioController } from "../controller/AudioController";
 
 export const COLORS = ["#124eb5", "#ff0000", "#00ff00"];
 const COLORSEMISSIVE = [10, 4, 10];
@@ -44,7 +45,8 @@ export class Player extends PhysicsObject {
     this.color = color;
     Player.clients.set(pid, this);
 
-    const engine = new DriveController(5, this, this.keyboard, isLocal);
+    const audio = new AudioController();
+    const engine = new DriveController(5, this, this.keyboard, audio, isLocal);
     const model = new PlayerModel(
       this,
       keyboard,
@@ -52,14 +54,18 @@ export class Player extends PhysicsObject {
       [color, colorSetEmissive],
       isLocal
     );
+    model.add(audio);
     this.update = [
       () => {
         keyboard.firstUpdate();
 
         isLocal && Global.cameraController.update();
+
         engine.update();
         model.update();
+
         this.tracker.update();
+        keyboard.isLocked = this.tracker.round >= 1;
 
         keyboard.lastUpdate();
       },
@@ -73,7 +79,7 @@ export class Player extends PhysicsObject {
     };
 
     Global.world.addBody(this);
-    Global.lod.add(model);
+    Global.lod.addLevel(model);
   }
 
   public applyTransform(transform: number[]) {
