@@ -301,46 +301,16 @@ function setupRenderer() {
   bloomPass.strength = 0.5;
   bloomPass.radius = 0;
 
-  const composer2 = new EffectComposer(Global.renderer);
-  composer2.addPass(new RenderPass(Global.scene, Global.camera));
-  composer2.addPass(new OutputPass());
-
-  const shader = {
-    uniforms: {
-      tDiffuse: { type: "t", value: null },
-      tColor: { type: "t", value: null },
-      resolution: { type: "v2", value: new THREE.Vector2(1, 1) },
-      viewProjectionInverseMatrix: { type: "m4", value: new THREE.Matrix4() },
-      previousViewProjectionMatrix: { type: "m4", value: new THREE.Matrix4() },
-      velocityFactor: { type: "f", value: 1 },
-    },
-
-    vertexShader: document.getElementById("vs-motionBlur")!.textContent,
-    fragmentShader: document.getElementById("fs-motionBlur")!.textContent,
-  };
-
-  const blurPass = new ShaderPass(shader);
-  blurPass.renderToScreen = true;
   if (Global.settings.useBloom) composer.addPass(bloomPass);
-  // composer.addPass(fastPass);
 
   window.addEventListener("resize", () => {
     const s = 1;
     composer.setSize(s * window.innerWidth, s * window.innerHeight);
-    composer2.setSize(s * window.innerWidth, s * window.innerHeight);
     Global.camera.aspect = window.innerWidth / window.innerHeight;
     Global.camera.updateProjectionMatrix();
 
     Global.renderer.setSize(s * window.innerWidth, s * window.innerHeight);
-    blurPass.uniforms.resolution.value.set(
-      s * window.innerWidth,
-      s * window.innerHeight
-    );
   });
-
-  var mCurrent = new THREE.Matrix4();
-  var mPrev = new THREE.Matrix4();
-  var tmpArray = new THREE.Matrix4();
 
   let beforeUpdate = () => {};
   if (Global.settings.displayWater) {
@@ -354,21 +324,8 @@ function setupRenderer() {
 
   Global.render = () => {
     beforeUpdate();
-    blurPass.material.uniforms.velocityFactor.value = 4;
 
-    tmpArray.copy(Global.camera.matrixWorldInverse);
-    tmpArray.multiply(Global.camera.projectionMatrix);
-    mCurrent.copy(tmpArray.clone().invert());
-
-    blurPass.material.uniforms.viewProjectionInverseMatrix.value.copy(mCurrent);
-    blurPass.material.uniforms.previousViewProjectionMatrix.value.copy(mPrev);
-
-    composer2.render();
-
-    blurPass.material.uniforms.tDiffuse.value = composer2.renderTarget2;
     composer.render();
-
-    mPrev.copy(tmpArray);
   };
 }
 
