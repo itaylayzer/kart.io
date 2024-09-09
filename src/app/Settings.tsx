@@ -46,6 +46,7 @@ export function Settings({
     displayPillars,
     displayWater,
     displayStars,
+    motionBlur,
   } = useSettingsScreen();
 
   return (
@@ -329,6 +330,25 @@ export function Settings({
                       checked={useBloom}
                       onChange={(_, value) => set({ useBloom: value })}
                     />
+                  </td>
+                </tr>
+                <tr>
+                  <td>Motion Blur</td>
+                  <td style={{ display: "flex", gap: 20 }}>
+                    <Slider
+                      key={"motionBlur"}
+                      min={0}
+                      step={5}
+                      max={100}
+                      style={{ width: 150 }}
+                      value={motionBlur}
+                      onChange={(_, value) => {
+                        set({ motionBlur: value as number });
+                      }}
+                    />
+                    <p style={{ fontFamily: "monospace" }}>
+                      {(motionBlur.toString() + "%").padStart(4, " ")}
+                    </p>
                   </td>
                 </tr>
                 <tr>

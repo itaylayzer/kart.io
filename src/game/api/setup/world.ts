@@ -1,37 +1,39 @@
 import * as CANNON from "cannon-es";
 import CannonDebugger from "cannon-es-debugger";
+import msgpack from "msgpack-lite";
 import { Socket } from "socket.io-client";
 import * as THREE from "three";
 import {
+  BlendShader,
+  CopyShader,
   EffectComposer,
-  OutputPass,
   PointerLockControls,
   RenderPass,
+  SavePass,
   ShaderPass,
   UnrealBloomPass,
 } from "three/examples/jsm/Addons.js";
+import Stats from "three/examples/jsm/libs/stats.module.js";
 import { colors } from "../../constants";
+import { curvePoints } from "../../constants/road";
+import { AudioController } from "../../controller/AudioController";
 import { CameraController } from "../../controller/CameraController";
 import { MouseController } from "../../controller/MouseController";
 import { LocalPlayer } from "../../player/LocalPlayer";
 import { OnlinePlayer } from "../../player/OnlinePlayer";
+import { PauseMenu } from "../../player/PauseMenu";
 import { Player } from "../../player/Player";
 import { CC, CS } from "../../store/codes";
 import { Global } from "../../store/Global";
 import { MysteryBox } from "../meshes/MysteryBox";
 import {
   createFences,
-  createRoad,
   createFencesPilars,
+  createRoad,
+  createStarfield,
   createVectorsFromNumbers,
   createWater,
-  createStarfield,
 } from "./road";
-import msgpack from "msgpack-lite";
-import { curvePoints } from "../../constants/road";
-import { PauseMenu } from "../../player/PauseMenu";
-import { AudioController } from "../../controller/AudioController";
-import Stats from "three/examples/jsm/libs/stats.module.js";
 
 function setupLights() {
   const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 1);
@@ -286,9 +288,9 @@ function setupSocket(
     Global.socket?.disconnect();
   });
 }
-
 function setupRenderer() {
   const composer = new EffectComposer(Global.renderer);
+
   composer.addPass(new RenderPass(Global.scene, Global.camera));
 
   const bloomPass = new UnrealBloomPass(
@@ -300,6 +302,39 @@ function setupRenderer() {
   bloomPass.threshold = 1;
   bloomPass.strength = 0.5;
   bloomPass.radius = 0;
+
+  // blend pass
+  if (Global.settings.motionBlur > 0) {
+    const renderTargetParameters = {
+      minFilter: THREE.LinearFilter,
+      magFilter: THREE.LinearFilter,
+      stencilBuffer: false,
+    };
+
+    const savePass = new SavePass(
+      new THREE.WebGLRenderTarget(
+        window.innerWidth,
+        window.innerHeight,
+        renderTargetParameters
+      )
+    );
+
+    const blendPass = new ShaderPass(BlendShader, "tDiffuse1");
+    blendPass.uniforms["tDiffuse2"].value = savePass.renderTarget.texture;
+    blendPass.uniforms["mixRatio"].value =
+      (0.2 * Global.settings.motionBlur) / 100;
+
+    // output pass
+
+    const outputPass = new ShaderPass(CopyShader);
+    outputPass.renderToScreen = true;
+
+    // setup pass chain
+
+    composer.addPass(blendPass);
+    composer.addPass(savePass);
+    composer.addPass(outputPass);
+  }
 
   if (Global.settings.useBloom) composer.addPass(bloomPass);
 
@@ -318,6 +353,7 @@ function setupRenderer() {
     for (const water of waterGround) {
       water.position.y -= 1;
     }
+    Global.optimizedObjects.push(...waterGround);
     beforeUpdate = _beforeUpdate;
     Global.lod.add(...waterGround);
   }
