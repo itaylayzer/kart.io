@@ -29,10 +29,16 @@ export default (
 
   const map = new WorldMap();
   Global.lockController.lock();
+
   const animate = () => {
+    if (document.visibilityState === "hidden") return;
     try {
       Global.deltaTime = clock.getDelta();
       Global.elapsedTime = clock.getElapsedTime();
+
+      for (const mesh of Global.optimizedObjects) {
+        mesh.visible = mesh.position.distanceTo(Global.camera.position) < 50;
+      }
 
       Global.updates
         .concat(PhysicsObject.childrens.flatMap((v) => v.update))

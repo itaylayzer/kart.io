@@ -88,7 +88,7 @@ export class Player extends PhysicsObject {
     };
 
     Global.world.addBody(this);
-    Global.lod.addLevel(model);
+    Global.lod.add(model);
   }
 
   public applyTransform(transform: number[]) {

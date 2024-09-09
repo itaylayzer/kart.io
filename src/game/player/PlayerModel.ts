@@ -33,7 +33,7 @@ export class PlayerModel extends THREE.Group {
   ) {
     super();
     const model = Global.assets.gltf.car.scene.clone();
-
+    console.log("a", model.id);
     model.traverse((part) => {
       const partAsMesh = part as THREE.Mesh;
       if (partAsMesh) {

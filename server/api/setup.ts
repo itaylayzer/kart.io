@@ -4,12 +4,12 @@ import { createMysteryBoxes } from "./createMysteryBoxes";
 import { randInt } from "three/src/math/MathUtils.js";
 import { createStartLocationsGenerator } from "./createStartLocationsGenerator";
 
-export default function () {
+export default function (mapInd:number) {
   const pts: THREE.Vector3[] = [];
 
-  for (let i = 0; i < curvePoints.length; i += 3) {
+  for (let i = 0; i < curvePoints[mapInd].length; i += 3) {
     pts.push(
-      new THREE.Vector3(curvePoints[i], curvePoints[i + 1], curvePoints[i + 2])
+      new THREE.Vector3(curvePoints[mapInd][i], curvePoints[mapInd][i + 1], curvePoints[mapInd][i + 2])
     );
   }
 

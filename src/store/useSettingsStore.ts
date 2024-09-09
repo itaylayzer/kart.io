@@ -17,9 +17,10 @@ export type settingsType = {
   useVsync: boolean;
   playerName: string;
   useSTATS: boolean;
-  displayWater:boolean;
-  displayFences:boolean;
-  displayPillars:boolean;
+  displayWater: boolean;
+  displayFences: boolean;
+  displayPillars: boolean;
+  displayStars: boolean;
 };
 
 const defualtValue: settingsType = {
@@ -31,16 +32,17 @@ const defualtValue: settingsType = {
   renderColliders: false,
   displayVelocity: true,
   Antialiasing: true,
-  musicVolume: 0.5,
+  musicVolume: 0,
   sfxVolume: 1,
-  displayAudio: true,
+  displayAudio: false,
   fps: 60,
   useSTATS: false,
   useVsync: true,
   playerName: "Guest",
-  displayFences:true,
-  displayPillars:true,
-  displayWater:true
+  displayFences: true,
+  displayPillars: true,
+  displayWater: true,
+  displayStars: true,
 };
 
 type SettingsStore = settingsType & {

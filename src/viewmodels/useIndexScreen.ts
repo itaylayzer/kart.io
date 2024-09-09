@@ -1,7 +1,11 @@
-import { useEffect, useState } from "react";
+import { createRef, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useSettingsStore } from "../store/useSettingsStore";
 import { audio } from "../lib/AudioContainer";
+import { CatmullRomCurve3 } from "three";
+import { curvePoints } from "../game/constants/road";
+import { createVectorsFromNumbers } from "../game/api/setup/road";
+import { renderMap } from "../game/player/WorldMap";
 
 type Room = [number, string, number, boolean];
 
@@ -21,9 +25,12 @@ export const useIndexScreen = () => {
   const [rooms, setRooms] = useState<Room[] | Error | undefined>();
   const [roomName, setRoomName] = useState<string>("");
   const [roomPassword, setRoomPassword] = useState<string>("");
+  const [roomMap, setRoomMap] = useState<number>(0);
   const [room, setRoom] = useState<
     [number, string, boolean, string | undefined]
   >([0, "local", false, undefined]);
+
+  const roomMapCanvasRef = createRef<HTMLCanvasElement>();
 
   async function loadRooms() {
     setRooms(undefined);
@@ -90,6 +97,15 @@ export const useIndexScreen = () => {
     }
   }, [screenIndex]);
 
+  useEffect(() => {
+    if (roomMapCanvasRef.current === null) return;
+    renderMap(
+      new CatmullRomCurve3(createVectorsFromNumbers(curvePoints[roomMap])),
+      roomMapCanvasRef.current!,
+      500
+    );
+  }, [roomMapCanvasRef.current, roomMap, screenIndex]);
+
   return {
     room,
     playerName,
@@ -102,5 +118,8 @@ export const useIndexScreen = () => {
     setRoomName,
     setRoom,
     setRoomPassword,
+    roomMap,
+    setRoomMap,
+    roomMapCanvasRef,
   };
 };

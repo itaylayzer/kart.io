@@ -13,9 +13,14 @@ for (let index = 5321; index < 5350; index++) {
   ports.set(
     index,
     startCount > 0
-      ? new Room(index, `demo ${startCount}`, () => {
-          ports.set(index, undefined);
-        })
+      ? new Room(
+          index,
+          `demo ${startCount}`,
+          () => {
+            ports.set(index, undefined);
+          },
+          undefined
+        )
       : undefined
   );
   startCount > 0 && startCount--;

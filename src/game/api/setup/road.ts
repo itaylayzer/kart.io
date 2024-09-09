@@ -134,6 +134,22 @@ export function createRoad(
       }
     }
 
+    // Calculate the centroid of the segment
+    const centroid = new THREE.Vector3();
+    for (let i = 0; i < vertices.length; i += 3) {
+      centroid.x += vertices[i];
+      centroid.y += vertices[i + 1];
+      centroid.z += vertices[i + 2];
+    }
+    centroid.divideScalar(vertices.length / 3);
+
+    // Translate vertices so the centroid is at the origin
+    for (let i = 0; i < vertices.length; i += 3) {
+      vertices[i] -= centroid.x;
+      vertices[i + 1] -= centroid.y;
+      vertices[i + 2] -= centroid.z;
+    }
+
     const material = [
       new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide }),
       new THREE.MeshBasicMaterial({ color: 0x111111, side: THREE.DoubleSide }),
@@ -146,6 +162,10 @@ export function createRoad(
     segmentGeometry.computeVertexNormals();
 
     const segmentMesh = new THREE.Mesh(segmentGeometry, material);
+
+    // Set the position of the segment mesh to the centroid
+    segmentMesh.position.copy(centroid);
+    segmentMesh.frustumCulled = true;
     segmentMeshes.push(segmentMesh);
   }
 
@@ -238,6 +258,22 @@ export function createFences(
         );
       }
 
+      // Calculate the centroid of the segment
+      const centroid = new THREE.Vector3();
+      for (let i = 0; i < vertices.length; i += 3) {
+        centroid.x += vertices[i];
+        centroid.y += vertices[i + 1];
+        centroid.z += vertices[i + 2];
+      }
+      centroid.divideScalar(vertices.length / 3);
+
+      // Translate vertices so the centroid is at the origin
+      for (let i = 0; i < vertices.length; i += 3) {
+        vertices[i] -= centroid.x;
+        vertices[i + 1] -= centroid.y;
+        vertices[i + 2] -= centroid.z;
+      }
+
       segmentGeometry.setAttribute(
         "position",
         new THREE.Float32BufferAttribute(vertices, 3)
@@ -253,6 +289,10 @@ export function createFences(
       segmentGeometry.computeVertexNormals();
 
       const segmentMesh = new THREE.Mesh(segmentGeometry, material);
+
+      // Set the position of the segment mesh to the centroid
+      segmentMesh.position.copy(centroid);
+      segmentMesh.frustumCulled = true;
       fenceMeshes.push(segmentMesh);
     }
   }
@@ -271,7 +311,7 @@ export function createFencesPilars(
   const fenceMeshes: THREE.Mesh[] = [];
 
   const raycaster = new THREE.Raycaster();
-  raycaster.far = 1000;
+  raycaster.far = 5000;
   raycaster.near = 0;
 
   const segmentLength = Math.floor(ls / segmentCount);
@@ -431,4 +471,33 @@ export function createWater(
   };
 
   return [waterMeshes, beforeUpdate] as [THREE.Mesh[], () => void];
+}
+export function createStarfield(radius: number, count: number) {
+  const starGeometry = new THREE.BufferGeometry();
+  const starMaterial = new THREE.PointsMaterial({
+    color: 0xff2b00,
+    opacity: 0.1,
+    transparent: true,
+    size: 5,
+    fog: false,
+  });
+
+  const starVertices = [];
+  for (let i = 0; i < count; i++) {
+    const theta = Math.random() * 2 * Math.PI;
+    const phi = Math.acos(2 * Math.random() - 1);
+    const x = radius * Math.sin(phi) * Math.cos(theta);
+    const y = radius * Math.sin(phi) * Math.sin(theta);
+    const z = radius * Math.cos(phi);
+
+    starVertices.push(x, y, z);
+  }
+
+  starGeometry.setAttribute(
+    "position",
+    new THREE.Float32BufferAttribute(starVertices, 3)
+  );
+
+  const stars = new THREE.Points(starGeometry, starMaterial);
+  return stars;
 }
