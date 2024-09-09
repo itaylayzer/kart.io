@@ -8,72 +8,79 @@ import { WorldMap } from "./player/WorldMap";
 import { Socket } from "socket.io-client";
 import { Scoreboard } from "./player/Scoreboard";
 import { settingsType } from "../store/useSettingsStore";
+import { curvePoints } from "./constants/road";
+import { createVectorsFromNumbers } from "./api/setup/road";
 
 export default (
-  assets: loadedAssets,
-  socket: Socket,
-  pid: number,
-  players: Map<number, [string, number, boolean]>,
-  settings: settingsType
+    assets: loadedAssets,
+    socket: Socket,
+    pid: number,
+    players: Map<number, [string, number, boolean]>,
+    settings: settingsType,
+    mapIndex: number
 ) => {
-  Global.assets = assets;
-  Global.settings = settings;
+    Global.assets = assets;
+    Global.settings = settings;
+    Global.curve = new THREE.CatmullRomCurve3(
+        createVectorsFromNumbers(curvePoints[mapIndex])
+    );
 
-  const scoreboard = new Scoreboard();
-  setupWorld(socket, pid, players);
+    const scoreboard = new Scoreboard();
+    setupWorld(socket, pid, players);
 
-  Global.system = new System();
-  Global.system.addRenderer(new SpriteRenderer(Global.scene, THREE));
+    Global.system = new System();
+    Global.system.addRenderer(new SpriteRenderer(Global.scene, THREE));
 
-  const clock = new THREE.Clock();
+    const clock = new THREE.Clock();
 
-  const map = new WorldMap();
-  Global.lockController.lock();
+    const map = new WorldMap();
+    Global.lockController.lock();
 
-  const animate = () => {
-    if (document.visibilityState === "hidden") return;
-    try {
-      Global.deltaTime = clock.getDelta();
-      Global.elapsedTime = clock.getElapsedTime();
+    const animate = () => {
+        if (document.visibilityState === "hidden") return;
+        try {
+            Global.deltaTime = clock.getDelta();
+            Global.elapsedTime = clock.getElapsedTime();
 
-      for (const mesh of Global.optimizedObjects) {
-        mesh.visible = mesh.position.distanceTo(Global.camera.position) < 50;
-      }
+            for (const mesh of Global.optimizedObjects) {
+                mesh.visible =
+                    mesh.position.distanceTo(Global.camera.position) < 50;
+            }
 
-      Global.updates
-        .concat(PhysicsObject.childrens.flatMap((v) => v.update))
-        .map((fn) => fn());
-      Global.lateUpdates.map((f) => f());
+            Global.updates
+                .concat(PhysicsObject.childrens.flatMap((v) => v.update))
+                .map((fn) => fn());
+            Global.lateUpdates.map((f) => f());
 
-      scoreboard.update();
-      Global.lod.update(Global.camera);
-      Global.system.update();
-      Global.render();
-      try {
-        Global.world.step(2.6 * Global.deltaTime);
-      } catch (er) {
-        console.error(er);
-      }
+            scoreboard.update();
+            Global.lod.update(Global.camera);
+            Global.system.update();
+            Global.render();
+            try {
+                Global.world.step(2.6 * Global.deltaTime);
+            } catch (er) {
+                console.error(er);
+            }
 
-      map.update();
+            map.update();
 
-      if (Global.settings.renderColliders) Global.cannonDebugger.update();
-      Global.mouseController.lastUpdate();
+            if (Global.settings.renderColliders) Global.cannonDebugger.update();
+            Global.mouseController.lastUpdate();
 
-      if (Global.settings.useSTATS) {
-        Global.stats.update();
-      }
-    } catch (er) {
-      console.error(er);
-    }
-  };
+            if (Global.settings.useSTATS) {
+                Global.stats.update();
+            }
+        } catch (er) {
+            console.error(er);
+        }
+    };
 
-  if (Global.settings.useVsync) Global.renderer.setAnimationLoop(animate);
-  else setInterval(animate, 1000 / Global.settings.fps);
+    if (Global.settings.useVsync) Global.renderer.setAnimationLoop(animate);
+    else setInterval(animate, 1000 / Global.settings.fps);
 
-  return {
-    destroyer: () => {
-      // while (Global.container.firstChild) Global.container.removeChild(Global.container.firstChild);
-    },
-  };
+    return {
+        destroyer: () => {
+            // while (Global.container.firstChild) Global.container.removeChild(Global.container.firstChild);
+        },
+    };
 };

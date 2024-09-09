@@ -124,8 +124,6 @@ function setupWindowEvents() {
 }
 
 function setupRoad() {
-  const pts: THREE.Vector3[] = createVectorsFromNumbers(curvePoints[0]);
-  Global.curve = new THREE.CatmullRomCurve3(pts);
   const roadsSegments = createRoad(Global.curve, 5, 200, 2000);
   Global.lod.add(...roadsSegments);
   Global.roadMesh = roadsSegments;

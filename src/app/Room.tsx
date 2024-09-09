@@ -27,11 +27,12 @@ export function Room({
     pid,
     socket,
     disconnect,
+    map
   } = useRoomScreen(roomPort, goBack, needPassword, tryPassword);
   return (
     <Condition
       conditions={startGameScreen}
-      onTrue={<Play socket={socket!} players={players!} pid={pid} />}
+      onTrue={<Play socket={socket!} players={players!} pid={pid} map={map} />}
       onFalse={
         <main style={{ display: "flex" }}>
           <Condition
