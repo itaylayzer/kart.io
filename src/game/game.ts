@@ -34,7 +34,6 @@ export default (
     const clock = new THREE.Clock();
 
     const map = new WorldMap();
-    Global.lockController.lock();
 
     const animate = () => {
         if (document.visibilityState === "hidden") return;
