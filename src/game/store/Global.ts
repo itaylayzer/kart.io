@@ -2,6 +2,7 @@ import {
   CatmullRomCurve3,
   LOD,
   Mesh,
+  Object3D,
   PerspectiveCamera,
   Scene,
   WebGLRenderer,
@@ -48,4 +49,5 @@ export class Global {
   public static lateUpdates: Action[];
   public static settings: settingsType;
   public static stats: Stats;
+  public static optimizedObjects:Object3D[]
 }

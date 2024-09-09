@@ -45,6 +45,7 @@ export function Settings({
     displayFences,
     displayPillars,
     displayWater,
+    displayStars,
   } = useSettingsScreen();
 
   return (
@@ -376,6 +377,22 @@ export function Settings({
                       key={"displaySun"}
                       checked={displaySun}
                       onChange={(_, value) => set({ displaySun: value })}
+                    />
+                  </td>
+                </tr>
+                <tr>
+                  <td>Display Stars</td>
+                  <td
+                    style={{
+                      display: "flex",
+                      justifyContent: "end",
+                      width: 215,
+                    }}
+                  >
+                    <Switch
+                      key={"displayStars"}
+                      checked={displayStars}
+                      onChange={(_, value) => set({ displayStars: value })}
                     />
                   </td>
                 </tr>

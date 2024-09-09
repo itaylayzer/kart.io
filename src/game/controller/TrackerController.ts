@@ -112,7 +112,9 @@ export class TrackerController {
       ?.querySelectorAll("div")!;
     const posInMatch = rightPlayer[0] + 1;
     positionHTML.item(0).innerHTML = `<p>${rightPlayer[2].round} / 3</p>`;
-    positionHTML.item(1).innerHTML = `<p>${posInMatch} rd</p>`;
+    positionHTML.item(1).innerHTML = `<p>${posInMatch} ${
+      ["st", "th", "rd", "th"][Math.min(posInMatch - 1, 3)]
+    }</p>`;
   }
   public static getScoreboard(): [string, number, number][] {
     return this.sortedTrackers.map(
