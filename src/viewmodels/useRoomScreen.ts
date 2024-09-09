@@ -9,126 +9,136 @@ import { useSettingsStore } from "../store/useSettingsStore";
 type Player = [string, number, boolean];
 
 export const useRoomScreen = (
-  room: number,
-  goBack: () => void,
-  needPassword: boolean,
-  tryPassword: string | undefined
+    room: number,
+    goBack: () => void,
+    needPassword: boolean,
+    tryPassword: string | undefined
 ) => {
-  const [players, setPlayers] = useState<Map<number, Player>>();
-  const [ready, toggleReady] = useToggle(false);
-  const [socket, setSocket] = useState<Socket>();
-  const [startGameScreen, setStartGameScreen] = useState(false);
-  const { playerName } = useSettingsStore();
-  const [pid, setPID] = useState<number>(0);
-  const isConnected = socket !== undefined;
+    const [players, setPlayers] = useState<Map<number, Player>>();
+    const [ready, toggleReady] = useToggle(false);
+    const [socket, setSocket] = useState<Socket>();
+    const [startGameScreen, setStartGameScreen] = useState(false);
+    const { playerName } = useSettingsStore();
+    const [pid, setPID] = useState<number>(0);
+    const isConnected = socket !== undefined;
+    const [map, setMap] = useState<number>(0);
+    useEffect(() => {
+        // join server
+        const playersMap = new Map<number, Player>();
 
-  useEffect(() => {
-    // join server
-    const playersMap = new Map<number, Player>();
-
-    let password = "";
-    if (needPassword) {
-      if (tryPassword === undefined) {
-        password = prompt("Room password") ?? "";
-      } else {
-        password = tryPassword;
-      }
-    }
-    const socket = io(`wss://${ip}:${room}`, {
-      transports: ["websocket"],
-      query: [undefined, { password }][+needPassword],
-    });
-
-    socket.on("connect", () => {
-      setSocket(socket);
-      socket.emit(CS.JOIN, playerName);
-    });
-    socket.on("error", () => {
-      toast("Couldnt Connect", { type: "error" });
-      goBack();
-    });
-    socket.on(
-      CC.INIT,
-      (data: false | true | [number, number, [number, ...Player][]]) => {
-        if (data === false) {
-          toast("Game Started", { type: "error" });
-          goBack();
-          return;
+        let password = "";
+        if (needPassword) {
+            if (tryPassword === undefined) {
+                password = prompt("Room password") ?? "";
+            } else {
+                password = tryPassword;
+            }
         }
+        const socket = io(`wss://${ip}:${room}`, {
+            transports: ["websocket"],
+            query: [undefined, { password }][+needPassword],
+        });
 
-        if (typeof data === "boolean") {
-          toast("Password Incorrect", { type: "error" });
-          goBack();
-          return;
-        }
+        socket.on("connect", () => {
+            setSocket(socket);
+            socket.emit(CS.JOIN, playerName);
+        });
+        socket.on("error", () => {
+            toast("Couldnt Connect", { type: "error" });
+            goBack();
+        });
+        socket.on(
+            CC.INIT,
+            (
+                data:
+                    | false
+                    | true
+                    | [number, number, number, [number, ...Player][]]
+            ) => {
+                if (data === false) {
+                    toast("Game Started", { type: "error" });
+                    goBack();
+                    return;
+                }
 
-        const [selfId, selfColor, players] = data;
-        setPID(selfId);
-        playersMap.set(selfId, [playerName, selfColor, false]);
+                if (typeof data === "boolean") {
+                    toast("Password Incorrect", { type: "error" });
+                    goBack();
+                    return;
+                }
 
-        for (const [pid, pname, pcolor, pready] of players) {
-          playersMap.set(pid, [pname, pcolor, pready]);
-        }
+                const [selfId, mapIndex, selfColor, players] = data;
+                setMap(mapIndex);
+                setPID(selfId);
+                playersMap.set(selfId, [playerName, selfColor, false]);
 
-        setPlayers(playersMap);
-      }
-    );
+                for (const [pid, pname, pcolor, pready] of players) {
+                    playersMap.set(pid, [pname, pcolor, pready]);
+                }
 
-    socket.on(CC.NEW_PLAYER, ([pid, name, color]: [number, string, number]) => {
-      playersMap.set(pid, [name, color, false]);
+                setPlayers(playersMap);
+            }
+        );
 
-      setPlayers(new Map(playersMap));
-    });
+        socket.on(
+            CC.NEW_PLAYER,
+            ([pid, name, color]: [number, string, number]) => {
+                playersMap.set(pid, [name, color, false]);
 
-    socket.on(CC.START_GAME, () => {
-      setStartGameScreen(true);
-    });
+                setPlayers(new Map(playersMap));
+            }
+        );
 
-    socket.on(CC.READY, ([id, ready]: [number, boolean]) => {
-      playersMap.get(id)![2] = ready;
-      setPlayers(new Map(playersMap));
-    });
+        socket.on(CC.START_GAME, () => {
+            setStartGameScreen(true);
+        });
 
-    socket.on(CC.DISCONNECTED, (disconnectedID: number) => {
-      playersMap.delete(disconnectedID);
-      setPlayers(new Map(playersMap));
-    });
+        socket.on(CC.READY, ([id, ready]: [number, boolean]) => {
+            playersMap.get(id)![2] = ready;
+            setPlayers(new Map(playersMap));
+        });
+
+        socket.on(CC.DISCONNECTED, (disconnectedID: number) => {
+            playersMap.delete(disconnectedID);
+            setPlayers(new Map(playersMap));
+        });
+        const disconnect = () => {
+            socket.disconnect();
+            setSocket(undefined);
+            setPlayers(undefined);
+        };
+
+        window.onbeforeunload = window.onunload = () => {
+            disconnect();
+        };
+
+        return () => {
+            disconnect();
+        };
+    }, []);
+
+    useEffect(() => {
+        if (socket === undefined) return;
+
+        socket.emit(CS.READY, ready);
+    }, [socket, ready]);
+
     const disconnect = () => {
-      socket.disconnect();
-      setSocket(undefined);
-      setPlayers(undefined);
+        socket?.disconnect();
+        setSocket(undefined);
+        setPlayers(undefined);
+        goBack();
     };
 
-    window.onbeforeunload = window.onunload = () => {
-      disconnect();
+    return {
+        isConnected,
+        players,
+        toggleReady,
+        ready,
+        startGameScreen,
+        pid,
+        socket,
+        disconnect,
+        map,
     };
-
-    return () => {
-      disconnect();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (socket === undefined) return;
-
-    socket.emit(CS.READY, ready);
-  }, [socket, ready]);
-
-  const disconnect = () => {
-    socket?.disconnect();
-    setSocket(undefined);
-    setPlayers(undefined);
-    goBack();
-  };
-
-  return {
-    isConnected,
-    players,
-    toggleReady,
-    ready,
-    startGameScreen,
-    pid,
-    socket,
-    disconnect,
-  };
 };

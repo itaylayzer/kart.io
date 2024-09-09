@@ -32,7 +32,7 @@ export function Index() {
     setRoomPassword,
     setRoomMap,
     roomMap,
-    roomMapCanvasRef,
+    roomMapCanvasRef,roomName, roomPassword
   } = useIndexScreen();
 
   return (
@@ -350,13 +350,16 @@ export function Index() {
               <h1 style={{ fontSize: 50 }}>Create Room</h1>
               <input
                 style={{ marginBottom: 10, width: "100%" }}
-                type="text"
+                type="text" 
+                defaultValue={roomName}
                 placeholder="Room's Name"
                 onChange={(e) => setRoomName(e.currentTarget.value)}
               />
               <br />
               <input
                 style={{ width: "100%" }}
+                defaultValue={roomPassword}
+
                 type="password"
                 placeholder="Room's Password"
                 onChange={(e) => setRoomPassword(e.currentTarget.value)}

@@ -6,13 +6,14 @@ export function Play({
   socket,
   players,
   pid,
+  map
 }: {
   socket: Socket;
-
+  map:number;
   pid: number;
   players: Map<number, [string, number, boolean]>;
 }) {
-  usePlayScreen(socket, pid, players);
+  usePlayScreen(socket, pid, players, map);
 
   return (
     <>

@@ -9,14 +9,15 @@ import { audio } from "../lib/AudioContainer";
 export const usePlayScreen = (
   socket: Socket,
   pid: number,
-  players: Map<number, [string, number, boolean]>
+  players: Map<number, [string, number, boolean]>,
+  map:number
 ) => {
   const assets = useAssetStore();
   const settings = useSettingsStore();
   useEffect(() => {
     const destroyers: Action[] = [];
     audio().play(["Barriers", "Zane Little Music"], "./audios/barriers.mp3");
-    const { destroyer } = game(assets, socket, pid, players, settings);
+    const { destroyer } = game(assets, socket, pid, players, settings, map);
     destroyers.push(destroyer);
 
     return useDestroy(destroyers);
