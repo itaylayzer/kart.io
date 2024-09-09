@@ -70,7 +70,13 @@ export class CameraController {
           .clone()
           .multiplyScalar(
             -1 / 2 +
-              (-(player.keyboard.vertical + Math.abs(this.driftSide[1])) *
+              (-(
+                player.keyboard.vertical +
+                Math.abs(
+                  this.driftSide[1] -
+                    Math.abs(this.driftSide[1]) * player.keyboard.horizontal
+                )
+              ) *
                 Global.settings.fovChange) /
                 5
           )
