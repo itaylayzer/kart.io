@@ -26,7 +26,8 @@ export class Room {
     port: number,
     public name,
     removeFromList: () => void,
-    public password: string | undefined = undefined
+    public password: string | undefined,
+    options?: { mapIndex?: number }
   ) {
     const app = express();
     const server = createServer(credentials, app);
@@ -36,7 +37,9 @@ export class Room {
     });
 
     const players = new Map<number, Player>();
-    const { mysteryLocations, startsLocationsGenerator } = setup();
+    const { mysteryLocations, startsLocationsGenerator } = setup(
+      options?.mapIndex ?? 0
+    );
     let gameStarted = false;
     this.isGameStarted = () => gameStarted;
     let colorIndex = 0;
@@ -53,7 +56,7 @@ export class Room {
       res.status(200).send("hi");
     });
 
-    const sockets = {
+    const sockets = () => ({
       emitAll(eventName: string, eventArgs?: any) {
         for (const x of players.values()) {
           x.socket.emit(eventName, eventArgs);
@@ -64,7 +67,7 @@ export class Room {
           x.pid !== exceptID && x.socket.emit(eventName, eventArgs);
         }
       },
-    };
+    });
 
     io.on("connection", (socket) => {
       socket.timeout(1000);
@@ -106,7 +109,7 @@ export class Room {
           ready: false,
         };
 
-        sockets.emitAll(CC.NEW_PLAYER, [pid, name, selfColor]);
+        sockets().emitAll(CC.NEW_PLAYER, [pid, name, selfColor]);
         local.socket.emit(CC.INIT, [
           pid,
           selfColor,
@@ -132,31 +135,31 @@ export class Room {
       };
 
       socket.on(CS.KEY_DOWN, (buffer: Buffer) => {
-        sockets.emitExcept(pid, CC.KEY_DOWN, { pid, buffer });
+        sockets().emitExcept(pid, CC.KEY_DOWN, { pid, buffer });
         updatePositionBasedBuffer(buffer);
       });
 
       socket.on(CS.KEY_UP, (buffer: Buffer) => {
-        sockets.emitExcept(pid, CC.KEY_UP, { pid, buffer });
+        sockets().emitExcept(pid, CC.KEY_UP, { pid, buffer });
         updatePositionBasedBuffer(buffer);
       });
 
       socket.on(CS.TOUCH_MYSTERY, (id: number) => {
-        sockets.emitAll(CC.MYSTERY_VISIBLE, [id, false]);
+        sockets().emitAll(CC.MYSTERY_VISIBLE, [id, false]);
 
         setTimeout(() => {
-          sockets.emitAll(CC.MYSTERY_VISIBLE, [id, true]);
+          sockets().emitAll(CC.MYSTERY_VISIBLE, [id, true]);
         }, 1000);
       });
 
       socket.on(CS.READY, (ready: boolean) => {
         local.ready = ready;
-        sockets.emitAll(CC.READY, [pid, ready]);
+        sockets().emitAll(CC.READY, [pid, ready]);
 
         if (Array.from(players.values()).filter((a) => !a.ready).length !== 0)
           return;
 
-        sockets.emitAll(CC.START_GAME);
+        sockets().emitAll(CC.START_GAME);
         for (const player of players.values()) {
           gameStarted = true;
           player.transform = startsLocationsGenerator();
@@ -165,7 +168,7 @@ export class Room {
 
       socket.on("disconnect", () => {
         players.delete(pid);
-        sockets.emitAll(CC.DISCONNECTED, pid);
+        sockets().emitAll(CC.DISCONNECTED, pid);
 
         if (players.size === 0) {
           close();

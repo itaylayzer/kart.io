@@ -25,6 +25,7 @@ import {
   createFencesPilars,
   createVectorsFromNumbers,
   createWater,
+  createStarfield,
 } from "./road";
 import msgpack from "msgpack-lite";
 import { curvePoints } from "../../constants/road";
@@ -121,18 +122,20 @@ function setupWindowEvents() {
 }
 
 function setupRoad() {
-  const pts: THREE.Vector3[] = createVectorsFromNumbers(curvePoints);
+  const pts: THREE.Vector3[] = createVectorsFromNumbers(curvePoints[0]);
   Global.curve = new THREE.CatmullRomCurve3(pts);
-  const roadsSegments = createRoad(Global.curve, 5, 100, 1400);
+  const roadsSegments = createRoad(Global.curve, 5, 200, 2000);
   Global.lod.add(...roadsSegments);
   Global.roadMesh = roadsSegments;
-  for (const mm of roadsSegments) {
-    mm.frustumCulled = true;
-  }
 
+  if (Global.settings.displayStars) {
+    const points = createStarfield(1000, 500);
+    Global.lod.add(points);
+  }
   if (Global.settings.displayFences) {
     const fences = createFences(Global.curve, 5, 100, 1400);
     Global.lod.add(...fences);
+    Global.optimizedObjects.push(...fences);
   }
 
   if (Global.settings.displayPillars) {
@@ -144,6 +147,7 @@ function setupRoad() {
       roadsSegments
     );
     Global.lod.add(...tiles);
+    Global.optimizedObjects.push(...tiles);
   }
 
   const texture = Global.assets.textures.block.clone();
@@ -171,8 +175,9 @@ function setupRoad() {
     .copy(flagPos)
     .add(new THREE.Vector3(0, 1.5, 0))
     .add(new THREE.Vector3(0, 0, 5).applyQuaternion(flagBlock.quaternion));
+  const crod = rod.clone();
   Global.lod.add(flagBlock);
-  Global.lod.add(rod.clone());
+  Global.lod.add(crod);
   rod.position
     .copy(flagPos)
     .add(new THREE.Vector3(0, 1.5, 0))
@@ -193,6 +198,8 @@ function setupRoad() {
   sun.position.set(500, 150, 500);
 
   if (Global.settings.displaySun) Global.lod.add(sun);
+
+  Global.optimizedObjects.push(...Global.roadMesh, rod, crod);
 }
 
 function setupSocket(
@@ -376,6 +383,7 @@ export default function (
   pid: number,
   players: Map<number, [string, number, boolean]>
 ) {
+  Global.optimizedObjects = [];
   setupScene();
   setupPhysicsWorld();
   setupLights();

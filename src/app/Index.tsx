@@ -9,7 +9,12 @@ import { Settings } from "./Settings";
 import "react-tooltip/dist/react-tooltip.css";
 import { Tooltip } from "react-tooltip";
 import { AudioContainer } from "../lib/AudioContainer";
-import { Button, TextField } from "@mui/material";
+import {
+  Button,
+  TextField,
+  ToggleButton,
+  ToggleButtonGroup,
+} from "@mui/material";
 import { FaLock } from "react-icons/fa";
 
 export function Index() {
@@ -25,6 +30,9 @@ export function Index() {
     playerName,
     setPlayerName,
     setRoomPassword,
+    setRoomMap,
+    roomMap,
+    roomMapCanvasRef,
   } = useIndexScreen();
 
   return (
@@ -299,44 +307,87 @@ export function Index() {
               </div>
             </div>
           </main>,
-          <main>
-            <h1>Create Room</h1>
-            <input
-              style={{ marginBottom: 10, width: "100%" }}
-              type="text"
-              placeholder="Room's Name"
-              onChange={(e) => setRoomName(e.currentTarget.value)}
-            />
-            <br />
-            <input
-              style={{ width: "100%" }}
-              type="password"
-              placeholder="Room's Password"
-              onChange={(e) => setRoomPassword(e.currentTarget.value)}
-            />
-            <br />
-            <center>
-              {" "}
+          <main style={{ display: "flex", gap: 100 }}>
+            <div>
+              <h1 style={{ fontSize: 40 }}>Map Selection</h1>
+              <center>
+                <ToggleButtonGroup
+                  color="primary"
+                  value={roomMap}
+                  onChange={(_, i) => {
+                    if (i === null) return;
+                    setRoomMap(i as number);
+                  }}
+                  exclusive
+                >
+                  <ToggleButton className="r mini" value={0}>
+                    Horde
+                  </ToggleButton>
+                  <ToggleButton className="r mini" value={1}>
+                    Hotel
+                  </ToggleButton>
+                </ToggleButtonGroup>
+              </center>
               <br />
-              <div style={{ display: "flex", justifyContent: "space-around" }}>
-                <button
-                  className="r"
-                  onClick={() => {
-                    setScreen(1);
-                  }}
+              <canvas
+                width={500}
+                height={500}
+                style={{ width: 350, height: 350 }}
+                ref={roomMapCanvasRef}
+              ></canvas>
+            </div>
+            <div
+              style={{
+                display: "block",
+                marginBlock: "auto",
+                height: 300,
+                width: 5,
+                borderRadius: 10,
+                backgroundColor: "rgba(255,255,255,25%)",
+              }}
+            ></div>
+            <div style={{ width: 600, marginBlock: "auto" }}>
+              <h1 style={{ fontSize: 50 }}>Create Room</h1>
+              <input
+                style={{ marginBottom: 10, width: "100%" }}
+                type="text"
+                placeholder="Room's Name"
+                onChange={(e) => setRoomName(e.currentTarget.value)}
+              />
+              <br />
+              <input
+                style={{ width: "100%" }}
+                type="password"
+                placeholder="Room's Password"
+                onChange={(e) => setRoomPassword(e.currentTarget.value)}
+              />
+
+              <br />
+              <center>
+                {" "}
+                <br />
+                <div
+                  style={{ display: "flex", justifyContent: "space-around" }}
                 >
-                  cancel
-                </button>
-                <button
-                  className="r"
-                  onClick={() => {
-                    createRoom();
-                  }}
-                >
-                  create room
-                </button>
-              </div>
-            </center>
+                  <button
+                    className="r"
+                    onClick={() => {
+                      setScreen(1);
+                    }}
+                  >
+                    cancel
+                  </button>
+                  <button
+                    className="r"
+                    onClick={() => {
+                      createRoom();
+                    }}
+                  >
+                    create room
+                  </button>
+                </div>
+              </center>
+            </div>
           </main>,
           <main>
             <h1 style={{ fontSize: 60, marginBottom: 0 }}>credits</h1>
