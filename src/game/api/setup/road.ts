@@ -466,7 +466,7 @@ export function createWater(
       water.visible = true;
 
       (water.material as THREE.ShaderMaterial).uniforms.time.value =
-        Global.elapsedTime * 0.1;
+        Global.elapsedTime * 0.3;
     });
   };
 
