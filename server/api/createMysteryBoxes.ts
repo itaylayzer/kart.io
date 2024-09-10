@@ -1,6 +1,6 @@
 import * as THREE from "three";
 
-export function createMysteryBoxes(curve: THREE.CatmullRomCurve3, ls: number) {
+export function createMysteryBoxes(curve: THREE.CatmullRomCurve3, ls: number, devideVertical:number = 10) {
   const points = curve.getPoints(ls);
 
   const dummyHorizontal = new THREE.Object3D();
@@ -8,7 +8,6 @@ export function createMysteryBoxes(curve: THREE.CatmullRomCurve3, ls: number) {
 
   let mysteryBoxLocations: number[] = [];
 
-  const devideVertical = 10;
   const devideHorizontal = 5;
   for (let x = 1  ; x < devideVertical + 1; x++) {
     const sourceIndex = Math.floor((x * ls) / (devideVertical + 1));
