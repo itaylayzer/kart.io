@@ -51,7 +51,7 @@ export function Settings({
 
   return (
     <main style={style}>
-      <h1 style={{ fontSize: 60 }}>Settings</h1>
+      <h1 style={{ fontSize: '60vh' }}>Settings</h1>
       <center>
         <ToggleButtonGroup
           color="primary"
@@ -96,7 +96,7 @@ export function Settings({
           </ToggleButton>
         </ToggleButtonGroup>
       </center>
-      <div style={{ minHeight: 400 }}>
+      <div style={{ minHeight: '41.7vh' }}>
         <table id="settings">
           <Listed
             index={nav}
@@ -109,7 +109,7 @@ export function Settings({
                     <Input
                       style={{
                         display: "inline-block",
-                        width: 250,
+                        width: "26.06vh",
                       }}
                       size="small"
                       data-tooltip-id="t"
@@ -131,8 +131,8 @@ export function Settings({
                       color="info"
                       style={{
                         color: "white",
-                        width: 215,
-                        height: 40,
+                        width: "22.419vh",
+                        height: '4.17vh',
                         textAlign: "center",
                         border: "1px solid #444",
                       }}
@@ -171,7 +171,7 @@ export function Settings({
                     style={{
                       display: "flex",
                       justifyContent: "end",
-                      width: 215,
+                      width: "22.419vh",
                     }}
                   >
                     <Switch
@@ -191,7 +191,7 @@ export function Settings({
                       min={0}
                       step={0.01}
                       max={1}
-                      style={{ width: 150 }}
+                      style={{ width: "15.64" }}
                       value={masterVolume}
                       onChange={(_, value) => {
                         set({ masterVolume: value as number });
@@ -210,7 +210,7 @@ export function Settings({
                       min={0}
                       step={0.01}
                       max={1}
-                      style={{ width: 150 }}
+                      style={{ width: "15.64" }}
                       value={musicVolume}
                       onChange={(_, value) => {
                         set({ musicVolume: value as number });
@@ -229,7 +229,7 @@ export function Settings({
                       min={0}
                       step={0.01}
                       max={1}
-                      style={{ width: 150 }}
+                      style={{ width: "15.64" }}
                       value={sfxVolume}
                       onChange={(_, value) => {
                         set({ sfxVolume: value as number });
@@ -246,7 +246,7 @@ export function Settings({
                     style={{
                       display: "flex",
                       justifyContent: "end",
-                      width: 215,
+                      width: "22.419vh",
                     }}
                   >
                     <Switch
@@ -271,7 +271,7 @@ export function Settings({
                       min={15}
                       step={5}
                       max={120}
-                      style={{ width: 150 }}
+                      style={{ width: "15.64" }}
                       value={fps}
                       onChange={(_, value) => {
                         set({ fps: value as number });
@@ -288,7 +288,7 @@ export function Settings({
                     style={{
                       display: "flex",
                       justifyContent: "end",
-                      width: 215,
+                      width: "22.419vh",
                     }}
                   >
                     <Switch
@@ -306,7 +306,7 @@ export function Settings({
                     style={{
                       display: "flex",
                       justifyContent: "end",
-                      width: 215,
+                      width: "22.419vh",
                     }}
                   >
                     <Switch
@@ -322,7 +322,7 @@ export function Settings({
                     style={{
                       display: "flex",
                       justifyContent: "end",
-                      width: 215,
+                      width: "22.419vh",
                     }}
                   >
                     <Switch
@@ -340,7 +340,7 @@ export function Settings({
                       min={0}
                       step={5}
                       max={100}
-                      style={{ width: 150 }}
+                      style={{ width: "15.64" }}
                       value={motionBlur}
                       onChange={(_, value) => {
                         set({ motionBlur: value as number });
@@ -357,7 +357,7 @@ export function Settings({
                     style={{
                       display: "flex",
                       justifyContent: "end",
-                      width: 215,
+                      width: "22.419vh",
                     }}
                   >
                     <Switch
@@ -373,7 +373,7 @@ export function Settings({
                     style={{
                       display: "flex",
                       justifyContent: "end",
-                      width: 215,
+                      width: "22.419vh",
                     }}
                   >
                     <Switch
@@ -390,7 +390,7 @@ export function Settings({
                     style={{
                       display: "flex",
                       justifyContent: "end",
-                      width: 215,
+                      width: "22.419vh",
                     }}
                   >
                     <Switch
@@ -406,7 +406,7 @@ export function Settings({
                     style={{
                       display: "flex",
                       justifyContent: "end",
-                      width: 215,
+                      width: "22.419vh",
                     }}
                   >
                     <Switch
@@ -422,7 +422,7 @@ export function Settings({
                     style={{
                       display: "flex",
                       justifyContent: "end",
-                      width: 215,
+                      width: "22.419vh",
                     }}
                   >
                     <Switch
@@ -438,7 +438,7 @@ export function Settings({
                     style={{
                       display: "flex",
                       justifyContent: "end",
-                      width: 215,
+                      width: "22.419vh",
                     }}
                   >
                     <Switch
@@ -454,7 +454,7 @@ export function Settings({
                     style={{
                       display: "flex",
                       justifyContent: "end",
-                      width: 215,
+                      width: "22.419vh",
                     }}
                   >
                     <Switch

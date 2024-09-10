@@ -38,13 +38,13 @@ export function Play({
         <div id="pauseMenu">
           <h5>Game Paused</h5>
           <p>but the server, keeps playing</p>
-          <button className="r" id="resume">
+        <center>  <button className="r" id="resume">
             Resume
           </button>
 
           <button className="r" id="disconnect">
             Disconnect
-          </button>
+          </button></center>
         </div>
       </main>
 
@@ -67,8 +67,8 @@ const styles = useStyles({
 
   position: {
     backgroundColor: "#050505",
-    paddingBlock: 4,
-    paddingInline: 16,
+    paddingBlock: "0.41vh",
+    paddingInline: "1.66vh",
     borderRadius: 4,
   },
   map: {
@@ -77,7 +77,7 @@ const styles = useStyles({
     translate: "0% -50%",
     right: 10,
     aspectRatio: 1,
-    width: 250,
+    width: "26.06vh",
     zIndex: 3,
     pointerEvents: "none",
   },
@@ -90,9 +90,9 @@ const styles = useStyles({
     margin: 0,
     color: "white",
     fontFamily: "New Super Mario Font U",
-    padding: "10px 20px",
+    padding: "1.04vh 2.08vh",
     borderRadius: "8px",
-    fontSize: 25,
+    fontSize: '2.6vh',
   },
   velocity: {
     position: "absolute",
@@ -100,8 +100,8 @@ const styles = useStyles({
     right: 10,
     zIndex: 3,
     backgroundColor: "#050505",
-    paddingBlock: 4,
-    paddingInline: 16,
+    paddingBlock: "0.41vh",
+    paddingInline: "1.66vh",
     borderRadius: 4,
     fontFamily: "New Super Mario Font U",
   },
