@@ -21,7 +21,7 @@ export default function AssetLoader({
   return (
     <LinearProgress
       style={{
-        width: 500,
+        width: "52.13vh",
         marginTop: 10,
         opacity: 0.2 * +(progress <= 1),
         transition: "opacity 1s ease-out",

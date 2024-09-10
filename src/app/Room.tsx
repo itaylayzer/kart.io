@@ -58,8 +58,8 @@ export function Room({
                         "repeat(auto-fill, minmax(150px, 1fr))",
                       gridAutoRows: "minmax(20px, auto)",
                       columnGap: 20,
-                      maxHeight: 800,
-                      width: 500,
+                      maxHeight: '83.42vh',
+                      width: "52.13vh",
                     }}
                   >
                     {Array.from(players.entries()).map(([id, p]) => (
@@ -88,8 +88,8 @@ export function Room({
                   <div
                     style={{
                       display: "block",
-                      height: 300,
-                      width: 5,
+                      height: '31.28vh',
+                      width: "0.52vh",
                       borderRadius: 10,
                       backgroundColor: "rgba(255,255,255,25%)",
                     }}
@@ -100,7 +100,7 @@ export function Room({
                       marginBlock: "auto",
                     }}
                   >
-                    <h1 style={{ fontSize: 80 }}>{roomName}</h1>
+                    <h1 style={{ fontSize: "8.34vh" }}>{roomName}</h1>
 
                     <br />
                     <div style={{ display: "flex", gap: 10 }}>
