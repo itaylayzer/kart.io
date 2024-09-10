@@ -83,5 +83,5 @@ app.get("/list", (req, res) => {
 
 const port = 5350;
 server.listen(port, () => {
-    console.log(`server is running on :${port}`);
+    console.log(`server is running on https://localhost:${port}`);
 });
