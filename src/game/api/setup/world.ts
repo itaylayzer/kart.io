@@ -238,6 +238,10 @@ function setupSocket(
         }
     );
 
+    Global.socket.on(CC.MYSTERY_ITEM, (itemIndex) => {
+        LocalPlayer.getInstance().setItem(itemIndex);
+    });
+
     Global.socket?.on(CC.KEY_DOWN, (args: { pid: number; buffer: Buffer }) => {
         const xplayer = Player.clients.get(args.pid);
 

@@ -1,1 +1,1 @@
-export type Room = [number, string, number]
+export type Room = [number, string, number];

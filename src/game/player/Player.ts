@@ -7,102 +7,140 @@ import * as CANNON from "cannon-es";
 import { PlayerModel } from "./PlayerModel";
 import { TrackerController } from "../controller/TrackerController";
 import { AudioController } from "../controller/AudioController";
+import { UpperItem } from "./UpperItem";
 
 export const COLORS = [
-  "#f56505",
-  "#f5ed05",
-  "#0591f5",
-  "#b105f5",
-  "#f50575",
-  "#00ff00",
-  "#124eb5",
-  "#ff0000",
+    "#f56505",
+    "#f5ed05",
+    "#0591f5",
+    "#b105f5",
+    "#f50575",
+    "#00ff00",
+    "#124eb5",
+    "#ff0000",
+];
+const itemsMeshes = [
+    UpperItem.banana,
+    UpperItem.boots,
+    UpperItem.rocket,
+    UpperItem.wheels,
 ];
 const COLORSEMISSIVE = [5, 5, 4, 5, 6, 3, 10, 4];
 export class Player extends PhysicsObject {
-  public static clients: Map<number, Player>;
-  public tracker: TrackerController;
-  public disconnect: () => void;
-  static {
-    this.clients = new Map();
-  }
-  public color: string;
+    public static clients: Map<number, Player>;
+    public tracker: TrackerController;
 
-  constructor(
-    public pid: number,
-    isLocal: boolean,
-    public name: string,
-    public colorFromServer: number,
-    public keyboard: IKeyboardController
-  ) {
-    const radius = 0.8 / 3;
+    public setItem: (itemNumber: number) => void;
+    public disconnect: () => void;
+    static {
+        this.clients = new Map();
+    }
+    public color: string;
 
-    const colorSetEmissive = COLORSEMISSIVE[colorFromServer];
-    const color = "#" + new THREE.Color(COLORS[colorFromServer]).getHexString();
+    constructor(
+        public pid: number,
+        isLocal: boolean,
+        public name: string,
+        public colorFromServer: number,
+        public keyboard: IKeyboardController
+    ) {
+        const radius = 0.8 / 3;
 
-    super(new THREE.Object3D(), {
-      shape: new CANNON.Cylinder(radius, radius, radius),
-      mass: 1,
-      position: new CANNON.Vec3(pid * 10, pid * 10, pid * 10),
-      material: new CANNON.Material({ friction: 0, restitution: 0 }),
-      collisionFilterGroup: 1,
-      collisionFilterMask: ~0,
-    });
+        const colorSetEmissive = COLORSEMISSIVE[colorFromServer];
+        const color =
+            "#" + new THREE.Color(COLORS[colorFromServer]).getHexString();
 
-    this.tracker = new TrackerController(this, isLocal);
+        super(new THREE.Object3D(), {
+            shape: new CANNON.Cylinder(radius, radius, radius),
+            mass: 1,
+            position: new CANNON.Vec3(pid * 10, pid * 10, pid * 10),
+            material: new CANNON.Material({ friction: 0, restitution: 0 }),
+            collisionFilterGroup: 1,
+            collisionFilterMask: ~0,
+        });
 
-    this.color = color;
-    Player.clients.set(pid, this);
+        this.tracker = new TrackerController(this, isLocal);
 
-    const audio = new AudioController();
-    const engine = new DriveController(5, this, this.keyboard, audio, isLocal);
-    const model = new PlayerModel(
-      this,
-      keyboard,
-      name,
-      [color, colorSetEmissive],
-      isLocal
-    );
-    model.add(audio);
-    this.update = [
-      () => {
-        keyboard.firstUpdate();
+        this.color = color;
+        Player.clients.set(pid, this);
 
-        isLocal && Global.cameraController.update();
+        const audio = new AudioController();
+        const engine = new DriveController(
+            5,
+            this,
+            this.keyboard,
+            audio,
+            isLocal
+        );
+        const model = new PlayerModel(
+            this,
+            keyboard,
+            name,
+            [color, colorSetEmissive],
+            isLocal
+        );
 
-        engine.update();
-        model.update();
+        let upperItem: UpperItem | null = null;
 
-        this.tracker.update();
-        keyboard.isLocked = this.tracker.round >= 1;
+        model.add(audio);
 
-        keyboard.lastUpdate();
-      },
-    ];
+        this.update = [
+            () => {
+                keyboard.firstUpdate();
 
-    this.disconnect = () => {
-      Global.lod.remove(model);
-      Global.world.removeBody(this);
+                isLocal && Global.cameraController.update();
 
-      Player.clients.delete(pid);
-    };
+                engine.update();
+                model.update();
+                if (
+                    isLocal &&
+                    upperItem !== null &&
+                    Global.mouseController.isMouseDown(0) &&
+                    !upperItem.stopping
+                ) {
+                    upperItem.stop(() => {
+                        model.remove(upperItem!);
+                        upperItem = null;
+                    });
+                }
+                upperItem?.update();
 
-    Global.world.addBody(this);
-    Global.lod.add(model);
-  }
+                this.tracker.update();
+                keyboard.isLocked = this.tracker.round >= 1;
 
-  public applyTransform(transform: number[]) {
-    [
-      this.position.x,
-      this.position.y,
-      this.position.z,
-      this.quaternion.x,
-      this.quaternion.y,
-      this.quaternion.z,
-      this.quaternion.w,
-    ] = transform;
+                keyboard.lastUpdate();
+            },
+        ];
 
-    this.velocity.setZero();
-    this.force.setZero();
-  }
+        this.setItem = (num) => {
+            if (upperItem !== null) return;
+            console.log("setItem", "setItem", num);
+            upperItem = new UpperItem(itemsMeshes[num]);
+            model.add(upperItem);
+        };
+        this.disconnect = () => {
+            Global.lod.remove(model);
+            Global.world.removeBody(this);
+
+            Player.clients.delete(pid);
+        };
+
+        Global.world.addBody(this);
+        Global.lod.add(model);
+    }
+
+    public applyTransform(transform: number[]) {
+        [
+            this.position.x,
+            this.position.y,
+            this.position.z,
+            this.quaternion.x,
+            this.quaternion.y,
+            this.quaternion.z,
+            this.quaternion.w,
+        ] = transform;
+
+        this.velocity.setZero();
+        this.force.setZero();
+    }
 }

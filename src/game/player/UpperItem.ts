@@ -1,51 +1,80 @@
 import * as THREE from "three";
 import * as TWEEN from "@tweenjs/tween.js";
 import { Global } from "../store/Global";
-import { lerp } from "three/src/math/MathUtils.js";
-
 
 export class UpperItem extends THREE.Group {
     public update: () => void;
+    public stop: (stopFn: () => void) => void;
+    public stopping: boolean;
     constructor(buildMesh: () => THREE.Object3D) {
         super();
 
         const obj = new THREE.Object3D();
         obj.add(buildMesh());
         obj.position.y -= 1;
-        obj.scale.set(0, 0, 0);
-        let ended = [0, 0];
+        obj.scale.set(0, 0.2, 0);
 
-        const tween = [
+        const fromTweens = [
             new TWEEN.Tween(obj.position)
                 .to(new THREE.Vector3(0, 0, 0))
-                .duration(2000)
-                .easing(TWEEN.Easing.Back.Out)
-                .onComplete(() => (ended[0] = 1)),
+                .duration(1250)
+                .easing(TWEEN.Easing.Back.Out),
             new TWEEN.Tween(obj.scale)
                 .to(new THREE.Vector3(1, 1, 1))
-                .duration(2000)
-                .easing(TWEEN.Easing.Exponential.Out),
+                .duration(1000)
+                .easing(TWEEN.Easing.Linear.None),
             new TWEEN.Tween({ x: -10 })
                 .to({ x: 0 })
-                .duration(2000)
+                .duration(1250)
                 .easing(TWEEN.Easing.Quartic.Out)
                 .onUpdate(({ x }) => {
                     obj.rotation.y = x;
-                    // obj.rotation.z = x;
+                }),
+        ];
+        const toTweens = [
+            new TWEEN.Tween({ x: 0, y: 0, z: 0 })
+                .to({ x: 0, y: -1, z: 0 })
+                .duration(800)
+                .easing(TWEEN.Easing.Back.In)
+                .onUpdate((v) => obj.position.copy(v)),
+            new TWEEN.Tween({ x: 1, y: 1, z: 1 })
+                .to({ x: 0, y: 0.2, z: 0 })
+                .duration(800)
+                .easing(TWEEN.Easing.Linear.None)
+                .onUpdate((v) => obj.scale.copy(v)),
+            new TWEEN.Tween({ x: 0 })
+                .to({ x: -10 })
+                .duration(600)
+                .easing(TWEEN.Easing.Quartic.In)
+                .onUpdate(({ x }) => {
+                    obj.rotation.y = x;
                 }),
         ];
 
+        let startTime = Global.elapsedTime - 0.255;
+        this.stopping = false;
         super.add(obj);
 
-        tween.map((v) => v.start(-100));
+        fromTweens.map((v) => v.start(0));
+
+        this.stop = (stopFn) => {
+            fromTweens.map((v) => v.stop());
+            this.stopping = true;
+            toTweens.map((v) => v.start(0));
+            toTweens[2].onComplete(stopFn);
+            startTime = Global.elapsedTime;
+        };
+
         this.update = () => {
-            ended[1] = lerp(ended[1], ended[0], Global.deltaTime * 7);
             this.position.set(
                 0,
                 Math.sin(Global.elapsedTime * 2) * 0.02 + 0.25,
                 0
             );
-            tween.map((v) => v.update(Global.elapsedTime * 1000));
+
+            const time = (Global.elapsedTime - startTime) * 1000;
+
+            [fromTweens, toTweens][+this.stopping].map((v) => v.update(time));
         };
     }
 

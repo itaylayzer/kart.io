@@ -4,7 +4,6 @@ import { damp } from "three/src/math/MathUtils.js";
 import { Global } from "../store/Global";
 import createPlayerNameSprite from "../api/createPlayerNameSprite";
 import * as CANNON from "cannon-es";
-import { UpperItem } from "./UpperItem";
 
 const namesToColor = [
     "Object_43",
@@ -54,7 +53,6 @@ export class PlayerModel extends THREE.Group {
             }
         });
 
-        const upperItem = new UpperItem(UpperItem.boots);
         model.scale.multiplyScalar(0.5 / 3);
 
         const backweels = model.getObjectByName("Back_Wheels_38")!;
@@ -62,7 +60,6 @@ export class PlayerModel extends THREE.Group {
         const steeringweel = model.getObjectByName("Wheel_25")!;
         model.getObjectByName("Back_18")!.visible = false;
         super.add(model);
-        super.add(upperItem);
 
         if (!isLocal) {
             const nametag = createPlayerNameSprite(name);
@@ -112,14 +109,8 @@ export class PlayerModel extends THREE.Group {
                 (-keyboard.horizontal * Math.PI * 2) / 3
             );
 
-            upperItem.update();
-
             this.position.copy(body.position);
             this.quaternion.copy(body.quaternion);
-            // isLocal &&
-            //   (document.querySelector("p#velocity")!.innerHTML = `${Math.abs(
-            //     velocityMagnitude
-            //   ).toFixed(2)} KM/S`);
         };
     }
 }
