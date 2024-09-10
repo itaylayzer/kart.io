@@ -21,7 +21,7 @@ const defualtValue: loadedAssets = {
     gltf: {},
     textures: {},
     sfx: {},
-    progress: 0
+    progress: 0,
 };
 
 type AssetStore = loadedAssets & {
@@ -29,7 +29,7 @@ type AssetStore = loadedAssets & {
     skipAssets: () => void;
 };
 
-export const useAssetStore = create<AssetStore>(set => ({
+export const useAssetStore = create<AssetStore>((set) => ({
     ...defualtValue,
     loadMeshes(items) {
         const SetProgress = (progress: number) => set({ progress });
@@ -41,7 +41,7 @@ export const useAssetStore = create<AssetStore>(set => ({
                 fbx: {},
                 textures: {},
                 fonts: {},
-                sfx: {}
+                sfx: {},
             } as loadedAssets;
 
             const loaders = [
@@ -49,7 +49,7 @@ export const useAssetStore = create<AssetStore>(set => ({
                 new FBXLoader(loadingManager),
                 new THREE.TextureLoader(loadingManager),
                 new FontLoader(loadingManager),
-                new THREE.AudioLoader(loadingManager)
+                new THREE.AudioLoader(loadingManager),
             ] as THREE.Loader[];
 
             const itemsLength = Object.keys(items).length;
@@ -61,7 +61,7 @@ export const useAssetStore = create<AssetStore>(set => ({
                 "fbx",
                 "textures",
                 "fonts",
-                "sfx"
+                "sfx",
             ];
 
             const exts = [
@@ -69,13 +69,13 @@ export const useAssetStore = create<AssetStore>(set => ({
                 [".fbx"],
                 [".png"],
                 [".typeface.json"],
-                [".mp3", ".wav"]
+                [".mp3", ".wav"],
             ];
 
             for (const itemEntry of Object.entries(items)) {
                 const [itemName, itemSrc] = itemEntry;
 
-                const index = exts.findIndex(formats => {
+                const index = exts.findIndex((formats) => {
                     for (const format of formats) {
                         if (itemSrc.endsWith(format)) return true;
                     }
@@ -89,7 +89,7 @@ export const useAssetStore = create<AssetStore>(set => ({
 
                 selectedLoader.load(
                     itemSrc,
-                    mesh1 => {
+                    (mesh1) => {
                         // @ts-ignore
                         _assets[selectedKey][itemName] = mesh1;
 
@@ -97,13 +97,14 @@ export const useAssetStore = create<AssetStore>(set => ({
                         minerProgress = 0;
                         set({ progress: itemProgress });
                     },
-                    progres => {
+                    (progres) => {
                         minerProgress = progres.loaded / progres.total;
                         set({
-                            progress: itemProgress + minerProgress / itemsLength
+                            progress:
+                                itemProgress + minerProgress / itemsLength,
                         });
                     },
-                    error => {
+                    (error) => {
                         reject(error);
                     }
                 );
@@ -121,5 +122,5 @@ export const useAssetStore = create<AssetStore>(set => ({
     },
     skipAssets() {
         set({ progress: 2 });
-    }
+    },
 }));

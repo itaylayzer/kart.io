@@ -6,6 +6,7 @@ import cors from "cors";
 import setup from "./api/setup";
 import msgpack from "msgpack-lite";
 import { credentials } from "./store/credentials";
+import { randInt } from "three/src/math/MathUtils.js";
 
 type Player = {
     socket: Socket;
@@ -149,7 +150,7 @@ export class Room {
 
             socket.on(CS.TOUCH_MYSTERY, (id: number) => {
                 sockets().emitAll(CC.MYSTERY_VISIBLE, [id, false]);
-
+                local.socket.emit(CC.MYSTERY_ITEM, randInt(0,3));
                 setTimeout(() => {
                     sockets().emitAll(CC.MYSTERY_VISIBLE, [id, true]);
                 }, 1000);
