@@ -78,7 +78,7 @@ const AudioHTML = forwardRef<AudioRef, {}>((_, ref) => {
             style={{
               position: "absolute",
               zIndex: 10,
-              width: 250,
+              width: "22.419vh",
               height: height,
               paddingTop: 60 - height,
               opacity: 0.1 * +playing,
@@ -100,7 +100,7 @@ const AudioHTML = forwardRef<AudioRef, {}>((_, ref) => {
                 marginBlock: "auto",
                 fontFamily: "Signika",
                 fontWeight: 500,
-                fontSize: 25,
+                fontSize: '2.6vh',
                 paddingLeft: 10,
                 translate: "0px -3px",
                 flexGrow: 1,

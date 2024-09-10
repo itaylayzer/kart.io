@@ -170,7 +170,7 @@ export function Index() {
                   <>
                     <p
                       style={{
-                        fontSize: 25,
+                        fontSize: "2.6vh",
                         opacity: 0.3,
                       }}
                     >
@@ -179,8 +179,8 @@ export function Index() {
                     <div
                       style={{
                         display: "block",
-                        maxHeight: (500 * 4) / 6,
-                        width: 550,
+                        maxHeight: "34.75vh",
+                        width: "57.35vh",
                         overflowY: "scroll",
                         overflowX: "hidden",
                       }}
@@ -251,7 +251,7 @@ export function Index() {
                   flexGrow: 1,
                   minWidth: "20ch",
                   width: "100%",
-                  fontSize: 60,
+                  fontSize: "6.25vh",
                   marginBottom: 0,
                 }}
               >
@@ -313,7 +313,7 @@ export function Index() {
           </main>,
           <main style={{ display: "flex", gap: 100 }}>
             <div>
-              <h1 style={{ fontSize: 40 }}>Map Selection</h1>
+              <h1 style={{ fontSize: "4.17vh" }}>Map Selection</h1>
               <center>
                 <ToggleButtonGroup
                   color="primary"
@@ -336,7 +336,7 @@ export function Index() {
               <canvas
                 width={500}
                 height={500}
-                style={{ width: 350, height: 350 }}
+                style={{ width: "36.49vh", height: "36.49vh" }}
                 ref={roomMapCanvasRef}
               ></canvas>
             </div>
@@ -344,14 +344,14 @@ export function Index() {
               style={{
                 display: "block",
                 marginBlock: "auto",
-                height: 300,
-                width: 5,
+                height: '31.28vh',
+                width: "0.52vh",
                 borderRadius: 10,
                 backgroundColor: "rgba(255,255,255,25%)",
               }}
             ></div>
-            <div style={{ width: 600, marginBlock: "auto" }}>
-              <h1 style={{ fontSize: 50 }}>Create Room</h1>
+            <div style={{ width: "62.5vh", marginBlock: "auto" }}>
+              <h1 style={{ fontSize: "5.21vh" }}>Create Room</h1>
               <input
                 style={{ marginBottom: 10, width: "100%" }}
                 type="text" 
@@ -397,7 +397,7 @@ export function Index() {
             </div>
           </main>,
           <main>
-            <h1 style={{ fontSize: 60, marginBottom: 0 }}>credits</h1>
+            <h1 style={{ fontSize: "6.25vh", marginBottom: 0 }}>credits</h1>
             <center>
               {" "}
               <p
@@ -412,7 +412,7 @@ export function Index() {
               </p>
             </center>
             <div
-              style={{ display: "block", maxHeight: 300, overflowY: "scroll" }}
+              style={{ display: "block", maxHeight: '31.28vh', overflowY: "scroll" }}
             >
               {" "}
               <h3> road </h3>
