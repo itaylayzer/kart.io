@@ -1,15 +1,15 @@
-import { loadedAssets } from "../store/useAssetLoader";
-import setupWorld from "./api/setup/world";
-import { Global } from "./store/Global";
-import { PhysicsObject } from "./physics/PhysicsMesh";
+import { Socket } from "socket.io-client";
 import * as THREE from "three";
 import System, { SpriteRenderer } from "three-nebula";
-import { WorldMap } from "./player/WorldMap";
-import { Socket } from "socket.io-client";
-import { Scoreboard } from "./player/Scoreboard";
+import { loadedAssets } from "../store/useAssetLoader";
 import { settingsType } from "../store/useSettingsStore";
-import { curvePoints } from "./constants/road";
 import { createVectorsFromNumbers } from "./api/setup/road";
+import setupWorld from "./api/setup/world";
+import { curvePoints } from "./constants/road";
+import { PhysicsObject } from "./physics/PhysicsMesh";
+import { Scoreboard } from "./player/Scoreboard";
+import { WorldMap } from "./player/WorldMap";
+import { Global } from "./store/Global";
 
 export default (
     assets: loadedAssets,
