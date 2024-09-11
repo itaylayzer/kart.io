@@ -267,6 +267,9 @@ function setupSocket(
                     new CANNON.Vec3(rest[0], rest[1], rest[2])
                 );
             }
+            if (mysteryNum === 1) {
+                Player.clients.get(xpid)!.engine.turbo();
+            }
         }
     );
     Global.socket?.on(CC.KEY_UP, (args: { pid: number; buffer: Buffer }) => {
