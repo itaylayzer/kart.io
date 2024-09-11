@@ -137,17 +137,22 @@ function setupRoad() {
         Global.lod.add(...fences);
         Global.optimizedObjects.push(...fences);
     }
-
+    console.log(
+        roadsSegments.length,
+        roadsSegments.filter((v) => v.visible === false)
+    );
     if (Global.settings.displayPillars) {
-        const tiles = createFencesPilars(
-            Global.curve,
-            5.1,
-            100,
-            1400,
-            roadsSegments
-        );
-        Global.lod.add(...tiles);
-        Global.optimizedObjects.push(...tiles);
+        requestAnimationFrame(() => {
+            const tiles = createFencesPilars(
+                Global.curve,
+                5.1,
+                100,
+                1400,
+                roadsSegments
+            );
+            Global.lod.add(...tiles);
+            Global.optimizedObjects.push(...tiles);
+        });
     }
 
     const texture = Global.assets.textures.block.clone();

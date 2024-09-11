@@ -1,9 +1,11 @@
 import * as THREE from "three";
 import { IKeyboardController } from "../controller/IKeyboardController";
-import { damp } from "three/src/math/MathUtils.js";
+import { damp, randInt } from "three/src/math/MathUtils.js";
 import { Global } from "../store/Global";
 import createPlayerNameSprite from "../api/createPlayerNameSprite";
 import * as CANNON from "cannon-es";
+import { Dust } from "../api/meshes/Dust";
+import { Easing, Tween } from "@tweenjs/tween.js";
 
 const namesToColor = [
     "Object_43",
@@ -25,6 +27,8 @@ const namesToColor = [
 export class PlayerModel extends THREE.Group {
     public update: () => void;
     public setRocketModel: (a: boolean) => void;
+    public shake: (duration: number) => void;
+
     constructor(
         body: CANNON.Body,
         keyboard: IKeyboardController,
@@ -54,6 +58,9 @@ export class PlayerModel extends THREE.Group {
             }
         });
 
+        let tween: undefined | Tween = undefined;
+        let startTime = 0;
+
         model.scale.multiplyScalar(0.5 / 3);
         const rocket = Global.assets.gltf.rocket.scene.clone();
         rocket.rotation.y = -Math.PI / 2;
@@ -69,6 +76,11 @@ export class PlayerModel extends THREE.Group {
         rocket.visible = false;
         super.add(rocket);
 
+        const rockBack = rocket.getObjectByName(
+            "Rocket_Ship_01_Material_#42_0"
+        )!;
+        rockBack.visible = false;
+
         if (!isLocal) {
             const nametag = createPlayerNameSprite(name);
             nametag.position.y += 0.35;
@@ -81,19 +93,37 @@ export class PlayerModel extends THREE.Group {
             model.visible = [true, false][+a];
         };
 
+        this.shake = (Duration) => {
+            tween = new Tween({ x: 0 })
+                .to({ x: Math.PI * 2 })
+                .duration(Duration)
+                .easing(Easing.Quintic.Out)
+                .onUpdate(({ x }) => {
+                    model.rotation.y = x;
+                })
+                .onComplete(() => {
+                    model.rotation.y = 0;
+                });
+            tween.start(0);
+            startTime = Global.elapsedTime;
+        };
+
         this.update = () => {
             this.position.copy(body.position);
             this.quaternion.copy(body.quaternion);
 
             model.rotation.set(0, 0, 0);
 
+            if (rocket.visible && randInt(0, 1)) {
+                new Dust(rockBack.getWorldPosition(new THREE.Vector3()));
+            }
             if (keyboard.isKeyDown(32) || keyboard.isKeyDown(-6)) {
                 driftSide[0] = keyboard.horizontalRaw * 0.6;
             }
             if (keyboard.isKeyUp(32) || keyboard.isKeyUp(-6)) {
                 driftSide[0] = 0;
             }
-
+            tween?.update((Global.elapsedTime - startTime) * 1000);
             driftSide[1] = damp(
                 driftSide[1],
                 driftSide[0],

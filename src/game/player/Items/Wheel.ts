@@ -23,7 +23,7 @@ export class Wheels extends PhysicsObject {
         position.y += 0.25;
         console.log("Wheels");
         const mesh = Global.assets.gltf.wheel.scene.clone();
-        mesh.scale.multiplyScalar(0.08);
+        mesh.scale.multiplyScalar(0.08 * 4);
 
         super(mesh, {
             position,
@@ -71,6 +71,7 @@ export class Wheels extends PhysicsObject {
 
         this.addEventListener("collide", (event: { body: CANNON.Body }) => {
             if (event.body.id === notFromId) return;
+            if (event.body.collisionFilterGroup !== 1) return;
             clearTimeout(timeout);
 
             dispose();
@@ -222,9 +223,8 @@ export class Wheels extends PhysicsObject {
                     mesh.position.distanceTo(Global.camera.position) < 50;
 
                 mesh.position.copy(this.position);
-                mesh.position.y += 0.25;
+                mesh.position.y += 0.1;
                 mesh.quaternion.copy(this.quaternion);
-                mesh.rotateZ(Math.PI / 2);
             },
         ];
 

@@ -128,19 +128,20 @@ export class ItemModel extends THREE.Group {
     }
     public static wheels() {
         const banana = Global.assets.gltf.wheel.scene.clone();
-        banana.scale.multiplyScalar(0.03);
+        banana.scale.multiplyScalar(0.03 * 4);
 
-        const banaColor = banana.getObjectByName(
-            "pCylinder3_Light_Wood_Lambert_0"
-        ) as THREE.Mesh;
-        (banaColor.material as THREE.MeshStandardMaterial).emissive =
-            new THREE.Color("#a16a52");
-        (
-            banaColor.material as THREE.MeshStandardMaterial
-        ).emissiveIntensity = 5;
-        banana.position.y = 0.15;
-        banana.rotation.x = (-Math.PI * 2) / 4;
-        banana.rotation.y = (-Math.PI * 3) / 4;
+        // const banaColor = banana.getObjectByName(
+        //     "GeoSphere001_Material_#26_0"
+        // ) as THREE.Mesh;
+        // (banaColor.material as THREE.MeshStandardMaterial).emissive =
+        //     new THREE.Color("blue");
+        // (
+        //     banaColor.material as THREE.MeshStandardMaterial
+        // ).emissiveIntensity = 10;
+        // banana.position.y = 0.15;
+        // banana.rotation.x = (-Math.PI * 2) / 4;
+        // banana.rotation.y = (-Math.PI * 3) / 4;
+        banana.position.y += 0.1;
         return banana;
     }
 }

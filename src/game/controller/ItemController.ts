@@ -2,7 +2,6 @@ import { ItemModel } from "../player/ItemModel";
 import { Global } from "../store/Global";
 import { Player } from "../player/Player";
 import { CS } from "../store/codes";
-import { Banana } from "../player/Items/Banana";
 import { PlayerModel } from "../player/PlayerModel";
 
 const itemsMeshes = [
