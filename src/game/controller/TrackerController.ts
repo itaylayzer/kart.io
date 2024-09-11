@@ -7,7 +7,7 @@ export class TrackerController {
     public reset: () => void;
     public update: () => void;
 
-    public getPointTransform: () => THREE.Object3D;
+    public getPointTransform: (position?: THREE.Vector3Like) => THREE.Object3D;
     private lastIndex: number = 0;
     public round: number = 0;
 
@@ -86,9 +86,11 @@ export class TrackerController {
                     : "visible";
             }
         };
-        this.getPointTransform = () => {
+        this.getPointTransform = (position?) => {
             const dummy = new THREE.Object3D();
-            dummy.position.copy(TrackerController.points[this.lastIndex]);
+            dummy.position.copy(
+                position ?? TrackerController.points[this.lastIndex]
+            );
             dummy.lookAt(
                 TrackerController.points[
                     (this.lastIndex + 1) % TrackerController.ls

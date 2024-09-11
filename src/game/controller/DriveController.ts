@@ -7,7 +7,6 @@ import { IKeyboardController } from "./IKeyboardController";
 import clamp from "../api/clamp";
 import { AudioController } from "./AudioController";
 import { Player } from "../player/Player";
-import { TrackerController } from "./TrackerController";
 
 const maxDistance = 1;
 export class DriveController {
@@ -33,7 +32,7 @@ export class DriveController {
         let turboTimeoutID: number | undefined = undefined;
         let rocketTimeoutID: number | undefined = undefined;
         let rocketMode = false;
-
+        let shakeMode = false;
         const putToGround = () => {
             raycaster.set(
                 new THREE.Vector3()
@@ -152,7 +151,8 @@ export class DriveController {
                         +turboMode * maxSpeed +
                         driftSpeedMultiplier +
                         timeSpeedMultiplier) *
-                    2
+                    2 *
+                    +!shakeMode
             );
 
             // Calculate and apply friction (simplified)
@@ -208,7 +208,7 @@ export class DriveController {
 
         const rocketUpdate = () => {
             const { quaternion: ThreeQuaternion } =
-                body.tracker.getPointTransform();
+                body.tracker.getPointTransform(body.position);
             const quaternion = new CANNON.Quaternion(
                 ThreeQuaternion.x,
                 ThreeQuaternion.y,
@@ -226,7 +226,14 @@ export class DriveController {
 
             const drivingForce = forward.scale(5);
 
-            body.velocity.copy(drivingForce);
+            body.velocity.lerp(
+                drivingForce,
+                Global.deltaTime * 7,
+                body.velocity
+            );
+
+            driftSide[1] = driftSide[0] = 0;
+            putToGround();
 
             return [false, 0, true] as [boolean, number, boolean];
         };
@@ -241,7 +248,15 @@ export class DriveController {
                 turboMode = false;
             }, 5000);
         };
-        this.shake = () => {};
+        this.shake = () => {
+            shakeMode = !rocketMode;
+            shakeMode && body.model.shake(1000);
+
+            // @ts-ignore typescripts make it setTimeout by nodejs insted of webapi
+            rocketTimeoutID = setTimeout(() => {
+                shakeMode = false;
+            }, 1000);
+        };
         this.rocket = (pos, quat) => {
             body.position.copy(pos);
             body.quaternion.copy(quat);

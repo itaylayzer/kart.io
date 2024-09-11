@@ -52,7 +52,8 @@ export function Index() {
             banana:"fbx/low_poly_banana.glb",
             boots:"fbx/turbo.glb",
             rocket:"fbx/rocket_ship.glb",
-            wheel:"fbx/low_poly_wheel.glb"
+            wheel:"fbx/blue_shell_-_low_poly_mario_kart_fan_art.glb",
+            dust:"fbx/dust.glb"
           }}
         >
           <></>{" "}
