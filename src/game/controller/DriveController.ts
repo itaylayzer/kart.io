@@ -7,12 +7,14 @@ import { IKeyboardController } from "./IKeyboardController";
 import clamp from "../api/clamp";
 import { AudioController } from "./AudioController";
 import { Player } from "../player/Player";
+import { TrackerController } from "./TrackerController";
 
 const maxDistance = 1;
 export class DriveController {
-    public update: () => [boolean, number];
+    public update: () => [boolean, number, boolean];
     public turbo: () => void;
     public shake: () => void;
+    public rocket: (pos: CANNON.Vec3, quat: CANNON.Quaternion) => void;
 
     constructor(
         public maxSpeed: number,
@@ -29,6 +31,8 @@ export class DriveController {
         let speedTime = 0;
         let turboMode = false;
         let turboTimeoutID: number | undefined = undefined;
+        let rocketTimeoutID: number | undefined = undefined;
+        let rocketMode = false;
 
         const putToGround = () => {
             raycaster.set(
@@ -104,7 +108,7 @@ export class DriveController {
             body.quaternion = alignUpQuat.mult(body.quaternion);
         };
 
-        this.update = () => {
+        const keyboardUpdate = () => {
             if (keyboard.isKeyDown(32) || keyboard.isKeyDown(-6)) {
                 driftSide[0] = keyboard.horizontalRaw * 1;
                 driftTime = 0;
@@ -195,8 +199,39 @@ export class DriveController {
 
             audio.update(velocityMagnitude);
 
-            return [turboMode, driftSide[1]];
+            return [turboMode, driftSide[1], false] as [
+                boolean,
+                number,
+                boolean
+            ];
         };
+
+        const rocketUpdate = () => {
+            const { quaternion: ThreeQuaternion } =
+                body.tracker.getPointTransform();
+            const quaternion = new CANNON.Quaternion(
+                ThreeQuaternion.x,
+                ThreeQuaternion.y,
+                ThreeQuaternion.z,
+                ThreeQuaternion.w
+            );
+            body.quaternion.slerp(
+                quaternion,
+                Global.deltaTime * 10,
+                body.quaternion
+            );
+
+            const forward = new CANNON.Vec3(0, 0, 1);
+            quaternion.vmult(forward, forward);
+
+            const drivingForce = forward.scale(5);
+
+            body.velocity.copy(drivingForce);
+
+            return [false, 0, true] as [boolean, number, boolean];
+        };
+
+        this.update = () => [keyboardUpdate, rocketUpdate][+rocketMode]();
         this.turbo = () => {
             turboTimeoutID != undefined && clearTimeout(turboTimeoutID);
 
@@ -207,5 +242,19 @@ export class DriveController {
             }, 5000);
         };
         this.shake = () => {};
+        this.rocket = (pos, quat) => {
+            body.position.copy(pos);
+            body.quaternion.copy(quat);
+            rocketTimeoutID != undefined && clearTimeout(rocketTimeoutID);
+
+            body.model.setRocketModel(true);
+            rocketMode = true;
+
+            // @ts-ignore typescripts make it setTimeout by nodejs insted of webapi
+            rocketTimeoutID = setTimeout(() => {
+                rocketMode = false;
+                body.model.setRocketModel(false);
+            }, 5000);
+        };
     }
 }

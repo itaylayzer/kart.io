@@ -132,7 +132,7 @@ export class WorldMap {
                 for (const player of Player.clients.values()) {
                     const p = calcPoint(dummyVec.copy(player.position));
 
-                    ctx.lineWidth = 10 + basicLength + p[2] * 5;
+                    ctx.lineWidth = 0;
 
                     ctx.globalAlpha = 1;
                     if (colors) ctx.strokeStyle = player.color;
