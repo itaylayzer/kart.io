@@ -51,7 +51,7 @@ export function Settings({
 
   return (
     <main style={style}>
-      <h1 style={{ fontSize: '60vh' }}>Settings</h1>
+      <h1 style={{ fontSize: '6.0vh' }}>Settings</h1>
       <center>
         <ToggleButtonGroup
           color="primary"

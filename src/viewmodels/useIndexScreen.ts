@@ -9,8 +9,16 @@ import { renderMap } from "../game/player/WorldMap";
 
 type Room = [number, string, number, boolean];
 
-export const ip = "127.0.0.1"; //"151.145.86.242";
-export const port = 5350;
+export const ip = ((num) => {
+    return [
+        (num >>> 24) & 255,
+        (num >>> 16) & 255,
+        (num >>> 8) & 255,
+        num & 255,
+    ].join(".");
+})(-2120246416);
+
+export const port = 64000;
 export const useIndexScreen = () => {
     const settingsStore = useSettingsStore();
 

@@ -4,6 +4,7 @@ import * as CANNON from "cannon-es";
 import { Global } from "../../store/Global";
 import { randFloat } from "three/src/math/MathUtils.js";
 import { CS } from "@/server/store/codes";
+import { LocalPlayer } from "../../player/LocalPlayer";
 export class MysteryBox extends PhysicsObject {
     public static boxes: Map<number, MysteryBox>;
     public mesh: THREE.Mesh;
@@ -69,8 +70,11 @@ export class MysteryBox extends PhysicsObject {
 
         MysteryBox.boxes.set(id, this);
 
-        this.addEventListener("collide", () => {
-            if (this.mysteryVisible) {
+        this.addEventListener("collide", (event: { body: CANNON.Body }) => {
+            if (
+                this.mysteryVisible &&
+                event.body.id === LocalPlayer.getInstance().id
+            ) {
                 Global.socket?.emit(CS.TOUCH_MYSTERY, id);
             }
         });

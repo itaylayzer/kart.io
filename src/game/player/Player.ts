@@ -7,7 +7,7 @@ import * as CANNON from "cannon-es";
 import { PlayerModel } from "./PlayerModel";
 import { TrackerController } from "../controller/TrackerController";
 import { AudioController } from "../controller/AudioController";
-import { UpperItem } from "./UpperItem";
+import { ItemController } from "../controller/ItemController";
 
 export const COLORS = [
     "#f56505",
@@ -19,18 +19,13 @@ export const COLORS = [
     "#124eb5",
     "#ff0000",
 ];
-const itemsMeshes = [
-    UpperItem.banana,
-    UpperItem.boots,
-    UpperItem.rocket,
-    UpperItem.wheels,
-];
+
 const COLORSEMISSIVE = [5, 5, 4, 5, 6, 3, 10, 4];
 export class Player extends PhysicsObject {
     public static clients: Map<number, Player>;
     public tracker: TrackerController;
+    public items: ItemController;
 
-    public setItem: (itemNumber: number) => void;
     public disconnect: () => void;
     static {
         this.clients = new Map();
@@ -60,7 +55,6 @@ export class Player extends PhysicsObject {
         });
 
         this.tracker = new TrackerController(this, isLocal);
-
         this.color = color;
         Player.clients.set(pid, this);
 
@@ -79,8 +73,7 @@ export class Player extends PhysicsObject {
             [color, colorSetEmissive],
             isLocal
         );
-
-        let upperItem: UpperItem | null = null;
+        this.items = new ItemController(model, this, isLocal);
 
         model.add(audio);
 
@@ -90,20 +83,9 @@ export class Player extends PhysicsObject {
 
                 isLocal && Global.cameraController.update();
 
+                this.items.update();
                 engine.update();
                 model.update();
-                if (
-                    isLocal &&
-                    upperItem !== null &&
-                    Global.mouseController.isMouseDown(0) &&
-                    !upperItem.stopping
-                ) {
-                    upperItem.stop(() => {
-                        model.remove(upperItem!);
-                        upperItem = null;
-                    });
-                }
-                upperItem?.update();
 
                 this.tracker.update();
                 keyboard.isLocked = this.tracker.round >= 1;
@@ -112,12 +94,6 @@ export class Player extends PhysicsObject {
             },
         ];
 
-        this.setItem = (num) => {
-            if (upperItem !== null) return;
-            console.log("setItem", "setItem", num);
-            upperItem = new UpperItem(itemsMeshes[num]);
-            model.add(upperItem);
-        };
         this.disconnect = () => {
             Global.lod.remove(model);
             Global.world.removeBody(this);

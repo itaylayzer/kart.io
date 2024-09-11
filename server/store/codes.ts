@@ -7,6 +7,7 @@ export enum CS {
     TOUCH_MYSTERY = "t",
     READY = "r",
     INIT_GAME = "g",
+    APPLY_MYSTERY = "a",
 }
 
 // client codes
@@ -21,4 +22,5 @@ export enum CC {
     READY = "r",
     START_GAME = "s",
     MYSTERY_ITEM = "y",
+    APPLY_MYSTERY = "a",
 }
