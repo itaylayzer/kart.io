@@ -30,7 +30,7 @@ export class ItemController {
                 upperItem = null;
                 const data = [itemIndex];
 
-                if ([0, 3].includes(itemIndex)) {
+                if ([0, 2, 3].includes(itemIndex)) {
                     data.push(
                         player.position.x,
                         player.position.y,
@@ -38,7 +38,7 @@ export class ItemController {
                     );
                 }
 
-                if (itemIndex === 3) {
+                if ([2, 3].includes(itemIndex)) {
                     data.push(
                         player.quaternion.x,
                         player.quaternion.y,

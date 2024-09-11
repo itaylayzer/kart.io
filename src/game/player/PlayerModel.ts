@@ -24,6 +24,7 @@ const namesToColor = [
 
 export class PlayerModel extends THREE.Group {
     public update: () => void;
+    public setRocketModel: (a: boolean) => void;
     constructor(
         body: CANNON.Body,
         keyboard: IKeyboardController,
@@ -54,12 +55,19 @@ export class PlayerModel extends THREE.Group {
         });
 
         model.scale.multiplyScalar(0.5 / 3);
-
+        const rocket = Global.assets.gltf.rocket.scene.clone();
+        rocket.rotation.y = -Math.PI / 2;
+        rocket.rotation.z = -Math.PI;
+        rocket.rotation.x = (-Math.PI * 3) / 4;
+        rocket.scale.multiplyScalar(0.4);
+        rocket.position.y += 0.25;
         const backweels = model.getObjectByName("Back_Wheels_38")!;
         const frontweels = model.getObjectByName("Front_Wheels_47")!;
         const steeringweel = model.getObjectByName("Wheel_25")!;
         model.getObjectByName("Back_18")!.visible = false;
         super.add(model);
+        rocket.visible = false;
+        super.add(rocket);
 
         if (!isLocal) {
             const nametag = createPlayerNameSprite(name);
@@ -67,6 +75,11 @@ export class PlayerModel extends THREE.Group {
             super.add(nametag);
         }
         let driftSide = [0, 0];
+
+        this.setRocketModel = (a) => {
+            rocket.visible = [false, true][+a];
+            model.visible = [true, false][+a];
+        };
 
         this.update = () => {
             this.position.copy(body.position);

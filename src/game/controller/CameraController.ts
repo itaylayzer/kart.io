@@ -37,9 +37,13 @@ export class CameraController {
 
         this.turboMode = lerp(
             this.turboMode,
-            +player.turboMode,
+            +player.turboMode * +!player.rocketMode,
             Global.deltaTime * 10
         );
+
+        let vertical = [player.keyboard.vertical, 2][+player.rocketMode];
+        let horizontal = [player.keyboard.horizontal, 0][+player.rocketMode];
+        let driftSide = [player.driftSide, 0][+player.rocketMode];
 
         const vec = player.position.clone();
         const forwardVec = new THREE.Vector3(0, 0, 1).applyQuaternion(
@@ -53,9 +57,7 @@ export class CameraController {
         const upVec = new THREE.Vector3(0, 1, 0).applyQuaternion(
             player.quaternion
         );
-        rightVec.multiplyScalar(
-            1 * (player.keyboard.horizontal + player.driftSide)
-        );
+        rightVec.multiplyScalar(1 * (horizontal + driftSide));
         const lookVec = rightVec.clone().multiplyScalar(0.5 / 3);
 
         this.camera.position
@@ -66,12 +68,9 @@ export class CameraController {
                     .multiplyScalar(
                         -1 / 2 +
                             (-(
-                                player.keyboard.vertical *
-                                    (1 + this.turboMode) +
+                                vertical * (1 + this.turboMode) +
                                 Math.abs(
-                                    player.driftSide -
-                                        Math.abs(player.driftSide) *
-                                            player.keyboard.horizontal
+                                    driftSide - Math.abs(driftSide) * horizontal
                                 )
                             ) *
                                 Global.settings.fovChange) /
@@ -86,8 +85,7 @@ export class CameraController {
 
         this.camera.lookAt(new THREE.Vector3().copy(lookVec));
         this.camera.rotateZ(
-            (player.keyboard.horizontal + player.driftSide) *
-                (0.05 + 0.04 * this.turboMode)
+            (horizontal + driftSide) * (0.05 + 0.04 * this.turboMode)
         );
 
         this.time += Global.deltaTime * 13;
