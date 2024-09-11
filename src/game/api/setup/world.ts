@@ -33,6 +33,7 @@ import {
     createVectorsFromNumbers,
     createWater,
 } from "./road";
+import { Banana } from "../../player/Items/Banana";
 
 function setupLights() {
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 1);
@@ -122,7 +123,7 @@ function setupWindowEvents() {
 }
 
 function setupRoad() {
-    const roadsSegments = createRoad(Global.curve, 5, 200, 2000);
+    const roadsSegments = createRoad(Global.curve, 5, 200, 3000);
     Global.lod.add(...roadsSegments);
     Global.roadMesh = roadsSegments;
 
@@ -239,7 +240,7 @@ function setupSocket(
     );
 
     Global.socket.on(CC.MYSTERY_ITEM, (itemIndex) => {
-        LocalPlayer.getInstance().setItem(itemIndex);
+        LocalPlayer.getInstance().items.setItem(itemIndex);
     });
 
     Global.socket?.on(CC.KEY_DOWN, (args: { pid: number; buffer: Buffer }) => {
@@ -256,6 +257,18 @@ function setupSocket(
         xplayer?.keyboard.keysDown.add(key);
     });
 
+    Global.socket?.on(
+        CC.APPLY_MYSTERY,
+        ([xpid, mysteryNum, ...rest]: number[]) => {
+            if (mysteryNum === 0) {
+                console.log("banana", xpid, localID, rest);
+                new Banana(
+                    Player.clients.get(xpid)!.id,
+                    new CANNON.Vec3(rest[0], rest[1], rest[2])
+                );
+            }
+        }
+    );
     Global.socket?.on(CC.KEY_UP, (args: { pid: number; buffer: Buffer }) => {
         const xplayer = Player.clients.get(args.pid);
         const [key, ...data] = msgpack.decode(

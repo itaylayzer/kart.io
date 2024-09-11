@@ -150,7 +150,7 @@ export class Room {
 
             socket.on(CS.TOUCH_MYSTERY, (id: number) => {
                 sockets().emitAll(CC.MYSTERY_VISIBLE, [id, false]);
-                local.socket.emit(CC.MYSTERY_ITEM, randInt(0,3));
+                socket.emit(CC.MYSTERY_ITEM, 0);
                 setTimeout(() => {
                     sockets().emitAll(CC.MYSTERY_VISIBLE, [id, true]);
                 }, 1000);
@@ -171,6 +171,9 @@ export class Room {
                     gameStarted = true;
                     player.transform = startsLocationsGenerator();
                 }
+            });
+            socket.on(CS.APPLY_MYSTERY, (data: number[]) => {
+                sockets().emitExcept(pid, CC.APPLY_MYSTERY, [pid, ...data]);
             });
 
             socket.on("disconnect", () => {
