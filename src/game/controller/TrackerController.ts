@@ -133,7 +133,7 @@ export class TrackerController {
         );
     }
 }
-function generateRange(
+export function generateRange(
     current: number,
     limit: number,
     backSteps: number,

@@ -30,8 +30,7 @@ export class ItemController {
                 upperItem = null;
                 const data = [itemIndex];
 
-                if (itemIndex === 0) {
-                    new Banana(player.id, player.position);
+                if ([0, 3].includes(itemIndex)) {
                     data.push(
                         player.position.x,
                         player.position.y,
@@ -39,9 +38,15 @@ export class ItemController {
                     );
                 }
 
-                if (itemIndex === 1) {
-                    player.engine.turbo();
+                if (itemIndex === 3) {
+                    data.push(
+                        player.quaternion.x,
+                        player.quaternion.y,
+                        player.quaternion.z,
+                        player.quaternion.w
+                    );
                 }
+
                 Global.socket?.emit(CS.APPLY_MYSTERY, data);
             }
             upperItem?.update();

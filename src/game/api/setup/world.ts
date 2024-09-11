@@ -34,6 +34,7 @@ import {
     createWater,
 } from "./road";
 import { Banana } from "../../player/Items/Banana";
+import { Wheels } from "../../player/Items/Wheel";
 
 function setupLights() {
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 1);
@@ -269,6 +270,13 @@ function setupSocket(
             }
             if (mysteryNum === 1) {
                 Player.clients.get(xpid)!.engine.turbo();
+            }
+            if (mysteryNum === 3) {
+                new Wheels(
+                    Player.clients.get(xpid)!.id,
+                    new CANNON.Vec3(rest[0], rest[1], rest[2]),
+                    new CANNON.Quaternion(rest[3], rest[4], rest[5], rest[6])
+                );
             }
         }
     );
