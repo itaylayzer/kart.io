@@ -3,6 +3,7 @@ import { Player } from "./Player";
 import { MysteryBox } from "../api/meshes/MysteryBox";
 import { Global } from "../store/Global";
 import * as CANNON from "cannon-es";
+import { Wheels } from "./Items/Wheel";
 export class WorldMap {
     public update: () => void;
 
@@ -130,6 +131,9 @@ export class WorldMap {
             function render(colors = true, basicLength = 0) {
                 for (const player of Player.clients.values()) {
                     const p = calcPoint(dummyVec.copy(player.position));
+
+                    ctx.lineWidth = 10 + basicLength + p[2] * 5;
+
                     ctx.globalAlpha = 1;
                     if (colors) ctx.strokeStyle = player.color;
                     if (Global.settings.useArrow) {
@@ -212,11 +216,21 @@ export class WorldMap {
                         );
                     } else {
                         ctx.beginPath();
-                        ctx.lineWidth = 25 + basicLength + p[2] * 5;
 
                         ctx.arc(p[0], p[1], 0.5, 0, 2 * Math.PI);
                         ctx.stroke();
                     }
+                }
+
+                for (const wheel of Wheels.wheels.values()) {
+                    const p = calcPoint(dummyVec.copy(wheel.position));
+                    ctx.globalAlpha = 1;
+                    if (colors) ctx.strokeStyle = "black";
+                    ctx.beginPath();
+                    ctx.lineWidth = 10 + basicLength + p[2] * 5;
+
+                    ctx.arc(p[0], p[1], 0.5, 0, 2 * Math.PI);
+                    ctx.stroke();
                 }
             }
 

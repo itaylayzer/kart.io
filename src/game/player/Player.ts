@@ -26,7 +26,8 @@ export class Player extends PhysicsObject {
     public tracker: TrackerController;
     public items: ItemController;
     public engine: DriveController;
-
+    public turboMode: boolean;
+    public driftSide: number;
     public disconnect: () => void;
     static {
         this.clients = new Map();
@@ -59,6 +60,9 @@ export class Player extends PhysicsObject {
         this.color = color;
         Player.clients.set(pid, this);
 
+        this.turboMode = false;
+        this.driftSide = 0;
+
         const audio = new AudioController();
         this.engine = new DriveController(
             5,
@@ -85,7 +89,7 @@ export class Player extends PhysicsObject {
                 isLocal && Global.cameraController.update();
 
                 this.items.update();
-                this.engine.update();
+                [this.turboMode, this.driftSide] = this.engine.update();
                 model.update();
 
                 this.tracker.update();

@@ -10,7 +10,7 @@ import { Player } from "../player/Player";
 
 const maxDistance = 1;
 export class DriveController {
-    public update: () => void;
+    public update: () => [boolean, number];
     public turbo: () => void;
     public shake: () => void;
 
@@ -115,7 +115,7 @@ export class DriveController {
             ) {
                 driftTime += Global.deltaTime;
             }
-            if (keyboard.isKeyUp(32) || keyboard.isKeyUp(-6)) {
+            if (keyboard.isKeyUp(32) || keyboard.isKeyUp(-6) || driftTime > 3) {
                 driftSide[0] = 0;
                 driftTime = 0;
             }
@@ -194,6 +194,8 @@ export class DriveController {
                 )!.innerHTML = `${velocityMagnitude.toFixed(2)} KM/S`);
 
             audio.update(velocityMagnitude);
+
+            return [turboMode, driftSide[1]];
         };
         this.turbo = () => {
             turboTimeoutID != undefined && clearTimeout(turboTimeoutID);

@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { Global } from "../store/Global";
 import { LocalPlayer } from "../player/LocalPlayer";
 import * as CANNON from "cannon-es";
-import { damp } from "three/src/math/MathUtils.js";
+import { lerp } from "three/src/math/MathUtils.js";
 import { Player } from "../player/Player";
 function explodeFn(t: number) {
     return t < Math.PI * 4
@@ -19,33 +19,26 @@ export class CameraController {
     public camera: THREE.PerspectiveCamera;
     public static sensitivity: number = 50;
     private time: number;
-    private driftSide: [number, number];
+    private turboMode: number;
 
     private forceRotation: THREE.Vector3;
     constructor(camera: THREE.PerspectiveCamera) {
         this.camera = camera;
         camera.rotation.y = Math.PI;
         this.time = Math.PI * 4;
-        this.driftSide = [0, 0];
 
         this.forceRotation = new THREE.Vector3();
+        this.turboMode = 0;
     }
 
     public update() {
         const player: Player = LocalPlayer.getInstance();
         if (player === undefined) return;
-        if (player.keyboard.isKeyDown(32) || player.keyboard.isKeyDown(-6)) {
-            this.driftSide[0] = player.keyboard.horizontalRaw * 0.6;
-        }
-        if (player.keyboard.isKeyUp(32) || player.keyboard.isKeyUp(-6)) {
-            this.driftSide[0] = 0;
-        }
 
-        this.driftSide[1] = damp(
-            this.driftSide[1],
-            this.driftSide[0],
-            1.5,
-            Global.deltaTime * 7
+        this.turboMode = lerp(
+            this.turboMode,
+            +player.turboMode,
+            Global.deltaTime * 10
         );
 
         const vec = player.position.clone();
@@ -61,7 +54,7 @@ export class CameraController {
             player.quaternion
         );
         rightVec.multiplyScalar(
-            1 * (player.keyboard.horizontal + this.driftSide[1])
+            1 * (player.keyboard.horizontal + player.driftSide)
         );
         const lookVec = rightVec.clone().multiplyScalar(0.5 / 3);
 
@@ -73,10 +66,11 @@ export class CameraController {
                     .multiplyScalar(
                         -1 / 2 +
                             (-(
-                                player.keyboard.vertical +
+                                player.keyboard.vertical *
+                                    (1 + this.turboMode) +
                                 Math.abs(
-                                    this.driftSide[1] -
-                                        Math.abs(this.driftSide[1]) *
+                                    player.driftSide -
+                                        Math.abs(player.driftSide) *
                                             player.keyboard.horizontal
                                 )
                             ) *
@@ -92,7 +86,8 @@ export class CameraController {
 
         this.camera.lookAt(new THREE.Vector3().copy(lookVec));
         this.camera.rotateZ(
-            (player.keyboard.horizontal + this.driftSide[1]) * 0.05
+            (player.keyboard.horizontal + player.driftSide) *
+                (0.05 + 0.04 * this.turboMode)
         );
 
         this.time += Global.deltaTime * 13;

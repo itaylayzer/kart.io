@@ -1,7 +1,8 @@
 InGame:
 
--   Special System
+-   Special System: Turbo System, Banana Shake
 -   Win Senerio, Switching Cameras
+-   Finals: Timers, Wrong Turn Object, Fix Tracking to be updated / last, Keyboard Customization
 
 specials:
 banna, make you slip and loose control
