@@ -1,4 +1,4 @@
-import { UpperItem } from "../player/UpperItem";
+import { ItemModel } from "../player/ItemModel";
 import { Global } from "../store/Global";
 import { Player } from "../player/Player";
 import { CS } from "../store/codes";
@@ -6,10 +6,10 @@ import { Banana } from "../player/Items/Banana";
 import { PlayerModel } from "../player/PlayerModel";
 
 const itemsMeshes = [
-    UpperItem.banana,
-    UpperItem.boots,
-    UpperItem.rocket,
-    UpperItem.wheels,
+    ItemModel.banana,
+    ItemModel.boots,
+    ItemModel.rocket,
+    ItemModel.wheels,
 ];
 
 export class ItemController {
@@ -18,7 +18,7 @@ export class ItemController {
     public update: () => void;
     constructor(model: PlayerModel, player: Player, isLocal: boolean) {
         let itemIndex = 0;
-        let upperItem: UpperItem | null = null;
+        let upperItem: ItemModel | null = null;
         this.update = () => {
             if (
                 isLocal &&
@@ -38,13 +38,17 @@ export class ItemController {
                         player.position.z
                     );
                 }
+
+                if (itemIndex === 1) {
+                    player.engine.turbo();
+                }
                 Global.socket?.emit(CS.APPLY_MYSTERY, data);
             }
             upperItem?.update();
         };
         this.setItem = (num) => {
             if (upperItem !== null) return;
-            upperItem = new UpperItem(itemsMeshes[(itemIndex = num)]);
+            upperItem = new ItemModel(itemsMeshes[(itemIndex = num)]);
             model.add(upperItem);
         };
     }

@@ -2,7 +2,7 @@ import * as THREE from "three";
 import * as TWEEN from "@tweenjs/tween.js";
 import { Global } from "../store/Global";
 
-export class UpperItem extends THREE.Group {
+export class ItemModel extends THREE.Group {
     public update: () => void;
     public stop: (stopFn: () => void) => void;
     public stopping: boolean;

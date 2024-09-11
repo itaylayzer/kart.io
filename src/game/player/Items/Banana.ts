@@ -2,6 +2,7 @@ import * as CANNON from "cannon-es";
 import * as THREE from "three";
 import { PhysicsObject } from "../../physics/PhysicsMesh";
 import { Global } from "../../store/Global";
+import { Player } from "../Player";
 export class Banana extends PhysicsObject {
     constructor(notFromId: number, position: CANNON.Vec3) {
         const mesh = Global.assets.gltf.banana.scene.clone();
@@ -37,7 +38,7 @@ export class Banana extends PhysicsObject {
             Global.scene.remove(mesh);
             Global.world.removeBody(this);
 
-            // TODO: apply force! event.body.engine.shake()!
+            (event.body as Player).engine.shake();
         });
         this.update = [
             () => {

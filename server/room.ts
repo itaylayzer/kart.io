@@ -150,7 +150,7 @@ export class Room {
 
             socket.on(CS.TOUCH_MYSTERY, (id: number) => {
                 sockets().emitAll(CC.MYSTERY_VISIBLE, [id, false]);
-                socket.emit(CC.MYSTERY_ITEM, 0);
+                socket.emit(CC.MYSTERY_ITEM, 1);
                 setTimeout(() => {
                     sockets().emitAll(CC.MYSTERY_VISIBLE, [id, true]);
                 }, 1000);
