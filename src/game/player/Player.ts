@@ -27,7 +27,9 @@ export class Player extends PhysicsObject {
     public items: ItemController;
     public engine: DriveController;
     public turboMode: boolean;
+    public rocketMode: boolean;
     public driftSide: number;
+    public model: PlayerModel;
     public disconnect: () => void;
     static {
         this.clients = new Map();
@@ -71,16 +73,16 @@ export class Player extends PhysicsObject {
             audio,
             isLocal
         );
-        const model = new PlayerModel(
+        this.model = new PlayerModel(
             this,
             keyboard,
             name,
             [color, colorSetEmissive],
             isLocal
         );
-        this.items = new ItemController(model, this, isLocal);
-
-        model.add(audio);
+        this.items = new ItemController(this.model, this, isLocal);
+        this.rocketMode = false;
+        this.model.add(audio);
 
         this.update = [
             () => {
@@ -89,8 +91,9 @@ export class Player extends PhysicsObject {
                 isLocal && Global.cameraController.update();
 
                 this.items.update();
-                [this.turboMode, this.driftSide] = this.engine.update();
-                model.update();
+                [this.turboMode, this.driftSide, this.rocketMode] =
+                    this.engine.update();
+                this.model.update();
 
                 this.tracker.update();
                 keyboard.isLocked = this.tracker.round >= 1;
@@ -100,14 +103,14 @@ export class Player extends PhysicsObject {
         ];
 
         this.disconnect = () => {
-            Global.lod.remove(model);
+            Global.lod.remove(this.model);
             Global.world.removeBody(this);
 
             Player.clients.delete(pid);
         };
 
         Global.world.addBody(this);
-        Global.lod.add(model);
+        Global.lod.add(this.model);
     }
 
     public applyTransform(transform: number[]) {

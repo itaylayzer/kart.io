@@ -278,6 +278,19 @@ function setupSocket(
                     new CANNON.Quaternion(rest[3], rest[4], rest[5], rest[6])
                 );
             }
+            if (mysteryNum === 2) {
+                Player.clients
+                    .get(xpid)!
+                    .engine.rocket(
+                        new CANNON.Vec3(rest[0], rest[1], rest[2]),
+                        new CANNON.Quaternion(
+                            rest[3],
+                            rest[4],
+                            rest[5],
+                            rest[6]
+                        )
+                    );
+            }
         }
     );
     Global.socket?.on(CC.KEY_UP, (args: { pid: number; buffer: Buffer }) => {
