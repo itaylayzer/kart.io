@@ -1,6 +1,6 @@
 InGame:
 
--   Special System: Turbo System, Banana Shake
+-   Special System: Turbo Effect
 -   Win Senerio, Switching Cameras
 -   Finals: Timers, Wrong Turn Object, Fix Tracking to be updated / last, Keyboard Customization
 
