@@ -25,6 +25,7 @@ export class Player extends PhysicsObject {
     public static clients: Map<number, Player>;
     public tracker: TrackerController;
     public items: ItemController;
+    public engine: DriveController;
 
     public disconnect: () => void;
     static {
@@ -59,7 +60,7 @@ export class Player extends PhysicsObject {
         Player.clients.set(pid, this);
 
         const audio = new AudioController();
-        const engine = new DriveController(
+        this.engine = new DriveController(
             5,
             this,
             this.keyboard,
@@ -84,7 +85,7 @@ export class Player extends PhysicsObject {
                 isLocal && Global.cameraController.update();
 
                 this.items.update();
-                engine.update();
+                this.engine.update();
                 model.update();
 
                 this.tracker.update();
