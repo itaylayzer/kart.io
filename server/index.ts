@@ -9,7 +9,7 @@ const server = createServer(credentials, app);
 
 const ports = new Map<number, Room | undefined>();
 let startCount = parseInt(process.argv[2] ?? "0");
-for (let index = 5321; index < 5350; index++) {
+for (let index = 64001; index < 65000; index++) {
     ports.set(
         index,
         startCount > 0
@@ -81,7 +81,7 @@ app.get("/list", (req, res) => {
     res.status(200).send(JSON.stringify(entries));
 });
 
-const port = 5350;
+const port = 64000;
 server.listen(port, () => {
     console.log(`server is running on https://localhost:${port}`);
 });
