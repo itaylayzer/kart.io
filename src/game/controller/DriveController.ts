@@ -7,7 +7,8 @@ import { IKeyboardController } from "./IKeyboardController";
 import clamp from "../api/clamp";
 import { AudioController } from "./AudioController";
 import { Player } from "../player/Player";
-
+import msgpack from "msgpack-lite";
+import { CS } from "../store/codes";
 const maxDistance = 1;
 export class DriveController {
     public update: () => [boolean, number, boolean];
@@ -106,6 +107,24 @@ export class DriveController {
             // Apply the alignment quaternion to the current quaternion
             body.quaternion = alignUpQuat.mult(body.quaternion);
         };
+
+        islocal &&
+            setInterval(() => {
+                if (rocketMode || shakeMode || body.velocity.isZero()) return;
+                Global.socket?.emit(
+                    CS.UPDATE_TRANSFORM,
+                    msgpack.encode([
+                        body.pid,
+                        body.position.x,
+                        body.position.y,
+                        body.position.z,
+                        body.quaternion.x,
+                        body.quaternion.y,
+                        body.quaternion.z,
+                        body.quaternion.w,
+                    ])
+                );
+            }, 1000);
 
         const keyboardUpdate = () => {
             if (keyboard.isKeyDown(32) || keyboard.isKeyDown(-6)) {

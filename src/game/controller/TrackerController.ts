@@ -2,6 +2,7 @@ import { Player } from "../player/Player";
 import { Global } from "../store/Global";
 import * as THREE from "three";
 import * as CANNON from "cannon-es";
+import { CS } from "../store/codes";
 
 export class TrackerController {
     public reset: () => void;
@@ -9,19 +10,24 @@ export class TrackerController {
 
     public getPointTransform: (position?: THREE.Vector3Like) => THREE.Object3D;
     private lastIndex: number = 0;
-    public round: number = 0;
+    public round: number;
 
     static sortedTrackers: [number, TrackerController][];
     static readonly ls = 700;
     static points: THREE.Vector3[];
     private static trackers: Map<number, TrackerController>;
+    public static FINALS: number[];
+    public shouldLock: () => boolean;
 
     static {
         this.points = [];
         this.trackers = new Map();
+        this.FINALS = [];
     }
 
     constructor(player: Player, isLocal: boolean) {
+        const MAX_ROUNDS = 0;
+        this.round = -1;
         TrackerController.trackers.set(player.pid, this);
 
         if (TrackerController.points.length === 0) {
@@ -42,7 +48,7 @@ export class TrackerController {
                     return generateRange(
                         this.lastIndex,
                         TrackerController.ls,
-                        0,
+                        -5,
                         5
                     ).includes(index);
                 })
@@ -55,6 +61,9 @@ export class TrackerController {
 
             if (forwardPos[0] === 1 && this.lastIndex === 0) {
                 this.round++;
+                if (isLocal && this.round >= MAX_ROUNDS) {
+                    Global.socket?.emit(CS.FINISH_LINE);
+                }
             }
             if (forwardPos[0] === 0 && this.lastIndex === 1) {
                 this.round--;
@@ -99,17 +108,25 @@ export class TrackerController {
 
             return dummy;
         };
+        this.shouldLock = () => this.round >= MAX_ROUNDS;
     }
 
     public static update(localPID: number) {
-        const trackers = Array.from(this.trackers.entries());
+        const trackers = Array.from(this.trackers.entries()).filter(
+            ([id, _]) => !(this.FINALS ?? []).includes(id)
+        );
         trackers.sort((b, a) => {
             let compare = a[1].round - b[1].round;
             if (compare === 0) compare = a[1].lastIndex - b[1].lastIndex;
             return compare;
         });
-        this.sortedTrackers = [...trackers];
-        const rightPlayer = trackers
+        this.sortedTrackers = [
+            ...(this.FINALS ?? []).map(
+                (v) => [v, this.trackers.get(v)!] as [number, TrackerController]
+            ),
+            ...trackers,
+        ];
+        const rightPlayer = [...this.sortedTrackers]
             .map((t, i) => [i, ...t] as [number, number, TrackerController])
             .filter((t) => {
                 return t[1] === localPID;
@@ -118,20 +135,23 @@ export class TrackerController {
         const positionHTML = document
             .querySelector("div#position")
             ?.querySelectorAll("div")!;
-        const posInMatch = rightPlayer[0] + 1;
-        positionHTML.item(0).innerHTML = `<p>${rightPlayer[2].round} / 3</p>`;
+        const posInMatch = rightPlayer === undefined ? 100 : rightPlayer[0] + 1;
+        const roundInMatch =
+            rightPlayer === undefined ? -1 : rightPlayer[2].round;
+        positionHTML.item(0).innerHTML = `<p>${roundInMatch} / 3</p>`;
         positionHTML.item(1).innerHTML = `<p>${posInMatch} ${
             ["st", "th", "rd", "th"][Math.min(posInMatch - 1, 3)]
         }</p>`;
     }
-    public static getScoreboard(): [string, number, number][] {
+    public static getScoreboard(): [string, string, number, number][] {
         return this.sortedTrackers.map(
             ([playerID, tracker], index) =>
                 [
+                    Player.clients.get(playerID)!.color,
                     Player.clients.get(playerID)!.name,
                     index + 1,
                     Math.max(tracker.round, 0),
-                ] as [string, number, number]
+                ] as [string, string, number, number]
         );
     }
 }

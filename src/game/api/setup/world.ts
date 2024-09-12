@@ -35,6 +35,7 @@ import {
 } from "./road";
 import { Banana } from "../../player/Items/Banana";
 import { Wheels } from "../../player/Items/Wheel";
+import { TrackerController } from "../../controller/TrackerController";
 
 function setupLights() {
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 1);
@@ -137,10 +138,7 @@ function setupRoad() {
         Global.lod.add(...fences);
         Global.optimizedObjects.push(...fences);
     }
-    console.log(
-        roadsSegments.length,
-        roadsSegments.filter((v) => v.visible === false)
-    );
+
     if (Global.settings.displayPillars) {
         requestAnimationFrame(() => {
             const tiles = createFencesPilars(
@@ -263,11 +261,28 @@ function setupSocket(
         xplayer?.keyboard.keysDown.add(key);
     });
 
+    Global.socket?.on(CC.UPDATE_TRANSFORM, (buffer: Buffer) => {
+        const [pid, ...data] = msgpack.decode(
+            new Uint8Array(buffer)
+        ) as number[];
+        const xplayer = Player.clients.get(pid);
+        const [x, y, z, rx, ry, rz, rw] = data;
+        xplayer?.position.set(x, y, z);
+        xplayer?.quaternion.set(rx, ry, rz, rw);
+    });
+
+    Global.socket?.on(CC.FINISH_LINE, (pid: number) => {
+        TrackerController.FINALS.push(pid);
+    });
+    Global.socket?.on(CC.SHOW_WINNERS, () => {
+        // TODO: SHOW NEXT SCREEN
+        console.warn("finished");
+    });
+
     Global.socket?.on(
         CC.APPLY_MYSTERY,
         ([xpid, mysteryNum, ...rest]: number[]) => {
             if (mysteryNum === 0) {
-                console.log("banana", xpid, localID, rest);
                 new Banana(
                     Player.clients.get(xpid)!.id,
                     new CANNON.Vec3(rest[0], rest[1], rest[2])

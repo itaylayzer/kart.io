@@ -15,6 +15,7 @@ type Player = {
     transform: number[];
     color: number;
     ready: boolean;
+    finish: boolean;
 };
 
 const COLORS_LENGTH = 8;
@@ -106,6 +107,7 @@ export class Room {
                     transform: [],
                     color: selfColor,
                     ready: false,
+                    finish: false,
                 };
 
                 sockets().emitAll(CC.NEW_PLAYER, [pid, name, selfColor]);
@@ -150,7 +152,7 @@ export class Room {
 
             socket.on(CS.TOUCH_MYSTERY, (id: number) => {
                 sockets().emitAll(CC.MYSTERY_VISIBLE, [id, false]);
-                socket.emit(CC.MYSTERY_ITEM, randInt(0, 0));
+                socket.emit(CC.MYSTERY_ITEM, randInt(0, 3));
                 setTimeout(() => {
                     sockets().emitAll(CC.MYSTERY_VISIBLE, [id, true]);
                 }, 1000);
@@ -174,6 +176,27 @@ export class Room {
             });
             socket.on(CS.APPLY_MYSTERY, (data: number[]) => {
                 sockets().emitAll(CC.APPLY_MYSTERY, [pid, ...data]);
+            });
+            socket.on(CS.UPDATE_TRANSFORM, (buffer: Buffer) => {
+                sockets().emitExcept(pid, CC.UPDATE_TRANSFORM, buffer);
+            });
+
+            socket.on(CS.FINISH_LINE, () => {
+                sockets().emitAll(CC.FINISH_LINE, pid);
+
+                local.finish = true;
+                players.set(pid, local);
+
+                const allFinishes = Array.from(players.values()).map(
+                    (v) => v.finish
+                );
+
+                const allFinished =
+                    allFinishes.filter((v) => v === false).length === 0;
+
+                if (allFinished) {
+                    sockets().emitAll(CC.SHOW_WINNERS, pid);
+                }
             });
 
             socket.on("disconnect", () => {

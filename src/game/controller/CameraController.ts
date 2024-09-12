@@ -20,19 +20,42 @@ export class CameraController {
     public static sensitivity: number = 50;
     private time: number;
     private turboMode: number;
+    private pid: number | false;
+    private players: Player[];
 
     private forceRotation: THREE.Vector3;
     constructor(camera: THREE.PerspectiveCamera) {
         this.camera = camera;
         camera.rotation.y = Math.PI;
         this.time = Math.PI * 4;
-
+        this.pid = false;
         this.forceRotation = new THREE.Vector3();
         this.turboMode = 0;
+        this.players = [];
     }
 
     public update() {
-        const player: Player = LocalPlayer.getInstance();
+        const localPlayer: Player = LocalPlayer.getInstance();
+
+        if (this.players.length === 0) {
+            this.players = Array.from(Player.clients.values());
+        }
+
+
+        const player = [localPlayer, this.players[this.pid as number]][
+            +(this.pid !== false)
+        ];
+        if (Global.mouseController.isLocked) {
+            if (this.pid === false) {
+                this.pid = this.players
+                    .map((v, i) => [i, v] as [number, Player])
+                    .filter(([_, v]) => v.pid === localPlayer.pid)[0][0];
+            } else {
+                this.pid =
+                    (this.pid + +Global.mouseController.isMouseDown(0)) %
+                    this.players.length;
+            }
+        }
         if (player === undefined) return;
 
         this.turboMode = lerp(

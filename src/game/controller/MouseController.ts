@@ -5,10 +5,12 @@ export class MouseController {
     private mousePressed: Set<number>;
     private mouseDown: Set<number>;
     private mouseUp: Set<number>;
+    public isLocked: boolean;
     constructor(enableOnStart: boolean = true) {
         this._movement = [0, 0];
         enableOnStart && this.enable();
 
+        this.isLocked = false;
         this.mouseDown = new Set();
         this.mousePressed = new Set();
         this.mouseUp = new Set();

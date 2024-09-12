@@ -22,7 +22,7 @@ export class Scoreboard {
             const scoreboardInformations = TrackerController.getScoreboard();
 
             for (const playerInfo of scoreboardInformations) {
-                tableHTML.innerHTML += `<tr><td>${playerInfo[0]}</td><td>${playerInfo[1]}</td><td>${playerInfo[2]}</td></tr>`;
+                tableHTML.innerHTML += `<tr><td style="color:${playerInfo[0]};">${playerInfo[1]}</td><td>${playerInfo[2]}</td><td>${playerInfo[3]}</td></tr>`;
             }
         };
     }
