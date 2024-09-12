@@ -3,28 +3,32 @@ import { createServer } from "https";
 import { Room } from "./room";
 import cors from "cors";
 import { credentials } from "./store/credentials";
+import { RandomCode } from "./store/randomCode";
 
 const app = express();
 const server = createServer(credentials, app);
 
-const ports = new Map<number, Room | undefined>();
+Room.initialize(server);
+const tokenizer = new RandomCode();
+
+const ports = new Map<string, Room | undefined>();
+
 let startCount = parseInt(process.argv[2] ?? "0");
-for (let index = 64001; index < 65000; index++) {
-    ports.set(
-        index,
-        startCount > 0
-            ? new Room(
-                  index,
-                  `demo ${startCount}`,
-                  () => {
-                      ports.set(index, undefined);
-                  },
-                  undefined,
-                  0
-              )
-            : undefined
+for (let index = 0; index < startCount; index++) {
+    const token = tokenizer.generate();
+
+    const room = new Room(
+        token,
+        `demo ${index}`,
+        () => {
+            ports.delete(token);
+            tokenizer.release(token);
+        },
+        undefined,
+        0
     );
-    startCount > 0 && startCount--;
+
+    ports.set(token, room);
 }
 
 app.use(cors({ origin: "*" }));
@@ -41,27 +45,21 @@ app.get("/reg", (req, res) => {
     ];
 
     try {
-        const entries = Array.from(ports.entries());
-        const openPortObj = entries.filter((v) => v[1] === undefined).pop();
-        if (openPortObj === undefined) {
-            res.status(200).send("1");
-            return;
-        }
-        const portNum = openPortObj[0];
+        const token = tokenizer.generate();
 
-        ports.set(
-            portNum,
-            new Room(
-                portNum,
-                name,
-                () => {
-                    ports.set(portNum, undefined);
-                },
-                password.length === 0 ? undefined : password,
-                roomIndex
-            )
+        const room = new Room(
+            token,
+            name,
+            () => {
+                ports.delete(token);
+                tokenizer.release(token);
+            },
+            password.length === 0 ? undefined : password,
+            roomIndex
         );
-        res.status(200).send(`p${portNum}`);
+
+        ports.set(token, room);
+        res.status(200).send(`p${token}`);
     } catch (er) {
         res.status(200).send("2");
         console.error(er);
