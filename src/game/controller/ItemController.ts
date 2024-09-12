@@ -9,6 +9,7 @@ const itemsMeshes = [
     ItemModel.boots,
     ItemModel.rocket,
     ItemModel.wheels,
+    ItemModel.mushroom,
 ];
 
 export class ItemController {

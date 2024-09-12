@@ -2,7 +2,7 @@ import * as CANNON from "cannon-es";
 import { Global } from "../store/Global";
 
 import * as THREE from "three";
-import { damp } from "three/src/math/MathUtils.js";
+import { damp, lerp } from "three/src/math/MathUtils.js";
 import { IKeyboardController } from "./IKeyboardController";
 import clamp from "../api/clamp";
 import { AudioController } from "./AudioController";
@@ -11,10 +11,11 @@ import msgpack from "msgpack-lite";
 import { CS } from "../store/codes";
 const maxDistance = 1;
 export class DriveController {
-    public update: () => [boolean, number, boolean];
+    public update: () => [boolean, number, boolean, number];
     public turbo: () => void;
     public shake: () => void;
     public rocket: (pos: CANNON.Vec3, quat: CANNON.Quaternion) => void;
+    public mushroom: () => void;
 
     constructor(
         public maxSpeed: number,
@@ -34,6 +35,8 @@ export class DriveController {
         let rocketTimeoutID: number | undefined = undefined;
         let rocketMode = false;
         let shakeMode = false;
+        let mushroomAddon = 0;
+
         const putToGround = () => {
             raycaster.set(
                 new THREE.Vector3()
@@ -153,7 +156,6 @@ export class DriveController {
                 1.5,
                 Global.deltaTime * 7
             );
-
             const driftSpeedMultiplier =
                 driftTime < 1 ? Math.sqrt(driftTime) : 5;
 
@@ -218,10 +220,13 @@ export class DriveController {
 
             audio.update(velocityMagnitude);
 
-            return [turboMode, driftSide[1], false] as [
+            mushroomAddon = lerp(mushroomAddon, 0, Global.deltaTime * 5);
+
+            return [turboMode, driftSide[1], false, mushroomAddon] as [
                 boolean,
                 number,
-                boolean
+                boolean,
+                number
             ];
         };
 
@@ -254,7 +259,7 @@ export class DriveController {
             driftSide[1] = driftSide[0] = 0;
             putToGround();
 
-            return [false, 0, true] as [boolean, number, boolean];
+            return [false, 0, true, 0] as [boolean, number, boolean, number];
         };
 
         this.update = () => [keyboardUpdate, rocketUpdate][+rocketMode]();
@@ -289,6 +294,11 @@ export class DriveController {
                 rocketMode = false;
                 body.model.setRocketModel(false);
             }, 5000);
+        };
+        this.mushroom = () => {
+            const forwardVec = body.quaternion.vmult(new CANNON.Vec3(0, 0, 1));
+            mushroomAddon = 1;
+            body.applyImpulse(forwardVec.scale(40));
         };
     }
 }
