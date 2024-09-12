@@ -22,6 +22,7 @@ export class ItemController {
             if (
                 isLocal &&
                 upperItem !== null &&
+                !Global.mouseController.isLocked &&
                 Global.mouseController.isMouseDown(0) &&
                 !upperItem.stopping
             ) {

@@ -8,7 +8,6 @@ import { PlayerModel } from "./PlayerModel";
 import { TrackerController } from "../controller/TrackerController";
 import { AudioController } from "../controller/AudioController";
 import { ItemController } from "../controller/ItemController";
-import { Easing, Tween } from "@tweenjs/tween.js";
 
 export const COLORS = [
     "#f56505",
@@ -97,8 +96,9 @@ export class Player extends PhysicsObject {
                 this.model.update();
 
                 this.tracker.update();
-                keyboard.isLocked = this.tracker.round >= 1;
-
+                keyboard.isLocked = this.tracker.shouldLock();
+                isLocal &&
+                    (Global.mouseController.isLocked = keyboard.isLocked);
                 keyboard.lastUpdate();
             },
         ];

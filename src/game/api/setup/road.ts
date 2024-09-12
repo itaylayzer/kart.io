@@ -367,7 +367,6 @@ export function createFencesPilars(
             raycaster.set(point, new THREE.Vector3(0, -1, 0));
 
             if (raycaster.intersectObjects(roadMeshes).length) {
-                console.log("a");
                 continue;
             }
 
