@@ -1,12 +1,13 @@
 import express from "express";
-import { createServer } from "https";
-import { Server, Socket } from "socket.io";
+import { createServer, Server as HTTPServer } from "https";
+import { Server as SocketIOServer, Socket } from "socket.io";
 import { CC, CS } from "./store/codes";
 import cors from "cors";
 import setup from "./api/setup";
 import msgpack from "msgpack-lite";
 import { credentials } from "./store/credentials";
 import { randInt } from "three/src/math/MathUtils.js";
+import { IncomingMessage, ServerResponse } from "http";
 
 type Player = {
     socket: Socket;
@@ -20,23 +21,25 @@ type Player = {
 
 const COLORS_LENGTH = 8;
 export class Room {
+    static io: SocketIOServer;
+    static initialize(server: HTTPServer) {
+        this.io = new SocketIOServer(server, {
+            transports: ["websocket"],
+            cors: { origin: "*" },
+        });
+    }
     public close: () => void;
     public players: Map<number, Player>;
     public isGameStarted: () => boolean;
 
     constructor(
-        port: number,
+        namespace: string,
         public name,
         removeFromList: () => void,
         public password: string | undefined,
         mapIndex: number = 0
     ) {
-        const app = express();
-        const server = createServer(credentials, app);
-        const io = new Server(server, {
-            transports: ["websocket"],
-            cors: { origin: "*" },
-        });
+        const io = Room.io.of("/room/" + namespace);
 
         const players = new Map<number, Player>();
         const { mysteryLocations, startsLocationsGenerator } = setup(mapIndex);
@@ -49,12 +52,6 @@ export class Room {
         const randomColor = () => {
             return colorIndex++ % COLORS_LENGTH;
         };
-
-        app.use(cors({ origin: "*" }));
-
-        app.get("/", (req, res) => {
-            res.status(200).send("hi");
-        });
 
         const sockets = () => ({
             emitAll(eventName: string, eventArgs?: any) {
@@ -152,7 +149,7 @@ export class Room {
 
             socket.on(CS.TOUCH_MYSTERY, (id: number) => {
                 sockets().emitAll(CC.MYSTERY_VISIBLE, [id, false]);
-                socket.emit(CC.MYSTERY_ITEM, randInt(0, 3));
+                socket.emit(CC.MYSTERY_ITEM, randInt(3, 3));
                 setTimeout(() => {
                     sockets().emitAll(CC.MYSTERY_VISIBLE, [id, true]);
                 }, 1000);
@@ -205,15 +202,12 @@ export class Room {
 
                 if (players.size === 0) {
                     close();
-                    server.close();
+
                     removeFromList();
                 }
             });
         });
 
-        server.listen(port, "0.0.0.0", () => {
-            console.log("opend room on port ", port);
-        });
         this.close = close;
         this.players = players;
     }

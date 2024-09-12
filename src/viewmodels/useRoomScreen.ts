@@ -3,13 +3,13 @@ import { useToggle } from "../hooks/useToggle";
 import { io, Socket } from "socket.io-client";
 import { CC, CS } from "@/server/store/codes";
 import { toast } from "react-toastify";
-import { ip } from "./useIndexScreen";
+import { ip, port } from "./useIndexScreen";
 import { useSettingsStore } from "../store/useSettingsStore";
 
 type Player = [string, number, boolean];
 
 export const useRoomScreen = (
-    room: number,
+    room: string,
     goBack: () => void,
     needPassword: boolean,
     tryPassword: string | undefined
@@ -34,7 +34,7 @@ export const useRoomScreen = (
                 password = tryPassword;
             }
         }
-        const socket = io(`wss://${ip}:${room}`, {
+        const socket = io(`wss://${ip}:${port}/room/${room}`, {
             transports: ["websocket"],
             query: [undefined, { password }][+needPassword],
         });

@@ -7,7 +7,7 @@ import { curvePoints } from "../game/constants/road";
 import { createVectorsFromNumbers } from "../game/api/setup/road";
 import { renderMap } from "../game/player/WorldMap";
 
-type Room = [number, string, number, boolean];
+type Room = [string, string, number, boolean];
 
 export const ip = ((num) => {
     return [
@@ -35,8 +35,8 @@ export const useIndexScreen = () => {
     const [roomPassword, setRoomPassword] = useState<string>("");
     const [roomMap, setRoomMap] = useState<number>(0);
     const [room, setRoom] = useState<
-        [number, string, boolean, string | undefined]
-    >([0, "local", false, undefined]);
+        [string, string, boolean, string | undefined]
+    >(["", "local", false, undefined]);
 
     const roomMapCanvasRef = createRef<HTMLCanvasElement>();
 
@@ -72,7 +72,7 @@ export const useIndexScreen = () => {
             const value = await response.text();
             if (value.startsWith("p")) {
                 setRoom([
-                    parseInt(value.substring(1)),
+                    value.substring(1),
                     roomName,
                     roomPassword.length > 0,
                     roomPassword,

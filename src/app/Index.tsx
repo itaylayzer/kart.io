@@ -209,65 +209,56 @@ export function Index() {
                                             }}
                                         >
                                             <center>
-                                                {rooms
-                                                    // @ts-ignore
-                                                    .toSorted((a, b) =>
-                                                        a[1].localeCompare(b[1])
-                                                    )
-                                                    // @ts-ignore
-
-                                                    .map((r) => (
-                                                        <div
-                                                            className="room"
-                                                            onClick={() => {
-                                                                setRoom([
-                                                                    r[0],
-                                                                    r[1],
-                                                                    r[3],
-                                                                    undefined,
-                                                                ]);
-                                                                setScreen(5);
-                                                            }}
-                                                        >
-                                                            <table>
+                                                {rooms.map((r) => (
+                                                    <div
+                                                        className="room"
+                                                        onClick={() => {
+                                                            setRoom([
+                                                                r[0],
+                                                                r[1],
+                                                                r[3],
+                                                                undefined,
+                                                            ]);
+                                                            setScreen(5);
+                                                        }}
+                                                    >
+                                                        <table>
+                                                            <tr>
+                                                                <th></th>
+                                                                <th>id</th>
+                                                                <th>name</th>
+                                                                <th>
+                                                                    players
+                                                                    count
+                                                                </th>
+                                                            </tr>
+                                                            <tr>
                                                                 <tr>
-                                                                    <th></th>
-                                                                    <th>
-                                                                        port
-                                                                    </th>
-                                                                    <th>
-                                                                        name
-                                                                    </th>
-                                                                    <th>
-                                                                        players
-                                                                        count
-                                                                    </th>
+                                                                    <FaLock
+                                                                        opacity={
+                                                                            +r[3]
+                                                                        }
+                                                                        color="white"
+                                                                        size={
+                                                                            10
+                                                                        }
+                                                                    />
                                                                 </tr>
-                                                                <tr>
-                                                                    <tr>
-                                                                        <FaLock
-                                                                            opacity={
-                                                                                +r[3]
-                                                                            }
-                                                                            color="white"
-                                                                            size={
-                                                                                10
-                                                                            }
-                                                                        />
-                                                                    </tr>
-                                                                    <td>
-                                                                        {r[0]}
-                                                                    </td>
-                                                                    <td>
-                                                                        {r[1]}
-                                                                    </td>
-                                                                    <td>
-                                                                        {r[2]}
-                                                                    </td>
-                                                                </tr>
-                                                            </table>
-                                                        </div>
-                                                    ))}{" "}
+                                                                <td
+                                                                    style={{
+                                                                        fontFamily:
+                                                                            "monospace",
+                                                                        fontWeight: 600,
+                                                                    }}
+                                                                >
+                                                                    {r[0].toUpperCase()}
+                                                                </td>
+                                                                <td>{r[1]}</td>
+                                                                <td>{r[2]}</td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                ))}{" "}
                                             </center>
                                         </div>
                                     </>

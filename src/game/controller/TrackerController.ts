@@ -26,7 +26,7 @@ export class TrackerController {
     }
 
     constructor(player: Player, isLocal: boolean) {
-        const MAX_ROUNDS = 0;
+        const MAX_ROUNDS = 3;
         this.round = -1;
         TrackerController.trackers.set(player.pid, this);
 

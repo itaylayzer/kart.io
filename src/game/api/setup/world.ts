@@ -140,7 +140,7 @@ function setupRoad() {
     }
 
     if (Global.settings.displayPillars) {
-        requestAnimationFrame(() => {
+        setTimeout(() => {
             const tiles = createFencesPilars(
                 Global.curve,
                 5.1,
@@ -150,7 +150,7 @@ function setupRoad() {
             );
             Global.lod.add(...tiles);
             Global.optimizedObjects.push(...tiles);
-        });
+        }, 100);
     }
 
     const texture = Global.assets.textures.block.clone();
