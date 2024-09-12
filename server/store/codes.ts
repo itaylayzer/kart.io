@@ -8,6 +8,8 @@ export enum CS {
     READY = "r",
     INIT_GAME = "g",
     APPLY_MYSTERY = "a",
+    UPDATE_TRANSFORM = "f",
+    FINISH_LINE = "l",
 }
 
 // client codes
@@ -23,4 +25,7 @@ export enum CC {
     START_GAME = "s",
     MYSTERY_ITEM = "y",
     APPLY_MYSTERY = "a",
+    SHOW_WINNERS = "w",
+    UPDATE_TRANSFORM = "f",
+    FINISH_LINE = "l",
 }

@@ -21,11 +21,11 @@ export class Wheels extends PhysicsObject {
         quaternion: CANNON.Quaternion
     ) {
         position.y += 0.25;
-        console.log("Wheels");
+        const group = new THREE.Group();
         const mesh = Global.assets.gltf.wheel.scene.clone();
         mesh.scale.multiplyScalar(0.08 * 4);
-
-        super(mesh, {
+        group.add(mesh);
+        super(group, {
             position,
             quaternion,
             shape: new CANNON.Cylinder(0.25, 0.25, 0.05),
@@ -38,7 +38,7 @@ export class Wheels extends PhysicsObject {
 
         const dispose = () => {
             Wheels.wheels.delete(this.id);
-            Global.scene.remove(mesh);
+            Global.scene.remove(group);
             Global.world.removeBody(this);
         };
 
@@ -52,10 +52,10 @@ export class Wheels extends PhysicsObject {
                 else return b;
             })[0];
 
-        mesh.position.copy(this.position);
-        mesh.quaternion.copy(this.quaternion);
+        group.position.copy(this.position);
+        group.quaternion.copy(this.quaternion);
 
-        mesh.rotateZ(Math.PI / 2);
+        group.rotateZ(Math.PI / 2);
         // this.quaternion.copy(
         //     new CANNON.Quaternion(
         //         mesh.quaternion.x,
@@ -219,16 +219,17 @@ export class Wheels extends PhysicsObject {
                 putToGround();
             },
             () => {
-                mesh.visible =
-                    mesh.position.distanceTo(Global.camera.position) < 50;
+                group.visible =
+                    group.position.distanceTo(Global.camera.position) < 50;
 
-                mesh.position.copy(this.position);
-                mesh.position.y += 0.1;
-                mesh.quaternion.copy(this.quaternion);
+                group.position.copy(this.position);
+                group.position.y += 0.1;
+                mesh.rotateY(0.2);
+                group.quaternion.copy(this.quaternion);
             },
         ];
 
-        Global.scene.add(mesh);
+        Global.scene.add(group);
         Global.world.addBody(this);
 
         Wheels.wheels.set(this.id, this);
