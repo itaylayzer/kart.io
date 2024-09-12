@@ -3,7 +3,7 @@ import { COLORS } from "../game/player/Player";
 import { useRoomScreen } from "../viewmodels/useRoomScreen";
 import { Play } from "./Play";
 import { GoDotFill } from "react-icons/go";
-import { FidgetSpinner, RotatingSquare } from "react-loader-spinner";
+import { FidgetSpinner } from "react-loader-spinner";
 
 export function Room({
     roomName,

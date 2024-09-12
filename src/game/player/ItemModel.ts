@@ -144,4 +144,23 @@ export class ItemModel extends THREE.Group {
         banana.position.y += 0.1;
         return banana;
     }
+
+    public static mushroom() {
+        const banana = Global.assets.gltf.mushroom.scene.clone();
+        banana.scale.multiplyScalar(0.03 * 0.66);
+
+        const banaColor = banana.getObjectByName("Cube001_1") as THREE.Mesh;
+
+        (banaColor.material as THREE.MeshStandardMaterial).color =
+            new THREE.Color("red");
+        (banaColor.material as THREE.MeshStandardMaterial).emissive =
+            new THREE.Color("red");
+        (
+            banaColor.material as THREE.MeshStandardMaterial
+        ).emissiveIntensity = 4;
+        // banana.position.y = 0.15;
+        // banana.rotation.x = (-Math.PI * 2) / 4;
+        // banana.rotation.y = (-Math.PI * 3) / 4;
+        return banana;
+    }
 }
