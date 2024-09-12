@@ -30,6 +30,7 @@ export class Player extends PhysicsObject {
     public rocketMode: boolean;
     public driftSide: number;
     public model: PlayerModel;
+    public mushroomAddon: number;
     public disconnect: () => void;
     static {
         this.clients = new Map();
@@ -44,7 +45,6 @@ export class Player extends PhysicsObject {
         public keyboard: IKeyboardController
     ) {
         const radius = 0.8 / 3;
-
         const colorSetEmissive = COLORSEMISSIVE[colorFromServer];
         const color =
             "#" + new THREE.Color(COLORS[colorFromServer]).getHexString();
@@ -57,6 +57,7 @@ export class Player extends PhysicsObject {
             collisionFilterGroup: 1,
             collisionFilterMask: ~0,
         });
+        this.mushroomAddon = 0;
 
         this.tracker = new TrackerController(this, isLocal);
         this.color = color;
@@ -91,8 +92,12 @@ export class Player extends PhysicsObject {
                 isLocal && Global.cameraController.update();
 
                 this.items.update();
-                [this.turboMode, this.driftSide, this.rocketMode] =
-                    this.engine.update();
+                [
+                    this.turboMode,
+                    this.driftSide,
+                    this.rocketMode,
+                    this.mushroomAddon,
+                ] = this.engine.update();
                 this.model.update();
 
                 this.tracker.update();

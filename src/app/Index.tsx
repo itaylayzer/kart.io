@@ -56,6 +56,7 @@ export function Index() {
                         rocket: "fbx/rocket_ship.glb",
                         wheel: "fbx/blue_shell_-_low_poly_mario_kart_fan_art.glb",
                         dust: "fbx/dust.glb",
+                        mushroom: "fbx/low_poly_mushroom.glb",
                     }}
                 >
                     <></>{" "}
@@ -466,7 +467,7 @@ export function Index() {
                         <div
                             style={{
                                 display: "block",
-                                maxHeight: "31.28vh",
+                                maxHeight: "50vh",
                                 overflowY: "scroll",
                             }}
                         >
@@ -514,6 +515,12 @@ export function Index() {
                                     @JiggleSticks - Turbo - Low Poly
                                     <br />
                                     https://sketchfab.com/3d-models/turbo-low-poly-4cf8772822d84ed4aa4d63f4377de745
+                                </p>
+                                <br />
+                                <p>
+                                    @GGklin - Low Poly Mushroom
+                                    <br />
+                                    https://sketchfab.com/3d-models/low-poly-mushroom-b8e7ee500c5b4432bf381e1ca00cc135
                                 </p>
                             </p>
                             <h3> textures </h3>

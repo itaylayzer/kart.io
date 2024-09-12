@@ -64,7 +64,7 @@ export class CameraController {
             Global.deltaTime * 10
         );
 
-        let vertical = [player.keyboard.vertical, 2][+player.rocketMode];
+        let vertical = [player.keyboard.vertical + player.mushroomAddon, 2][+player.rocketMode];
         let horizontal = [player.keyboard.horizontal, 0][+player.rocketMode];
         let driftSide = [player.driftSide, 0][+player.rocketMode];
 

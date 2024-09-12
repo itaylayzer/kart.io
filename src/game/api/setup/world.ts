@@ -311,6 +311,9 @@ function setupSocket(
                         )
                     );
             }
+            if (mysteryNum === 4) {
+                Player.clients.get(xpid)!.engine.mushroom();
+            }
         }
     );
     Global.socket?.on(CC.KEY_UP, (args: { pid: number; buffer: Buffer }) => {
