@@ -57,6 +57,7 @@ export function Index() {
                         wheel: "fbx/blue_shell_-_low_poly_mario_kart_fan_art.glb",
                         dust: "fbx/dust.glb",
                         mushroom: "fbx/low_poly_mushroom.glb",
+                        question: "textures/quation.png",
                     }}
                 >
                     <></>{" "}
@@ -130,6 +131,11 @@ export function Index() {
                                 <td> Escape </td> <td>Start </td>{" "}
                                 <td>Unlock / Pause Menu </td>{" "}
                             </tr>
+                            <tr>
+                                {" "}
+                                <td> Mouse Left </td> <td></td>{" "}
+                                <td>Switch Camera </td>{" "}
+                            </tr>
                         </table>
                         <br />
                         <center
@@ -139,7 +145,7 @@ export function Index() {
                                 justifyContent: "center",
                             }}
                         >
-                            <Button
+                            {/* <Button
                                 data-tooltip-id="t"
                                 data-tooltip-content={
                                     "you need to visit this page to allow your browser reach the servers"
@@ -153,7 +159,7 @@ export function Index() {
                                 className="r mini"
                             >
                                 Servers Page
-                            </Button>
+                            </Button> */}
                             <TextField
                                 data-tooltip-id="t"
                                 data-tooltip-content={"Player Name"}

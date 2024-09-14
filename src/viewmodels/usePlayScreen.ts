@@ -10,7 +10,8 @@ export const usePlayScreen = (
     socket: Socket,
     pid: number,
     players: Map<number, [string, number, boolean]>,
-    map: number
+    map: number,
+    goBack: () => void
 ) => {
     const assets = useAssetStore();
     const settings = useSettingsStore();
@@ -20,7 +21,7 @@ export const usePlayScreen = (
             ["Barriers", "Zane Little Music"],
             "./audios/barriers.mp3"
         );
-        const { destroyer } = game(assets, socket, pid, players, settings, map);
+        const { destroyer } = game(assets, socket, pid, players, settings, map, goBack);
         destroyers.push(destroyer);
 
         return useDestroy(destroyers);
