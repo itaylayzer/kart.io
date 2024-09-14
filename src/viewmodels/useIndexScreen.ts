@@ -9,14 +9,7 @@ import { renderMap } from "../game/player/WorldMap";
 
 type Room = [string, string, number, boolean];
 
-export const ip = ((num) => {
-    return [
-        (num >>> 24) & 255,
-        (num >>> 16) & 255,
-        (num >>> 8) & 255,
-        num & 255,
-    ].join(".");
-})(-2120246416);
+export const ip = "kartio.duckdns.org";
 
 export const port = 64000;
 export const useIndexScreen = () => {

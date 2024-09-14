@@ -256,7 +256,7 @@ export class WorldMap {
 
                 for (const box of MysteryBox.boxes.values()) {
                     if (!box.mysteryVisible) continue;
-                    const p = calcPoint(box.mesh.getWorldPosition(dummyVec));
+                    const p = calcPoint(box.group.getWorldPosition(dummyVec));
 
                     ctx.lineWidth = startSize + p[2] * 5;
                     ctx.globalAlpha = p[2] * 0.5 + 0.5;
@@ -272,11 +272,32 @@ export class WorldMap {
             render(10, "#de7310");
         };
 
+        const htmlTimer = document.querySelector(
+            "p#timer"
+        )! as HTMLParagraphElement;
+
+        const translateToTimer = (num: number) => {
+            const minutes = Math.floor(num / 60);
+            const seconds = Math.floor(num) % 60;
+            const mls = Math.floor((num % 1) * 100);
+
+            return (
+                minutes.toString().padStart(2, "0") +
+                ":" +
+                seconds.toString().padStart(2, "0") +
+                "." +
+                mls.toString().padStart(3, "0") +
+                " s"
+            );
+        };
+
         this.update = () => {
             ctx.clearRect(0, 0, size, size);
             renderRoad();
             renderMysteryBoxes();
             renderPlayers();
+
+            htmlTimer.innerHTML = translateToTimer(Global.elapsedTime);
         };
     }
 }
