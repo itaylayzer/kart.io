@@ -18,8 +18,7 @@ export class PauseMenu {
             Global.lockController.lock();
         };
         disconnectButton.onclick = () => {
-            Global.socket?.disconnect();
-            window.location.reload();
+            Global.goBack();
         };
 
         let lastShowing = false;

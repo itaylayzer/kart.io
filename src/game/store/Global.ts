@@ -50,4 +50,5 @@ export class Global {
     public static settings: settingsType;
     public static stats: Stats;
     public static optimizedObjects: Object3D[];
+    public static goBack: () => void;
 }

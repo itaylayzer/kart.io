@@ -33,7 +33,7 @@ export function Room({
         <Condition
             conditions={startGameScreen}
             onTrue={
-                <Play socket={socket!} players={players!} pid={pid} map={map} />
+                <Play goBack={goBack} socket={socket!} players={players!} pid={pid} map={map} />
             }
             onFalse={
                 <main style={{ display: "flex" }}>

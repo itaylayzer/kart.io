@@ -17,7 +17,8 @@ export default (
     pid: number,
     players: Map<number, [string, number, boolean]>,
     settings: settingsType,
-    mapIndex: number
+    mapIndex: number,
+    goBack: () => void
 ) => {
     Global.assets = assets;
     Global.settings = settings;
@@ -74,12 +75,32 @@ export default (
         }
     };
 
+    let interval: undefined | number = undefined;
+
     if (Global.settings.useVsync) Global.renderer.setAnimationLoop(animate);
-    else setInterval(animate, 1000 / Global.settings.fps);
+    else {
+        // @ts-ignore
+        interval = setInterval(animate, 1000 / Global.settings.fps);
+    }
+
+    Global.goBack = () => {
+        setTimeout(() => {
+            try {
+                Global.socket?.disconnect();
+            } catch {}
+
+            Global.renderer.dispose();
+            goBack();
+        }, 100);
+
+        Global.renderer.setAnimationLoop(null);
+
+        interval !== undefined && clearInterval(interval);
+    };
 
     return {
         destroyer: () => {
-            // while (Global.container.firstChild) Global.container.removeChild(Global.container.firstChild);
+            Global.goBack();
         },
     };
 };

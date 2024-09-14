@@ -206,20 +206,6 @@ export class DriveController {
 
             putToGround();
 
-            const velocityMagnitude = Math.abs(
-                body.velocity.dot(
-                    body.quaternion.vmult(new CANNON.Vec3(0, 0, 1))
-                )
-            );
-
-            islocal &&
-                Global.settings.displayVelocity &&
-                (document.querySelector(
-                    "p#velocity"
-                )!.innerHTML = `${velocityMagnitude.toFixed(2)} KM/S`);
-
-            audio.update(velocityMagnitude);
-
             mushroomAddon = lerp(mushroomAddon, 0, Global.deltaTime * 5);
 
             return [turboMode, driftSide[1], false, mushroomAddon] as [
@@ -248,7 +234,7 @@ export class DriveController {
             const forward = new CANNON.Vec3(0, 0, 1);
             quaternion.vmult(forward, forward);
 
-            const drivingForce = forward.scale(5);
+            const drivingForce = forward.scale(10);
 
             body.velocity.lerp(
                 drivingForce,
@@ -262,7 +248,24 @@ export class DriveController {
             return [false, 0, true, 0] as [boolean, number, boolean, number];
         };
 
-        this.update = () => [keyboardUpdate, rocketUpdate][+rocketMode]();
+        this.update = () => {
+            const val = [keyboardUpdate, rocketUpdate][+rocketMode]();
+
+            const velocityMagnitude = Math.abs(
+                body.velocity.dot(
+                    body.quaternion.vmult(new CANNON.Vec3(0, 0, 1))
+                )
+            );
+
+            islocal &&
+                Global.settings.displayVelocity &&
+                (document.querySelector(
+                    "p#velocity"
+                )!.innerHTML = `${velocityMagnitude.toFixed(2)} KM/S`);
+
+            audio.update(velocityMagnitude);
+            return val;
+        };
         this.turbo = () => {
             turboTimeoutID != undefined && clearTimeout(turboTimeoutID);
 

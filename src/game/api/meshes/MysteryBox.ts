@@ -7,13 +7,14 @@ import { CS } from "@/server/store/codes";
 import { LocalPlayer } from "../../player/LocalPlayer";
 export class MysteryBox extends PhysicsObject {
     public static boxes: Map<number, MysteryBox>;
-    public mesh: THREE.Mesh;
+    public group: THREE.Group;
     static {
         this.boxes = new Map();
     }
     public mysteryVisible: boolean;
     constructor(id: number, position: CANNON.Vec3) {
         const size = 0.4;
+        const group = new THREE.Group();
         const mesh = new THREE.Mesh(
             new THREE.BoxGeometry(size, size, size),
             new THREE.MeshPhongMaterial({
@@ -25,9 +26,10 @@ export class MysteryBox extends PhysicsObject {
                 emissive: "orange",
             })
         );
+        group.add(mesh);
         mesh.castShadow = true;
         mesh.receiveShadow = true;
-        super(mesh, {
+        super(group, {
             shape: new CANNON.Box(
                 new CANNON.Vec3(size / 2, size / 2, size / 2)
             ),
@@ -42,29 +44,25 @@ export class MysteryBox extends PhysicsObject {
         });
 
         this.mysteryVisible = true;
-        this.mesh = mesh;
+        this.group = group;
 
-        Global.lod.add(mesh);
+        Global.lod.add(group);
 
-        mesh.position.copy(position);
+        group.position.copy(position);
         this.position.set(position.x, position.y - 0.25, position.z);
 
         let x = randFloat(-2, 2);
         let y = randFloat(-2, 2);
         let z = randFloat(-2, 2);
-
         this.update = [
             () => {
-                mesh.position
-                    .copy(this.position)
-                    .add(new THREE.Vector3(0, 0.25, 0));
                 mesh.rotateX(x * Global.deltaTime);
                 mesh.rotateY(y * Global.deltaTime);
                 mesh.rotateZ(z * Global.deltaTime);
 
-                mesh.visible =
+                group.visible =
                     this.mysteryVisible &&
-                    mesh.position.distanceTo(Global.camera.position) < 50;
+                    group.position.distanceTo(Global.camera.position) < 50;
             },
         ];
 

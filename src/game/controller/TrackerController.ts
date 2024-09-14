@@ -3,6 +3,7 @@ import { Global } from "../store/Global";
 import * as THREE from "three";
 import * as CANNON from "cannon-es";
 import { CS } from "../store/codes";
+import { toast } from "react-toastify";
 
 export class TrackerController {
     public reset: () => void;
@@ -26,7 +27,7 @@ export class TrackerController {
     }
 
     constructor(player: Player, isLocal: boolean) {
-        const MAX_ROUNDS = 3;
+        const MAX_ROUNDS = 0;
         this.round = -1;
         TrackerController.trackers.set(player.pid, this);
 
@@ -62,6 +63,7 @@ export class TrackerController {
             if (forwardPos[0] === 1 && this.lastIndex === 0) {
                 this.round++;
                 if (isLocal && this.round >= MAX_ROUNDS) {
+                    toast("You Can Switch Cameras Now", { type: "info" });
                     Global.socket?.emit(CS.FINISH_LINE);
                 }
             }
@@ -126,6 +128,7 @@ export class TrackerController {
             ),
             ...trackers,
         ];
+
         const rightPlayer = [...this.sortedTrackers]
             .map((t, i) => [i, ...t] as [number, number, TrackerController])
             .filter((t) => {
@@ -138,7 +141,10 @@ export class TrackerController {
         const posInMatch = rightPlayer === undefined ? 100 : rightPlayer[0] + 1;
         const roundInMatch =
             rightPlayer === undefined ? -1 : rightPlayer[2].round;
-        positionHTML.item(0).innerHTML = `<p>${roundInMatch} / 3</p>`;
+        positionHTML.item(0).innerHTML = `<p>${Math.max(
+            roundInMatch,
+            0
+        )} / 3</p>`;
         positionHTML.item(1).innerHTML = `<p>${posInMatch} ${
             ["st", "th", "rd", "th"][Math.min(posInMatch - 1, 3)]
         }</p>`;
