@@ -36,6 +36,8 @@ import {
 import { Banana } from "../../player/Items/Banana";
 import { Wheels } from "../../player/Items/Wheel";
 import { TrackerController } from "../../controller/TrackerController";
+import { Scoreboard } from "../../player/Scoreboard";
+import { StartTimer } from "../../player/StartTimer";
 
 function setupLights() {
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 1);
@@ -72,6 +74,8 @@ function setupObjects() {
     Global.updates = [];
     Global.lateUpdates = [];
     new PauseMenu();
+    Player.clients.clear();
+    TrackerController.FINALS = [];
 }
 
 function setupScene() {
@@ -220,9 +224,10 @@ function setupSocket(
 
     Global.socket.on(
         CC.INIT_GAME,
-        ([playerTransforms, mysteryBoxLocations]: [
+        ([playerTransforms, mysteryBoxLocations, startTime]: [
             [number, number[]][],
-            number[]
+            number[],
+            number
         ]) => {
             for (const [playerID, ptTransform] of playerTransforms) {
                 const xplayer = Player.clients.get(playerID);
@@ -240,6 +245,8 @@ function setupSocket(
                 Global.container.appendChild(Global.renderer.domElement);
                 Global.lockController.lock();
             });
+
+            StartTimer.start(startTime);
         }
     );
 
@@ -274,8 +281,12 @@ function setupSocket(
     Global.socket?.on(CC.FINISH_LINE, (pid: number) => {
         TrackerController.FINALS.push(pid);
     });
+
+    Scoreboard.finishMacth = false;
     Global.socket?.on(CC.SHOW_WINNERS, () => {
         // TODO: SHOW NEXT SCREEN
+        Scoreboard.finishMacth = true;
+        Global.lockController.unlock();
         console.warn("finished");
     });
 

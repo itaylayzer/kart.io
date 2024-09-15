@@ -9,6 +9,7 @@ import { AudioController } from "./AudioController";
 import { Player } from "../player/Player";
 import msgpack from "msgpack-lite";
 import { CS } from "../store/codes";
+import { StartTimer } from "../player/StartTimer";
 const maxDistance = 1;
 export class DriveController {
     public update: () => [boolean, number, boolean, number];
@@ -173,22 +174,24 @@ export class DriveController {
                         driftSpeedMultiplier +
                         timeSpeedMultiplier) *
                     2 *
-                    +!shakeMode
+                    +!shakeMode *
+                    +!(StartTimer.locked)
             );
-
             // Calculate and apply friction (simplified)
             const velocity = body.velocity.clone();
             const frictionForce = velocity.scale(-2); // Adjust friction coefficient as needed
 
             // Combine driving force and friction
             const totalForce = drivingForce.vadd(frictionForce);
+
             body.force.copy(totalForce);
 
             // Steering mechanics
             steeringAngle =
                 (keyboard.horizontal + driftSide[1]) *
                 maxSteeringAngle *
-                keyboard.vertical;
+                keyboard.vertical *
+                +!(StartTimer.locked);
 
             // Calculate the steering direction using quaternion
             const steeringQuaternion = new CANNON.Quaternion();
@@ -263,7 +266,7 @@ export class DriveController {
                     "p#velocity"
                 )!.innerHTML = `${velocityMagnitude.toFixed(2)} KM/S`);
 
-            audio.update(velocityMagnitude);
+            audio.update(isNaN(velocityMagnitude) ? 0 : velocityMagnitude);
             return val;
         };
         this.turbo = () => {
