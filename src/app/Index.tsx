@@ -1,6 +1,6 @@
 import { ToastContainer } from "react-toastify";
 import { Listed } from "../components/Listed";
-import { ip, port, useIndexScreen } from "../viewmodels/useIndexScreen";
+import { useIndexScreen } from "../viewmodels/useIndexScreen";
 import { Room } from "./Room";
 import AssetLoader from "../components/AssetLoader";
 import { FidgetSpinner } from "react-loader-spinner";

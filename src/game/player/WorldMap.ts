@@ -279,7 +279,7 @@ export class WorldMap {
         const translateToTimer = (num: number) => {
             const minutes = Math.floor(num / 60);
             const seconds = Math.floor(num) % 60;
-            const mls = Math.floor((num % 1) * 100);
+            const mls = Math.floor((num % 1) * 1000);
 
             return (
                 minutes.toString().padStart(2, "0") +
