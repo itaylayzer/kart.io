@@ -1,5 +1,6 @@
 import { audio } from "@/src/lib/AudioContainer";
 import { Global } from "../store/Global";
+import { Scoreboard } from "./Scoreboard";
 
 export class PauseMenu {
     constructor() {
@@ -26,7 +27,9 @@ export class PauseMenu {
         audio().setVisible(false);
 
         Global.updates.push(() => {
-            const showing = !Global.lockController.isLocked;
+            const showing = Scoreboard.finishMacth
+                ? false
+                : !Global.lockController.isLocked;
 
             if (lastShowing !== showing) {
                 audio().setVisible(showing);

@@ -53,6 +53,7 @@ export class Room {
             return colorIndex++ % COLORS_LENGTH;
         };
 
+        let startTime = 0;
         const sockets = () => ({
             emitAll(eventName: string, eventArgs?: any) {
                 for (const x of players.values()) {
@@ -79,6 +80,7 @@ export class Room {
                         transform,
                     ]),
                     mysteryLocations,
+                    startTime,
                 ]);
             });
 
@@ -165,6 +167,7 @@ export class Room {
                 )
                     return;
 
+                startTime = new Date().getTime() + 5000;
                 sockets().emitAll(CC.START_GAME);
                 for (const player of players.values()) {
                     gameStarted = true;

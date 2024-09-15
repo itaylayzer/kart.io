@@ -39,8 +39,27 @@ export function Play({
             </div>
             <canvas id="map" width={500} height={500} style={styles.map} />
 
-            <main>
-                <table id="scoreboard" style={{ zIndex: 11 }}></table>
+            <main
+                style={{
+                    backgroundColor: "rgba(8,8,8, 100%)",
+                    boxShadow: `0px 0px 10px 0px rgba(0, 0, 0, 50%)`,
+                    borderRadius: 10,
+                    zIndex: 12,
+                }}
+            >
+                <center>
+                    <h3 className="scoreboard_finish">Game Finished</h3>
+                    <table id="scoreboard"></table>
+                    <button
+                        style={{
+                            pointerEvents: "all",
+                            marginBottom: 10,
+                        }}
+                        className="r scoreboard_finish"
+                    >
+                        Disconnect
+                    </button>
+                </center>
             </main>
 
             <main>
@@ -66,6 +85,29 @@ export function Play({
             <p id="timer" style={styles.timer}>
                 00:00.000 s
             </p>
+
+            <main
+                id="start-timer"
+                style={{
+                    opacity: "0",
+                    borderRadius: "100%",
+                    backgroundColor: "black",
+                    padding: "3vh",
+                    aspectRatio: "1",
+                    width: 70,
+                    height: 70,
+                }}
+            >
+                <p
+                    style={{
+                        fontSize: "8vh",
+                        textAlign: "center",
+                        margin: "0",
+                        marginBlock: "auto",
+                        fontFamily: "New Super Mario Font U",
+                    }}
+                ></p>
+            </main>
         </>
     );
 }

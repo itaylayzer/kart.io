@@ -1,0 +1,1 @@
+sudo /home/ubuntu/.bun/bin/bun serve
