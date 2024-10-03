@@ -175,7 +175,7 @@ export class DriveController {
                         timeSpeedMultiplier) *
                     2 *
                     +!shakeMode *
-                    +!(StartTimer.locked)
+                    +!StartTimer.locked
             );
             // Calculate and apply friction (simplified)
             const velocity = body.velocity.clone();
@@ -191,7 +191,7 @@ export class DriveController {
                 (keyboard.horizontal + driftSide[1]) *
                 maxSteeringAngle *
                 keyboard.vertical *
-                +!(StartTimer.locked);
+                +!StartTimer.locked;
 
             // Calculate the steering direction using quaternion
             const steeringQuaternion = new CANNON.Quaternion();

@@ -104,7 +104,7 @@ export function Play({
                         textAlign: "center",
                         margin: "0",
                         marginBlock: "auto",
-                        fontFamily: "New Super Mario Font U",
+                        fontFamily: "monospace",
                     }}
                 ></p>
             </main>
