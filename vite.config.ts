@@ -3,11 +3,11 @@ import react from "@vitejs/plugin-react";
 import path from "path";
 import { obfuscator } from "rollup-obfuscator";
 import objs from "vite-plugin-javascript-obfuscator";
+import simpleSsl from "@vitejs/plugin-basic-ssl";
 // https://vitejs.dev/config/
 export default defineConfig({
     plugins: [
         react(),
-
         objs({
             apply: "build",
             debugger: true,
@@ -36,5 +36,8 @@ export default defineConfig({
     },
     build: {
         outDir: "kart.io",
+    },
+    server: {
+        port: 64000,
     },
 });
