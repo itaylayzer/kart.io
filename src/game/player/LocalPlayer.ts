@@ -2,7 +2,6 @@ import { Player } from "./Player";
 import { KeyboardController } from "../controller/KeyboardController";
 import { TrackerController } from "../controller/TrackerController";
 import { Global } from "../store/Global";
-
 export class LocalPlayer extends Player {
     private static instance: LocalPlayer;
 

@@ -5,6 +5,13 @@ import * as CANNON from "cannon-es";
 import { lerp } from "three/src/math/MathUtils.js";
 import { Player } from "../player/Player";
 import { PerlinNoise } from "../api/PerlinNoise";
+import { randomCirclePoint } from "../api/randomCirclePoint";
+
+const lineMaterial = new THREE.LineBasicMaterial({
+    color: 0xffffff,
+    opacity: 0.02,
+    transparent: true,
+});
 
 export class CameraController {
     public camera: THREE.PerspectiveCamera;
@@ -121,5 +128,47 @@ export class CameraController {
         this.camera.updateProjectionMatrix();
 
         this.time += Global.deltaTime * 13;
+
+        // SPEED LINES
+        if (speedDotQuatewrnion >= 4.5) {
+            this.createSpeedLines(player);
+            this.createSpeedLines(player);
+        }
+        if (speedDotQuatewrnion >= 9.5) this.createSpeedLines(player);
+    }
+
+    private createSpeedLines(player: Player) {
+        const start = new THREE.Vector3().copy(player.position);
+        const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(
+            player.quaternion
+        );
+        const up = new THREE.Vector3(0, 1, 0).applyQuaternion(
+            player.quaternion
+        );
+        const right = new THREE.Vector3(1, 0, 0).applyQuaternion(
+            player.quaternion
+        );
+        let { x: rx, y: ry } = randomCirclePoint(
+            2 + (this.camera.fov - 100) / 10
+        );
+
+        rx *= 9 / 16;
+        start.add(up.multiplyScalar(ry)).add(right.multiplyScalar(rx));
+        const end = start.clone().add(forward.clone().multiplyScalar(0.5));
+
+        const geometry = new THREE.BufferGeometry().setFromPoints([start, end]);
+        const material = lineMaterial.clone();
+        const line = new THREE.Line(geometry, material);
+
+        Global.lod.add(line);
+        Global.optimizedObjects.push(line);
+
+        requestAnimationFrame(() => {
+            Global.lod.remove(line);
+            Global.optimizedObjects.splice(
+                Global.optimizedObjects.indexOf(line),
+                1
+            );
+        });
     }
 }

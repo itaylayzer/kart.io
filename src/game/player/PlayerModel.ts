@@ -99,7 +99,7 @@ export class PlayerModel extends THREE.Group {
                 tagNameColor,
                 0.04,
                 100,
-                [0.5, 0.05][+isLocal]
+                [0.5, 0.01][+isLocal]
             );
 
             Global.lod.add(trail);
@@ -113,7 +113,7 @@ export class PlayerModel extends THREE.Group {
                 tagNameColor,
                 0.025,
                 100,
-                [0.5, 0.05][+isLocal]
+                [0.5, 0.01][+isLocal]
             );
 
             Global.lod.add(trail);
