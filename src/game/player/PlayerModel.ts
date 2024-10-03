@@ -6,6 +6,7 @@ import createPlayerNameSprite from "../api/createPlayerNameSprite";
 import * as CANNON from "cannon-es";
 import { Dust } from "../api/meshes/Dust";
 import { Easing, Tween } from "@tweenjs/tween.js";
+import { Trail } from "../api/meshes/Trail";
 
 const namesToColor = [
     "Object_43",
@@ -74,6 +75,50 @@ export class PlayerModel extends THREE.Group {
         super.add(model);
         rocket.visible = false;
         super.add(rocket);
+
+        const realWeelsNames = [
+            "Object_75",
+            "Object_60",
+            "Object_58",
+            "Object_77",
+        ];
+
+        const trails: Trail[] = [];
+
+        {
+            const trail = new Trail(rocket, 3, ["gray", 0], 0.1, 100, 1);
+
+            Global.lod.add(trail);
+            trails.push(trail);
+        }
+
+        {
+            const trail = new Trail(
+                model.getObjectByName("Object_43")!,
+                3 * (+!isLocal + 1),
+                tagNameColor,
+                0.04,
+                100,
+                [0.5, 0.05][+isLocal]
+            );
+
+            Global.lod.add(trail);
+            trails.push(trail);
+        }
+
+        for (const realWeelName of realWeelsNames) {
+            const trail = new Trail(
+                model.getObjectByName(realWeelName)!,
+                2 * (+!isLocal + 1),
+                tagNameColor,
+                0.025,
+                100,
+                [0.5, 0.05][+isLocal]
+            );
+
+            Global.lod.add(trail);
+            trails.push(trail);
+        }
 
         const rockBack = rocket.getObjectByName(
             "Rocket_Ship_01_Material_#42_0"
@@ -153,6 +198,8 @@ export class PlayerModel extends THREE.Group {
 
             this.position.copy(body.position);
             this.quaternion.copy(body.quaternion);
+
+            trails.forEach((v) => v.update());
         };
     }
 }
