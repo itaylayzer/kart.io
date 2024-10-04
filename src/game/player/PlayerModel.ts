@@ -1,10 +1,9 @@
 import * as THREE from "three";
 import { IKeyboardController } from "../controller/IKeyboardController";
-import { damp, randInt } from "three/src/math/MathUtils.js";
+import { damp } from "three/src/math/MathUtils.js";
 import { Global } from "../store/Global";
 import createPlayerNameSprite from "../api/createPlayerNameSprite";
 import * as CANNON from "cannon-es";
-import { Dust } from "../api/meshes/Dust";
 import { Easing, Tween } from "@tweenjs/tween.js";
 import { Trail } from "../api/meshes/Trail";
 
@@ -92,20 +91,6 @@ export class PlayerModel extends THREE.Group {
             trails.push(trail);
         }
 
-        {
-            const trail = new Trail(
-                model.getObjectByName("Object_43")!,
-                3 * (+!isLocal + 1),
-                tagNameColor,
-                0.04,
-                100,
-                [0.5, 0.01][+isLocal]
-            );
-
-            Global.lod.add(trail);
-            trails.push(trail);
-        }
-
         for (const realWeelName of realWeelsNames) {
             const trail = new Trail(
                 model.getObjectByName(realWeelName)!,
@@ -158,9 +143,9 @@ export class PlayerModel extends THREE.Group {
 
             model.rotation.set(0, 0, 0);
 
-            if (rocket.visible && randInt(0, 1)) {
-                new Dust(rockBack.getWorldPosition(new THREE.Vector3()));
-            }
+            // if (rocket.visible && randInt(0, 1)) {
+            // new Dust(rockBack.getWorldPosition(new THREE.Vector3()));
+            // }
             if (keyboard.isKeyDown(32) || keyboard.isKeyDown(-6)) {
                 driftSide[0] = keyboard.horizontalRaw * 0.6;
             }

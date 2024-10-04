@@ -67,7 +67,7 @@ export const useAssetStore = create<AssetStore>((set) => ({
             const exts = [
                 [".gltf", ".glb"],
                 [".fbx"],
-                [".png"],
+                [".png", ".jpg"],
                 [".typeface.json"],
                 [".mp3", ".wav"],
             ];
