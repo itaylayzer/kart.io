@@ -17,7 +17,7 @@ export class DriveController {
     public shake: () => void;
     public rocket: (pos: CANNON.Vec3, quat: CANNON.Quaternion) => void;
     public mushroom: () => void;
-
+    public isRocket: () => boolean;
     constructor(
         public maxSpeed: number,
         body: Player,
@@ -306,5 +306,6 @@ export class DriveController {
             mushroomAddon = 1;
             body.applyImpulse(forwardVec.scale(40));
         };
+        this.isRocket = () => rocketMode;
     }
 }

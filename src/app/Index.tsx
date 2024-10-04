@@ -58,6 +58,7 @@ export function Index() {
                         dust: "fbx/dust.glb",
                         mushroom: "fbx/low_poly_mushroom.glb",
                         question: "textures/quation.png",
+                        water: "textures/waterdudv.jpg",
                     }}
                 >
                     <></>{" "}

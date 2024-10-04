@@ -50,7 +50,10 @@ export class ItemController {
 
                 Global.socket?.emit(CS.APPLY_MYSTERY, data);
             }
-            upperItem?.update();
+            if (upperItem) {
+                upperItem.update();
+                upperItem.position.y += +player.engine.isRocket() * 0.2;
+            }
         };
         this.setItem = (num) => {
             if (upperItem !== null) return;

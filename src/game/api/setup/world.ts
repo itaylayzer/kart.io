@@ -196,7 +196,7 @@ function setupRoad() {
         new THREE.MeshPhongMaterial({
             color: "#f56505",
             emissive: "#f56505",
-            emissiveIntensity: 150,
+            emissiveIntensity: 1500,
             fog: false,
             opacity: 0.3,
             transparent: true,

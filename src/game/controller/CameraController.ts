@@ -5,13 +5,7 @@ import * as CANNON from "cannon-es";
 import { lerp } from "three/src/math/MathUtils.js";
 import { Player } from "../player/Player";
 import { PerlinNoise } from "../api/PerlinNoise";
-import { randomCirclePoint } from "../api/randomCirclePoint";
-
-const lineMaterial = new THREE.LineBasicMaterial({
-    color: 0xffffff,
-    opacity: 0.02,
-    transparent: true,
-});
+import { SpeedLine } from "../api/meshes/SpeedLine";
 
 export class CameraController {
     public camera: THREE.PerspectiveCamera;
@@ -21,7 +15,7 @@ export class CameraController {
     private pid: number | false;
     private players: Player[];
     private perlin: PerlinNoise;
-
+    private speedLines: SpeedLine[];
     constructor(camera: THREE.PerspectiveCamera) {
         this.camera = camera;
         camera.rotation.y = Math.PI;
@@ -30,6 +24,15 @@ export class CameraController {
         this.perlin = new PerlinNoise();
         this.turboMode = 0;
         this.players = [];
+
+        this.speedLines = [
+            new SpeedLine(0.02),
+            new SpeedLine(0.02),
+            new SpeedLine(0.02),
+            new SpeedLine(0.02),
+            new SpeedLine(0.02),
+            new SpeedLine(0.02),
+        ];
     }
 
     public update() {
@@ -115,60 +118,28 @@ export class CameraController {
         );
 
         const timeMultiplier = 4;
-        const XYDivider = 300;
+        const XYDivider = 250;
 
-        const perlinValue =
-            (this.perlin.get(0, (Global.elapsedTime % 2) * timeMultiplier) *
-                Math.abs(speedDotQuatewrnion)) /
-            XYDivider;
+        const perlinValue = (x: number, y: number) =>
+            (this.perlin.get(x, y) * Math.abs(speedDotQuatewrnion)) / XYDivider;
 
-        this.camera.rotateX(perlinValue);
-        this.camera.rotateY(perlinValue);
+        this.camera.rotateX(
+            perlinValue(0, Global.elapsedTime * timeMultiplier)
+        );
+        this.camera.rotateY(
+            perlinValue(Global.elapsedTime * timeMultiplier, 0)
+        );
+
         this.camera.fov = Math.min(90 + Math.abs(speedDotQuatewrnion) * 2, 120);
         this.camera.updateProjectionMatrix();
 
         this.time += Global.deltaTime * 13;
 
-        // SPEED LINES
-        if (speedDotQuatewrnion >= 4.5) {
-            this.createSpeedLines(player);
-            this.createSpeedLines(player);
-        }
-        if (speedDotQuatewrnion >= 9.5) this.createSpeedLines(player);
-    }
-
-    private createSpeedLines(player: Player) {
-        const start = new THREE.Vector3().copy(player.position);
-        const forward = new THREE.Vector3(0, 0, 1).applyQuaternion(
-            player.quaternion
-        );
-        const up = new THREE.Vector3(0, 1, 0).applyQuaternion(
-            player.quaternion
-        );
-        const right = new THREE.Vector3(1, 0, 0).applyQuaternion(
-            player.quaternion
-        );
-        let { x: rx, y: ry } = randomCirclePoint(
-            2 + (this.camera.fov - 100) / 10
-        );
-
-        rx *= 9 / 16;
-        start.add(up.multiplyScalar(ry)).add(right.multiplyScalar(rx));
-        const end = start.clone().add(forward.clone().multiplyScalar(0.5));
-
-        const geometry = new THREE.BufferGeometry().setFromPoints([start, end]);
-        const material = lineMaterial.clone();
-        const line = new THREE.Line(geometry, material);
-
-        Global.lod.add(line);
-        Global.optimizedObjects.push(line);
-
-        requestAnimationFrame(() => {
-            Global.lod.remove(line);
-            Global.optimizedObjects.splice(
-                Global.optimizedObjects.indexOf(line),
-                1
-            );
+        this.speedLines.forEach((line, index) => {
+            line.setLocationFromPlayer(player);
+            line.visible =
+                speedDotQuatewrnion >=
+                [4, 9][+(index > (this.speedLines.length * 2) / 3)];
         });
     }
 }
