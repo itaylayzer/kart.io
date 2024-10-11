@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { IKeyboardController } from "../controller/IKeyboardController";
 import { damp } from "three/src/math/MathUtils.js";
 import { Global } from "../store/Global";
-import createPlayerNameSprite from "../api/createPlayerNameSprite";
+import createPlayerNameSprite from "../api/utils/createPlayerNameSprite";
 import * as CANNON from "cannon-es";
 import { Easing, Tween } from "@tweenjs/tween.js";
 import { Trail } from "../api/meshes/Trail";

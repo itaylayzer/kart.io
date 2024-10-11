@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { Global } from "../store/Global";
-import clamp from "../api/clamp";
+import clamp from "../api/utils/clamp";
 
 const maxVolume = 0.3;
 

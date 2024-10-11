@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { Player } from "../../player/Player";
-import { randomCirclePoint } from "../randomCirclePoint";
+import { randomCirclePoint } from "../utils/randomCirclePoint";
 import { Global } from "../../store/Global";
 const lineMaterial = new THREE.LineBasicMaterial({
     color: 0xffffff,

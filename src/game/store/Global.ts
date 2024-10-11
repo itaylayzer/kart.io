@@ -23,6 +23,7 @@ import { Socket } from "socket.io-client";
 import * as CANNON from "cannon-es";
 import { settingsType } from "@/src/store/useSettingsStore";
 import Stats from "three/examples/jsm/libs/stats.module.js";
+import { MotionBlurPass } from "../api/pass/MotionBlurPass";
 
 export class Global {
     public static mouseController: MouseController;
@@ -51,4 +52,5 @@ export class Global {
     public static stats: Stats;
     public static optimizedObjects: Object3D[];
     public static goBack: () => void;
+    public static motionBlur: MotionBlurPass;
 }

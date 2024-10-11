@@ -1,6 +1,6 @@
 import { lerp } from "three/src/math/MathUtils.js";
 import { Global } from "../store/Global";
-import clamp from "../api/clamp";
+import clamp from "../api/utils/clamp";
 
 const HORIZONTAL = 0;
 const VERTICAL = 1;
