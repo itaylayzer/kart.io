@@ -38,6 +38,7 @@ import { Wheels } from "../../player/Items/Wheel";
 import { TrackerController } from "../../controller/TrackerController";
 import { Scoreboard } from "../../player/Scoreboard";
 import { StartTimer } from "../../player/StartTimer";
+import { MotionBlurPass } from "../pass/MotionBlurPass";
 
 function setupLights() {
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 1);
@@ -413,6 +414,8 @@ function setupRenderer() {
 
     if (Global.settings.useBloom) composer.addPass(bloomPass);
 
+    Global.motionBlur = new MotionBlurPass();
+    composer.addPass(Global.motionBlur);
     window.addEventListener("resize", () => {
         const s = 1;
         composer.setSize(s * window.innerWidth, s * window.innerHeight);

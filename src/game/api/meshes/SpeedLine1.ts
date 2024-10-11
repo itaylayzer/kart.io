@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import { Player } from "../../player/Player";
-import { randomCirclePoint } from "../randomCirclePoint";
+import { randomCirclePoint } from "../utils/randomCirclePoint";
 import { Global } from "../../store/Global";
 import { Refractor } from "three/examples/jsm/objects/Refractor.js"; // Import Refractor
 import { WaterRefractionShader } from "three/examples/jsm/shaders/WaterRefractionShader.js"; // Import shader

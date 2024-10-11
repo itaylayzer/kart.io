@@ -4,7 +4,7 @@ import { Global } from "../store/Global";
 import * as THREE from "three";
 import { damp, lerp } from "three/src/math/MathUtils.js";
 import { IKeyboardController } from "./IKeyboardController";
-import clamp from "../api/clamp";
+import clamp from "../api/utils/clamp";
 import { AudioController } from "./AudioController";
 import { Player } from "../player/Player";
 import msgpack from "msgpack-lite";

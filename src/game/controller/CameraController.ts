@@ -4,7 +4,7 @@ import { LocalPlayer } from "../player/LocalPlayer";
 import * as CANNON from "cannon-es";
 import { lerp } from "three/src/math/MathUtils.js";
 import { Player } from "../player/Player";
-import { PerlinNoise } from "../api/PerlinNoise";
+import { PerlinNoise } from "../api/utils/PerlinNoise";
 import { SpeedLine } from "../api/meshes/SpeedLine";
 
 export class CameraController {
@@ -26,12 +26,12 @@ export class CameraController {
         this.players = [];
 
         this.speedLines = [
-            new SpeedLine(0.02),
-            new SpeedLine(0.02),
-            new SpeedLine(0.02),
-            new SpeedLine(0.02),
-            new SpeedLine(0.02),
-            new SpeedLine(0.02),
+            new SpeedLine(0.3),
+            new SpeedLine(0.3),
+            new SpeedLine(0.3),
+            new SpeedLine(0.3),
+            new SpeedLine(0.3),
+            new SpeedLine(0.3),
         ];
     }
 
@@ -117,7 +117,7 @@ export class CameraController {
             player.quaternion.vmult(new CANNON.Vec3(0, 0, 1))
         );
 
-        const timeMultiplier = 4;
+        const timeMultiplier = 3;
         const XYDivider = 250;
 
         const perlinValue = (x: number, y: number) =>
@@ -141,5 +141,9 @@ export class CameraController {
                 speedDotQuatewrnion >=
                 [4, 9][+(index > (this.speedLines.length * 2) / 3)];
         });
+
+        Global.motionBlur.uniforms["uVelocity"].value.y =
+            Math.min(speedDotQuatewrnion, 10) / 5;
+        Global.motionBlur.uniforms["uVelocity"].value.x = 0;
     }
 }
