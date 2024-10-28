@@ -3,6 +3,8 @@ import * as THREE from "three";
 import { createMysteryBoxes } from "./createMysteryBoxes";
 import { randInt } from "three/src/math/MathUtils.js";
 import { createStartLocationsGenerator } from "./createStartLocationsGenerator";
+import { createRoad } from "./createRoad";
+
 
 export default function (mapInd: number) {
     const pts: THREE.Vector3[] = [];
@@ -26,5 +28,8 @@ export default function (mapInd: number) {
         1000,
         990
     );
-    return { mysteryLocations, startsLocationsGenerator };
+
+    const roadsSegments = createRoad(curve, 5, 200, 3000);
+
+    return { mysteryLocations, startsLocationsGenerator, curve, roadsSegments };
 }

@@ -12,95 +12,94 @@ import { WorldMap } from "./player/WorldMap";
 import { Global } from "./store/Global";
 
 export default (
-    assets: loadedAssets,
-    socket: Socket,
-    pid: number,
-    players: Map<number, [string, number, boolean]>,
-    settings: settingsType,
-    mapIndex: number,
-    goBack: () => void
+	assets: loadedAssets,
+	socket: Socket,
+	pid: number,
+	players: Map<number, [string, number, boolean]>,
+	settings: settingsType,
+	mapIndex: number,
+	goBack: () => void
 ) => {
-    Global.assets = assets;
-    Global.settings = settings;
-    Global.curve = new THREE.CatmullRomCurve3(
-        createVectorsFromNumbers(curvePoints[mapIndex])
-    );
+	Global.assets = assets;
+	Global.settings = settings;
+	Global.curve = new THREE.CatmullRomCurve3(
+		createVectorsFromNumbers(curvePoints[mapIndex])
+	);
 
-    const scoreboard = new Scoreboard();
-    setupWorld(socket, pid, players);
+	const scoreboard = new Scoreboard();
+	setupWorld(socket, pid, players);
 
-    Global.system = new System();
-    Global.system.addRenderer(new SpriteRenderer(Global.scene, THREE));
+	Global.system = new System();
+	Global.system.addRenderer(new SpriteRenderer(Global.scene, THREE));
 
-    const clock = new THREE.Clock();
+	const clock = new THREE.Clock();
 
-    const map = new WorldMap();
+	const map = new WorldMap();
+	const animate = () => {
+		if (document.visibilityState === "hidden") return;
+		try {
+			Global.deltaTime = clock.getDelta();
+			Global.elapsedTime = clock.getElapsedTime();
 
-    const animate = () => {
-        if (document.visibilityState === "hidden") return;
-        try {
-            Global.deltaTime = clock.getDelta();
-            Global.elapsedTime = clock.getElapsedTime();
+			for (const mesh of Global.optimizedObjects) {
+				mesh.visible =
+					mesh.position.distanceTo(Global.camera.position) < 50;
+			}
 
-            for (const mesh of Global.optimizedObjects) {
-                mesh.visible =
-                    mesh.position.distanceTo(Global.camera.position) < 50;
-            }
+			Global.updates
+				.concat(PhysicsObject.childrens.flatMap((v) => v.update))
+				.map((fn) => fn());
+			Global.lateUpdates.map((f) => f());
 
-            Global.updates
-                .concat(PhysicsObject.childrens.flatMap((v) => v.update))
-                .map((fn) => fn());
-            Global.lateUpdates.map((f) => f());
+			scoreboard.update();
+			Global.lod.update(Global.camera);
+			Global.system.update();
+			Global.render();
+			try {
+				Global.world.step(2.6 * Global.deltaTime);
+			} catch (er) {
+				console.error(er);
+			}
 
-            scoreboard.update();
-            Global.lod.update(Global.camera);
-            Global.system.update();
-            Global.render();
-            try {
-                Global.world.step(2.6 * Global.deltaTime);
-            } catch (er) {
-                console.error(er);
-            }
+			map.update();
 
-            map.update();
+			if (Global.settings.renderColliders) Global.cannonDebugger.update();
+			Global.mouseController.lastUpdate();
 
-            if (Global.settings.renderColliders) Global.cannonDebugger.update();
-            Global.mouseController.lastUpdate();
+			if (Global.settings.useSTATS) {
+				Global.stats.update();
+			}
+		} catch (er) {
+			console.error(er);
+		}
+	};
 
-            if (Global.settings.useSTATS) {
-                Global.stats.update();
-            }
-        } catch (er) {
-            console.error(er);
-        }
-    };
+	let interval: undefined | number = undefined;
 
-    let interval: undefined | number = undefined;
+	if (Global.settings.useVsync) Global.renderer.setAnimationLoop(animate);
+	else {
+		// @ts-ignore
+		interval = setInterval(animate, 1000 / Global.settings.fps);
+	}
 
-    if (Global.settings.useVsync) Global.renderer.setAnimationLoop(animate);
-    else {
-        // @ts-ignore
-        interval = setInterval(animate, 1000 / Global.settings.fps);
-    }
+	Global.goBack = () => {
+		setTimeout(() => {
+			try {
+				Global.socket?.disconnect();
+			} catch {}
 
-    Global.goBack = () => {
-        setTimeout(() => {
-            try {
-                Global.socket?.disconnect();
-            } catch {}
+			Global.renderer.dispose();
+			goBack();
+		}, 100);
 
-            Global.renderer.dispose();
-            goBack();
-        }, 100);
+		Global.renderer.setAnimationLoop(null);
 
-        Global.renderer.setAnimationLoop(null);
+		interval !== undefined && clearInterval(interval);
+	};
 
-        interval !== undefined && clearInterval(interval);
-    };
-
-    return {
-        destroyer: () => {
-            Global.goBack();
-        },
-    };
+	return {
+		destroyer: () => {
+			Global.goBack();
+		},
+	};
 };
