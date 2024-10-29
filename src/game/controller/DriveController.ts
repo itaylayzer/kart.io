@@ -7,8 +7,6 @@ import { IKeyboardController } from "./IKeyboardController";
 import clamp from "../api/utils/clamp";
 import { AudioController } from "./AudioController";
 import { Player } from "../player/Player";
-import msgpack from "msgpack-lite";
-import { CS } from "../store/codes";
 import { StartTimer } from "../player/StartTimer";
 const maxDistance = 1;
 export class DriveController {
@@ -51,10 +49,10 @@ export class DriveController {
                 intercetions.length === 0
                     ? undefined
                     : intercetions.length === 1
-                    ? intercetions[0]
-                    : intercetions.reduce((a, b) =>
-                          a.distance > b.distance ? b : a
-                      );
+                        ? intercetions[0]
+                        : intercetions.reduce((a, b) =>
+                            a.distance > b.distance ? b : a
+                        );
 
             if (
                 closestIntersection === undefined ||
@@ -112,23 +110,7 @@ export class DriveController {
             body.quaternion = alignUpQuat.mult(body.quaternion);
         };
 
-        islocal &&
-            setInterval(() => {
-                if (rocketMode || shakeMode || body.velocity.isZero()) return;
-                Global.socket?.emit(
-                    CS.UPDATE_TRANSFORM,
-                    msgpack.encode([
-                        body.pid,
-                        body.position.x,
-                        body.position.y,
-                        body.position.z,
-                        body.quaternion.x,
-                        body.quaternion.y,
-                        body.quaternion.z,
-                        body.quaternion.w,
-                    ])
-                );
-            }, 1000);
+
 
         const keyboardUpdate = () => {
             if (keyboard.isKeyDown(32) || keyboard.isKeyDown(-6)) {
@@ -169,13 +151,13 @@ export class DriveController {
             // Apply forward/reverse force
             const drivingForce = forward.scale(
                 keyboard.vertical *
-                    (maxSpeed +
-                        +turboMode * maxSpeed +
-                        driftSpeedMultiplier +
-                        timeSpeedMultiplier) *
-                    2 *
-                    +!shakeMode *
-                    +!StartTimer.locked
+                (maxSpeed +
+                    +turboMode * maxSpeed +
+                    driftSpeedMultiplier +
+                    timeSpeedMultiplier) *
+                2 *
+                +!shakeMode *
+                +!StartTimer.locked
             );
             // Calculate and apply friction (simplified)
             const velocity = body.velocity.clone();
@@ -266,7 +248,7 @@ export class DriveController {
                     "p#velocity"
                 )!.innerHTML = `${velocityMagnitude.toFixed(2)} KM/S`);
 
-            audio.update(isNaN(velocityMagnitude) ? 0 : velocityMagnitude);
+            audio.update(velocityMagnitude);
             return val;
         };
         this.turbo = () => {

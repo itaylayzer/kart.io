@@ -10,8 +10,8 @@ import { renderMap } from "../game/player/WorldMap";
 type Room = [string, string, number, boolean];
 
 export const ip = "kartio.duckdns.org";
+export const port = 64002;
 
-export const port = 64000;
 export const useIndexScreen = () => {
     const settingsStore = useSettingsStore();
 
@@ -74,7 +74,7 @@ export const useIndexScreen = () => {
             } else {
                 toast(
                     ["No More Ports to Open", "Server Error"][
-                        parseInt(value) - 1
+                    parseInt(value) - 1
                     ],
                     {
                         type: "error",

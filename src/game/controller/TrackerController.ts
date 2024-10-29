@@ -13,7 +13,7 @@ export class TrackerController {
     private lastIndex: number = 0;
     public round: number;
 
-    static sortedTrackers: [number, TrackerController][];
+    static sortedTrackers: [number, TrackerController][] | undefined;
     static readonly ls = 700;
     static points: THREE.Vector3[];
     private static trackers: Map<number, TrackerController>;
@@ -24,6 +24,7 @@ export class TrackerController {
         this.points = [];
         this.trackers = new Map();
         this.FINALS = [];
+        this.sortedTrackers = undefined;
     }
 
     constructor(player: Player, isLocal: boolean) {
@@ -75,7 +76,7 @@ export class TrackerController {
             dummy.position.copy(forwardPos[1]);
             dummy.lookAt(
                 TrackerController.points[
-                    (forwardPos[0] + 1) % TrackerController.points.length
+                (forwardPos[0] + 1) % TrackerController.points.length
                 ]
             );
 
@@ -104,7 +105,7 @@ export class TrackerController {
             );
             dummy.lookAt(
                 TrackerController.points[
-                    (this.lastIndex + 1) % TrackerController.ls
+                (this.lastIndex + 1) % TrackerController.ls
                 ]
             );
 
@@ -114,20 +115,8 @@ export class TrackerController {
     }
 
     public static update(localPID: number) {
-        const trackers = Array.from(this.trackers.entries()).filter(
-            ([id, _]) => !(this.FINALS ?? []).includes(id)
-        );
-        trackers.sort((b, a) => {
-            let compare = a[1].round - b[1].round;
-            if (compare === 0) compare = a[1].lastIndex - b[1].lastIndex;
-            return compare;
-        });
-        this.sortedTrackers = [
-            ...(this.FINALS ?? []).map(
-                (v) => [v, this.trackers.get(v)!] as [number, TrackerController]
-            ),
-            ...trackers,
-        ];
+
+        if (this.sortedTrackers === undefined) return;
 
         const rightPlayer = [...this.sortedTrackers]
             .map((t, i) => [i, ...t] as [number, number, TrackerController])
@@ -145,11 +134,12 @@ export class TrackerController {
             roundInMatch,
             0
         )} / 3</p>`;
-        positionHTML.item(1).innerHTML = `<p>${posInMatch} ${
-            ["st", "th", "rd", "th"][Math.min(posInMatch - 1, 3)]
-        }</p>`;
+        positionHTML.item(1).innerHTML = `<p>${posInMatch} ${["st", "th", "rd", "th"][Math.min(posInMatch - 1, 3)]
+            }</p>`;
     }
     public static getScoreboard(): [string, string, number, number][] {
+        if (this.sortedTrackers === undefined) return [];
+
         return this.sortedTrackers.map(
             ([playerID, tracker], index) =>
                 [
@@ -159,6 +149,9 @@ export class TrackerController {
                     Math.max(tracker.round, 0),
                 ] as [string, string, number, number]
         );
+    }
+    public static unpackTrackers(trackers: number[]) {
+        this.sortedTrackers = trackers.map(xid => [xid, this.trackers.get(xid)] as [number, TrackerController])
     }
 }
 export function generateRange(

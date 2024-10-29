@@ -6,7 +6,7 @@ import { PlayerCollision } from './PlayerCollision';
 import { clamp, damp, lerp } from 'three/src/math/MathUtils.js';
 import { PlayerTracker } from './PlayerTracker';
 import { PlayerModel } from './PlayerModel';
-const maxDistance = 1;
+const maxDistance = 10;
 export class PlayerDriver {
     public update: () => [boolean, number, boolean, number];
     public turbo: () => void;
@@ -80,6 +80,10 @@ export class PlayerDriver {
                 body.applyImpulse(
                     new CANNON.Vec3(impulse.x, impulse.y, impulse.z)
                 );
+
+                console.log('bump', game.roadsSegments.length, closestIntersection === undefined,
+                    closestIntersection === undefined ? -1 : closestIntersection.distance)
+
                 return;
             }
 

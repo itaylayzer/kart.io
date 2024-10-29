@@ -53,4 +53,5 @@ export class Global {
     public static optimizedObjects: Object3D[];
     public static goBack: () => void;
     public static motionBlur: MotionBlurPass;
+    public static letancy: number;
 }

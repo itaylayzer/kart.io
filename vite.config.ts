@@ -38,6 +38,6 @@ export default defineConfig({
         outDir: "kart.io",
     },
     server: {
-        port: 64000,
+        port: 64005,
     },
 });
