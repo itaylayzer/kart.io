@@ -3,10 +3,6 @@ import * as THREE from "three";
 import * as CANNON from "cannon-es";
 import { GameTracker } from "./GameTracker";
 
-export interface UpdateObject {
-    update: () => void;
-}
-
 export interface GameState {
     players: Map<number, Player>;
     scene: THREE.Scene;

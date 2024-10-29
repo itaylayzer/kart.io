@@ -269,14 +269,17 @@ function setupSocket(
         xplayer?.keyboard.keysDown.add(key);
     });
 
-    Global.socket?.on(CC.UPDATE_TRANSFORM, (buffer: Buffer) => {
-        const [pid, ...data] = msgpack.decode(
-            new Uint8Array(buffer)
-        ) as number[];
-        const xplayer = Player.clients.get(pid);
-        const [x, y, z, rx, ry, rz, rw] = data;
-        xplayer?.position.set(x, y, z);
-        xplayer?.quaternion.set(rx, ry, rz, rw);
+    Global.socket?.on(CC.UPDATE_TRANSFORM, (rawData: [number, number[], ...number[][]]) => {
+
+        const [dateBefore, trackers, ...playersData] = rawData;
+        Global.letancy = Date.now() - dateBefore;
+        TrackerController.unpackTrackers(trackers);
+        for (const playerPackage of playersData) {
+            const [xid, ...transform] = playerPackage;
+            const xplayer = Player.clients.get(xid)!;
+            xplayer.unpackPackage(dateBefore, transform.map(v => v / 10000));
+        }
+
     });
 
     Global.socket?.on(CC.FINISH_LINE, (pid: number) => {
@@ -425,7 +428,7 @@ function setupRenderer() {
         Global.renderer.setSize(s * window.innerWidth, s * window.innerHeight);
     });
 
-    let beforeUpdate = () => {};
+    let beforeUpdate = () => { };
     if (Global.settings.displayWater) {
         const [waterGround, _beforeUpdate] = createWater(500, 500, 10, 10);
         for (const water of waterGround) {

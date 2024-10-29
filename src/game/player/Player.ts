@@ -21,6 +21,12 @@ export const COLORS = [
 ];
 
 const COLORSEMISSIVE = [5, 5, 4, 5, 6, 3, 10, 4];
+
+type State = {
+    pos: THREE.Vector3Like,
+    quat: THREE.QuaternionLike, timestamp: number
+}
+
 export class Player extends PhysicsObject {
     public static clients: Map<number, Player>;
     public tracker: TrackerController;
@@ -32,6 +38,9 @@ export class Player extends PhysicsObject {
     public model: PlayerModel;
     public mushroomAddon: number;
     public disconnect: () => void;
+    public unpackPackage: (time: number, transform: number[]) => void;
+    private tickBehind: number;
+    applyTransform: (transform: number[]) => void;
     static {
         this.clients = new Map();
     }
@@ -44,6 +53,9 @@ export class Player extends PhysicsObject {
         public colorFromServer: number,
         public keyboard: IKeyboardController
     ) {
+
+
+
         const radius = 0.8 / 3;
         const colorSetEmissive = COLORSEMISSIVE[colorFromServer];
         const color =
@@ -85,26 +97,67 @@ export class Player extends PhysicsObject {
         this.rocketMode = false;
         this.model.add(audio);
 
+
+        this.tickBehind = 0;
+        let stateBuffer: State[] = []
+
+        const interpolate = (timeInThePast: number) => {
+            if (stateBuffer.length < 1) {
+                return
+            }
+
+
+
+            let firstStateIndex = -1
+            let secondStateIndex = -1
+
+            for (let i = 0; i < stateBuffer.length; i++) {
+                const state = stateBuffer[i];
+                if (state.timestamp > timeInThePast) {
+                    firstStateIndex = i - 1
+                    secondStateIndex = i
+                    break;
+                }
+            }
+
+            const firstState = stateBuffer[firstStateIndex];
+            const secondState = stateBuffer[secondStateIndex];
+
+            if (!firstState) {
+                return
+            }
+
+
+            this.position.set(firstState.pos.x, firstState.pos.y, firstState.pos.z)
+            this.quaternion.set(firstState.quat.x, firstState.quat.y, firstState.quat.z, firstState.quat.w)
+
+            if (!secondState) {//We don't have two states to interpolate between
+                return
+            }
+
+
+            const alpha = (timeInThePast - firstState.timestamp) / (secondState.timestamp - firstState.timestamp)
+            this.position.lerp(new CANNON.Vec3(secondState.pos.x, secondState.pos.y, secondState.pos.z), alpha, this.position);
+            this.quaternion.slerp(new CANNON.Quaternion(secondState.quat.x, secondState.quat.y, secondState.quat.z, secondState.quat.w), alpha, this.quaternion);
+        }
+
+
         this.update = [
             () => {
+
                 keyboard.firstUpdate();
 
+                const timestamp = Date.now();
+                const currentTimeMinusLatency = timestamp - Global.letancy;
+                const currentTimeMinusLatencyAndInterpolationDelay = currentTimeMinusLatency - Global.letancy;
+
+                interpolate(currentTimeMinusLatencyAndInterpolationDelay);
                 isLocal && Global.cameraController.update();
 
-                this.items.update();
-                [
-                    this.turboMode,
-                    this.driftSide,
-                    this.rocketMode,
-                    this.mushroomAddon,
-                ] = this.engine.update();
-                this.model.update();
 
-                this.tracker.update();
-                keyboard.isLocked = this.tracker.shouldLock();
-                isLocal &&
-                    (Global.mouseController.isLocked = keyboard.isLocked);
+                this.model.update();
                 keyboard.lastUpdate();
+                this.tickBehind++;
             },
         ];
 
@@ -115,22 +168,52 @@ export class Player extends PhysicsObject {
             Player.clients.delete(pid);
         };
 
-        Global.world.addBody(this);
         Global.lod.add(this.model);
+
+
+        this.unpackPackage = (timestamp, transform) => {
+            this.tickBehind = 0;
+
+            const pos = new THREE.Vector3();
+            const quat = new THREE.Quaternion();
+
+            [
+                pos.x,
+                pos.y,
+                pos.z,
+                quat.x,
+                quat.y,
+                quat.z,
+                quat.w,
+            ] = transform;
+
+            stateBuffer.push({ timestamp, pos, quat: quat })
+            stateBuffer.sort((a, b) => {
+                return a.timestamp - b.timestamp;
+            });
+            if (stateBuffer.length > 60) {
+                stateBuffer.splice(0, 1)
+            }
+
+        }
+
+
+        this.applyTransform = (transform: number[]) => {
+
+            [
+                this.position.x,
+                this.position.y,
+                this.position.z,
+                this.quaternion.x,
+                this.quaternion.y,
+                this.quaternion.z,
+                this.quaternion.w,
+            ] = transform;
+
+
+
+        }
+
     }
 
-    public applyTransform(transform: number[]) {
-        [
-            this.position.x,
-            this.position.y,
-            this.position.z,
-            this.quaternion.x,
-            this.quaternion.y,
-            this.quaternion.z,
-            this.quaternion.w,
-        ] = transform;
-
-        this.velocity.setZero();
-        this.force.setZero();
-    }
 }

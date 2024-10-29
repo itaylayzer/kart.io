@@ -68,18 +68,18 @@ app.get("/reg", (req, res) => {
 
 app.get("/list", (req, res) => {
     const entries = Array.from(ports.entries())
-        .filter((v) => v[1] !== undefined && !v[1].isGameStarted())
+        .filter((v) => v[1] !== undefined && !v[1].game.isGameStarted())
         .map(([port, room]) => [
             port,
             room!.name,
-            room!.players.size,
+            room!.game.state.players.size,
             room!.password !== undefined,
         ]);
 
     res.status(200).send(JSON.stringify(entries));
 });
 
-const port = 64000;
+const port = 64002;
 server.listen(port, () => {
     console.log(`server is running on https://localhost:${port}`);
 });

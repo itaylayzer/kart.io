@@ -8,7 +8,6 @@ export enum CS {
     READY = "r",
     INIT_GAME = "g",
     APPLY_MYSTERY = "a",
-    UPDATE_TRANSFORM = "f",
     FINISH_LINE = "l",
 }
 

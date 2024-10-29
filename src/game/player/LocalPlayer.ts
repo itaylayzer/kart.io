@@ -14,6 +14,35 @@ export class LocalPlayer extends Player {
         LocalPlayer.instance = this;
         new SpeedLine1(this);
 
+
+
+        // this.update = [
+        //     () => {
+
+        //         this.keyboard.firstUpdate();
+
+        //         Global.cameraController.update();
+
+        //         this.items.update();
+        //         [
+        //             this.turboMode,
+        //             this.driftSide,
+        //             this.rocketMode,
+        //             this.mushroomAddon,
+        //         ] = this.engine.update();
+        //         this.model.update();
+
+        //         console.log(this.position);
+        //         console.log(this.quaternion);
+
+        //         this.tracker.update();
+        //         this.keyboard.isLocked = this.tracker.shouldLock();
+
+        //         (Global.mouseController.isLocked = this.keyboard.isLocked);
+        //         this.keyboard.lastUpdate();
+        //     },
+        // ];
+
         Global.lateUpdates.push(() => {
             TrackerController.update(id);
         });
