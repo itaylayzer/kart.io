@@ -2,14 +2,13 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import express from "express";
-import { createServer } from "https";
+import { createServer } from "http";
 import { Room } from "./room";
 import cors from "cors";
-import { credentials } from "./store/credentials";
 import { RandomCode } from "./store/randomCode";
 
 const app = express();
-const server = createServer(credentials, app);
+const server = createServer(app);
 
 Room.initialize(server);
 const tokenizer = new RandomCode();
@@ -84,5 +83,5 @@ app.get("/list", (req, res) => {
 
 const port = +process.env.PORT!;
 server.listen(port, () => {
-	console.log(`server is running on https://localhost:${port}`);
+	console.log(`server is running on http://localhost:${port}`);
 });

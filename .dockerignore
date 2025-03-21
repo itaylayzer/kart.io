@@ -29,5 +29,4 @@ url-guide.md
 config.ts
 
 # Ignore frontend folders
-/src
 /public
