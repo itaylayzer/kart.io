@@ -24,11 +24,10 @@ dist-ssr
 *.sw?
 url-guide.md
 
-# Certificates
-*.key
-*.csr
-*.cert
-
-# Configuration Files
+# Ignore configurations
 .env
 config.ts
+
+# Ignore frontend folders
+/src
+/public

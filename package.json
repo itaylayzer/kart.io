@@ -34,6 +34,7 @@
     "cli-progress": "^3.12.0",
     "compression": "^1.7.4",
     "dat.gui": "^0.7.9",
+    "dotenv": "^16.4.7",
     "express": "^4.19.2",
     "gamepad": "^1.6.0",
     "gamepad.js": "^2.1.0",
