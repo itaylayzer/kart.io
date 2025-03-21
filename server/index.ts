@@ -37,7 +37,7 @@ for (let index = 0; index < startCount; index++) {
 app.use(cors({ origin: process.env.ORIGIN }));
 
 app.get("/", (req, res) => {
-	res.status(200).send("Great! now y.envou can play KartIO with servers");
+	res.status(200).send("Great! now you can play KartIO with servers");
 });
 
 app.get("/reg", (req, res) => {
