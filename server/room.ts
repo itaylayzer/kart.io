@@ -34,7 +34,9 @@ export class Room {
 		public password: string | undefined,
 		mapIndex: number = 0
 	) {
-		const io = Room.io.of((process.env.PATH ?? "") + namespace);
+		const io = Room.io.of(
+			(process.env.SUBPATH ?? "") + "/room/" + namespace
+		);
 
 		const players = new Map<number, Player>();
 		const { mysteryLocations, startsLocationsGenerator } = setup(mapIndex);
