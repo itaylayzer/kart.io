@@ -20,7 +20,6 @@ export class Room {
 	static io: SocketIOServer;
 	static initialize(server: HTTPServer) {
 		this.io = new SocketIOServer(server, {
-			transports: ["websocket"],
 			cors: { origin: process.env.ORIGIN },
 		});
 	}
@@ -35,7 +34,7 @@ export class Room {
 		public password: string | undefined,
 		mapIndex: number = 0
 	) {
-		const io = Room.io.of("/room/" + namespace);
+		const io = Room.io.of((process.env.PATH ?? "") + namespace);
 
 		const players = new Map<number, Player>();
 		const { mysteryLocations, startsLocationsGenerator } = setup(mapIndex);

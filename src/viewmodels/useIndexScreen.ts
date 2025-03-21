@@ -9,7 +9,8 @@ import { renderMap } from "../game/player/WorldMap";
 import Config from "../config";
 
 type Room = [string, string, number, boolean];
-export const ip = Config.IP;
+export const ip = Config.BASE_URL!;
+export const ip_path = Config.PATH ?? "";
 
 export const useIndexScreen = () => {
 	const settingsStore = useSettingsStore();
@@ -41,7 +42,9 @@ export const useIndexScreen = () => {
 				}, 5000);
 
 				try {
-					const response = await fetch(`https://${ip}/list`);
+					const response = await fetch(
+						`https://${ip}${ip_path}/list`
+					);
 					clearTimeout(timeout);
 					resolve((await response.json()) as Room[]);
 				} catch (er) {
@@ -59,7 +62,7 @@ export const useIndexScreen = () => {
 	async function createRoom() {
 		try {
 			const response = await fetch(
-				`https://${ip}/reg/?name=${roomName}&map=${roomMap}&password=${roomPassword}`
+				`https://${ip}${ip_path}/reg/?name=${roomName}&map=${roomMap}&password=${roomPassword}`
 			);
 			const value = await response.text();
 			if (value.startsWith("p")) {
