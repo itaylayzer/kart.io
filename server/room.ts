@@ -1,4 +1,4 @@
-import { Server as HTTPServer } from "https";
+import { Server as HTTPServer } from "http";
 import { Server as SocketIOServer } from "socket.io";
 import { CC, CS } from "./store/codes";
 import { randInt } from "three/src/math/MathUtils.js";
