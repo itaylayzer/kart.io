@@ -5,6 +5,7 @@ import { CC, CS } from "@/server/store/codes";
 import { toast } from "react-toastify";
 import { useSettingsStore } from "../store/useSettingsStore";
 import { ip, ip_path } from "./useIndexScreen";
+import Config from "../config";
 
 type Player = [string, number, boolean];
 
