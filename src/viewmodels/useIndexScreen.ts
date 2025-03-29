@@ -43,7 +43,10 @@ export const useIndexScreen = () => {
 
 				try {
 					const response = await fetch(
-						`https://${ip}${ip_path}/list`
+						`${
+							// @ts-ignore
+							Config.HTTP_PROTOCOL ?? "https"
+						}://${ip}${ip_path}/list`
 					);
 					clearTimeout(timeout);
 					resolve((await response.json()) as Room[]);
@@ -62,7 +65,10 @@ export const useIndexScreen = () => {
 	async function createRoom() {
 		try {
 			const response = await fetch(
-				`https://${ip}${ip_path}/reg/?name=${roomName}&map=${roomMap}&password=${roomPassword}`
+				`${
+					// @ts-ignore
+					Config.HTTP_PROTOCOL ?? "https"
+				}://${ip}${ip_path}/reg/?name=${roomName}&map=${roomMap}&password=${roomPassword}`
 			);
 			const value = await response.text();
 			if (value.startsWith("p")) {

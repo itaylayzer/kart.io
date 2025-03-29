@@ -27,6 +27,8 @@ in src folder create `config.ts` file with this variables
 export default {
 	IP: "<ip>:<port>", // its important that its will not end with /
 	PATH: "",
+	WEBSOCKET_PROTOCOL: "ws", // "ws" | "wss"
+	HTTP_PROTOCOL: "http", // "http" | "https"
 };
 ```
 
@@ -51,6 +53,8 @@ in src folder create `config.ts` file with this variables
 export default {
 	IP: "<domain>", // its important that its will not end with /
 	PATH: "",
+	WEBSOCKET_PROTOCOL: "ws", // "ws" | "wss"
+	HTTP_PROTOCOL: "http", // "http" | "https"
 };
 ```
 
@@ -76,6 +80,8 @@ in src folder create `config.ts` file with this variables
 export default {
 	IP: "<domain>", // its important that its will not end with /
 	PATH: "/<path>", // its important that its will start with /
+	WEBSOCKET_PROTOCOL: "ws", // "ws" | "wss"
+	HTTP_PROTOCOL: "http", // "http" | "https"
 };
 ```
 

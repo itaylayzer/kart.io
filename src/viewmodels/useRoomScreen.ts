@@ -34,11 +34,17 @@ export const useRoomScreen = (
 				password = tryPassword;
 			}
 		}
-		const socket = io(`wss://${ip}${ip_path}/room/${room}`, {
-			path: `${ip_path}/socket.io`,
-			transports: ["websocket"],
-			query: [undefined, { password }][+needPassword],
-		});
+		const socket = io(
+			`${
+				// @ts-ignore
+				Config.WEBSOCKET_PROTOCOL ?? "wss"
+			}://${ip}${ip_path}/room/${room}`,
+			{
+				path: `${ip_path}/socket.io`,
+				transports: ["websocket"],
+				query: [undefined, { password }][+needPassword],
+			}
+		);
 
 		socket.on("connect", () => {
 			setSocket(socket);
