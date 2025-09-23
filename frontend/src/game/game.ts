@@ -11,7 +11,7 @@ import { Scoreboard } from "./player/Scoreboard";
 import { WorldMap } from "./player/WorldMap";
 import { Global } from "./store/Global";
 
-export default (
+const game = (
     assets: loadedAssets,
     socket: Socket,
     pid: number,
@@ -100,7 +100,9 @@ export default (
 
     return {
         destroyer: () => {
-            Global.goBack();
+            // Global.goBack();
         },
     };
 };
+
+export default game;

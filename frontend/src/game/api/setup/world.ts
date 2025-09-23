@@ -38,6 +38,7 @@ import { Wheels } from "../../player/Items/Wheel";
 import { TrackerController } from "../../controller/TrackerController";
 import { Scoreboard } from "../../player/Scoreboard";
 import { StartTimer } from "../../player/StartTimer";
+import { GlobalStyles } from "@mui/material";
 
 function setupLights() {
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 1);
@@ -422,21 +423,22 @@ function setupRenderer() {
         Global.renderer.setSize(s * window.innerWidth, s * window.innerHeight);
     });
 
-    let beforeUpdate = () => {};
+    let beforeUpdate = () => { };
     if (Global.settings.displayWater) {
         const [waterGround, _beforeUpdate] = createWater(500, 500, 10, 10);
         for (const water of waterGround) {
             water.position.y -= 1;
         }
         Global.optimizedObjects.push(...waterGround);
-        beforeUpdate = _beforeUpdate;
+        // beforeUpdate = _beforeUpdate;
         Global.lod.add(...waterGround);
     }
 
     Global.render = () => {
-        beforeUpdate();
+        // beforeUpdate();
 
-        composer.render();
+        Global.renderer.render(Global.scene, Global.camera);
+        // composer.render();
     };
 }
 

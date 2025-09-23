@@ -49,7 +49,9 @@ export function Play({
             >
                 <center>
                     <h3 className="scoreboard_finish">Game Finished</h3>
-                    <table id="scoreboard"></table>
+                    <table id="scoreboard">
+                        <tbody></tbody>
+                    </table>
                     <button
                         style={{
                             pointerEvents: "all",
