@@ -1,4 +1,4 @@
-import { curvePoints } from "../../src/game/constants/road";
+import { curvePoints } from "@shared/config/road";
 import * as THREE from "three";
 import { createMysteryBoxes } from "./createMysteryBoxes";
 import { randInt } from "three/src/math/MathUtils.js";

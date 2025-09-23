@@ -1,6 +1,6 @@
 import { Server as HTTPServer } from "http";
 import { Server as SocketIOServer, Socket } from "socket.io";
-import { CC, CS } from "./store/codes";
+import { CC, CS } from "@shared/types/codes";
 import setup from "./api/setup";
 import msgpack from "msgpack-lite";
 import { randInt } from "three/src/math/MathUtils.js";
@@ -29,7 +29,7 @@ export class Room {
 
 	constructor(
 		namespace: string,
-		public name,
+		public name: string,
 		removeFromList: () => void,
 		public password: string | undefined,
 		mapIndex: number = 0
