@@ -19,7 +19,7 @@ export const usePlayScreen = (
         const destroyers: Action[] = [];
         audio().play(
             ["Barriers", "Zane Little Music"],
-            "./audios/barriers.mp3"
+            "/kart.io/audios/barriers.mp3"
         );
         const { destroyer } = game(assets, socket, pid, players, settings, map, goBack);
         destroyers.push(destroyer);

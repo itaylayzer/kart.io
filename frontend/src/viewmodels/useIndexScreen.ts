@@ -103,7 +103,7 @@ export const useIndexScreen = () => {
 			loadRooms();
 			audio().play(
 				["Rhythm Factory", "Zane Little Music"],
-				"./audios/rhythm_factory.mp3"
+				"/kart.io/audios/rhythm_factory.mp3"
 			);
 		}
 	}, [screenIndex]);
