@@ -430,15 +430,15 @@ function setupRenderer() {
             water.position.y -= 1;
         }
         Global.optimizedObjects.push(...waterGround);
-        // beforeUpdate = _beforeUpdate;
+        beforeUpdate = _beforeUpdate;
         Global.lod.add(...waterGround);
     }
 
     Global.render = () => {
-        // beforeUpdate();
+        beforeUpdate();
 
-        Global.renderer.render(Global.scene, Global.camera);
-        // composer.render();
+        // Global.renderer.render(Global.scene, Global.camera);
+        composer.render();
     };
 }
 

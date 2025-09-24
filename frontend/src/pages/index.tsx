@@ -39,7 +39,6 @@ function Index() {
 
     return (
         <>
-            <footer></footer>
             <header>
                 <AssetLoader
                     items={{
@@ -61,31 +60,7 @@ function Index() {
                     <></>
                 </AssetLoader>
             </header>
-
-            <Tooltip
-                id="t"
-                style={{
-                    backgroundColor: "#020202",
-                    zIndex: 3,
-                    fontFamily: "monospace",
-                    color: "white",
-                    opacity: 1,
-                    fontWeight: 400,
-                }}
-            />
-            <ToastContainer
-                position="bottom-right"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnHover
-                pauseOnFocusLoss={false}
-                closeButton={false}
-                theme="dark"
-            />
-            <AudioContainer />
+            <AudioContainer /> 
             <Listed
                 index={screenIndex}
                 childrens={[

@@ -1,7 +1,6 @@
 import { curvePoints } from "@shared/config/road";
 import * as THREE from "three";
 import { createMysteryBoxes } from "./createMysteryBoxes";
-import { randInt } from "three/src/math/MathUtils.js";
 import { createStartLocationsGenerator } from "./createStartLocationsGenerator";
 
 export default function (mapInd: number) {

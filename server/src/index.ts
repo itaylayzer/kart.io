@@ -35,7 +35,7 @@ for (let index = 0; index < startCount; index++) {
 
 app.use(cors({ origin: process.env.ORIGIN }));
 
-app.get("/", (req, res) => {
+app.get("/", (_req, res) => {
 	res.status(200).send("Great! now you can play KartIO with servers");
 });
 
@@ -68,7 +68,7 @@ app.get("/reg", (req, res) => {
 	}
 });
 
-app.get("/list", (req, res) => {
+app.get("/list", (_req, res) => {
 	const entries = Array.from(ports.entries())
 		.filter((v) => v[1] !== undefined && !v[1].isGameStarted())
 		.map(([port, room]) => [
