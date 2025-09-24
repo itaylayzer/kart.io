@@ -30,3 +30,4 @@ config.ts
 
 # Ignore frontend folders
 /public
+/frontend
