@@ -1,0 +1,364 @@
+@import url("https://fonts.googleapis.com/css2?family=Signika:wght@300..700&display=swap");
+@import url("https://fonts.cdnfonts.com/css/new-super-mario-font-u");
+
+body {
+    background-color: #050505;
+}
+
+*::-webkit-scrollbar {
+    width: 0.52vh;
+}
+
+*::-webkit-scrollbar-track {
+    background-color: rgb(255, 255, 255, 5%);
+    border-radius: 100px;
+    margin-block: 20px;
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: rgb(255, 255, 255, 25%);
+    border-radius: 100px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(255, 255, 255, 100%);
+}
+main {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    display: block;
+}
+
+body,
+body button.r,
+body input,
+p {
+    font-family: "Signika";
+    font-weight: 100;
+    color: white;
+}
+p {
+    font-size: 2.8vh;
+    margin-block: 0px;
+}
+body input,
+body button.r {
+    background-color: #15151500;
+    transition: background-color 0.2s, border 0.2s, scale 0.2s;
+    border: 2px solid #444;
+    font-size: 2.29vh;
+    padding: 1.04vh 2.08vh;
+
+    box-sizing: content-box;
+    cursor: pointer;
+    border-radius: 2px;
+}
+body input:hover,
+body input:focus {
+    outline: 0;
+    border: 2px solid #777;
+}
+body button.r {
+    scale: 0.92;
+    padding: 1.04vh 5.21vh;
+}
+
+body input,
+body input:hover {
+    color: white !important;
+    outline: 0 !important;
+    border: 1px solid white !important;
+}
+body input:focus {
+    border: 0 !important;
+}
+body button.r[aria-pressed="true"],
+body button.r:hover {
+    scale: 1;
+
+    border: 2px solid #151515ff;
+    background-color: #151515ff;
+}
+body button.r {
+    outline: 0;
+}
+
+body h1 {
+    font-size: 10.42vh;
+    text-align: center;
+    margin-top: 0px;
+}
+body h2 {
+    font-size: 2.08vh;
+    text-align: center;
+    margin-block: 0px;
+    font-weight: 100;
+    opacity: 0.5;
+    translate: 0px 25px;
+}
+body h6 {
+    font-size: 3.12vh;
+    font-weight: 100;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+    text-align: center;
+    cursor: pointer;
+    margin-top: 0;
+}
+body h6:hover {
+    opacity: 1;
+}
+main div.room {
+    width: 52.13vh;
+    background-color: #151515;
+
+    display: flex;
+    justify-content: space-around;
+    transition: background-color 0.2s, opacity 0.2s, scale 0.2s;
+    cursor: pointer;
+    margin-bottom: 10px;
+    padding: 0.834vh 2.08vh;
+    box-sizing: border-box;
+    opacity: 0.7;
+    background-color: #040404;
+    border: 2px solid #222;
+    scale: 0.98;
+}
+main div.room:hover {
+    opacity: 1;
+    scale: 1;
+}
+
+main table#scoreboard {
+    padding: 1.04vh;
+    font-family: "Signika";
+}
+table.instructions,
+table#settings {
+    padding: 1.04vh;
+    border-radius: 10px;
+    font-family: "Signika";
+}
+table.instructions,
+table#settings,
+main table#scoreboard,
+main div.room table {
+    width: 100%;
+}
+
+table.instructions,
+table#settings {
+    border-spacing: 8px;
+}
+table.instructions,
+table#settings tr td,
+main table#scoreboard tr td,
+main div.room table tr td {
+    font-size: 2.08vh;
+}
+
+table.instructions tr th,
+table.instructions tr td,
+table#settings tr th,
+table#settings tr td,
+main table#scoreboard tr td,
+main table#scoreboard tr th,
+main div.room table tr td,
+main div.room table tr th {
+    padding-inline: 5px;
+}
+
+table.instructions tr th,
+main table#scoreboard tr th,
+main div.room table tr th {
+    text-align: left;
+    font-size: 1.66vh;
+    font-weight: 100;
+    opacity: 0.5;
+}
+main div.room table tr th:nth-child(1) {
+    width: 1.042vh;
+}
+main div.room table tr th:nth-child(3) {
+    width: 11ch;
+}
+table.instructions tr td {
+    font-size: 1.87vh;
+}
+main div.room table tr td {
+    opacity: 0.8;
+}
+main div.room:hover table tr td {
+    opacity: 1;
+}
+main table#scoreboard tr td:nth-child(1) {
+    min-width: 200px;
+    font-family: "New Super Mario Font U";
+    filter: drop-shadow(0px 0px 1px #ce9178);
+}
+main table#scoreboard tr td:nth-child(1),
+main div.room table tr td:nth-child(2) {
+    color: #ce9178;
+}
+main table#scoreboard tr td:nth-child(2),
+main div.room table tr td:nth-child(1) {
+    color: #b5cea8;
+}
+main table#scoreboard tr td:nth-child(3),
+main div.room table tr td:nth-child(3) {
+    color: #9cdcfe;
+}
+
+main div#pauseMenu {
+    z-index: 11;
+    display: block;
+    background-color: #090909;
+    padding: 2.08vh;
+    border-radius: 10px;
+    font-family: "Signika";
+    box-shadow: 0px 0px 10px 0px #090909;
+}
+main div#pauseMenu p {
+    margin-bottom: 20px;
+    margin-top: 0;
+    text-align: center;
+    font-family: monospace;
+}
+main div#pauseMenu h5 {
+    font-size: 4.17vh;
+    font-weight: 100;
+    text-align: center;
+    margin-top: 20px;
+    font-family: "New Super Mario Font U";
+
+    margin-bottom: 5px;
+}
+
+div.blocks {
+    position: absolute;
+    width: 100%;
+    height: 10.42vh;
+    left: 0;
+    display: block;
+    background-image: url(/images/blocks.png);
+    background-repeat: repeat;
+    background-size: 10.42vh 10.42vh;
+}
+
+div.blocks.header {
+    top: 18px;
+}
+div.blocks.footer {
+    bottom: 18px;
+}
+footer {
+    background-color: black;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    z-index: 10;
+}
+header {
+    background-color: rgba(0, 0, 0, 0);
+    top: 0;
+    left: 0;
+    min-height: 1.87vh;
+    min-width: 100%;
+    height: auto;
+    position: absolute;
+    z-index: 10;
+    justify-content: center;
+    display: flex;
+}
+
+footer a {
+    font-family: monospace;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+body button.mini {
+    padding: 0.41vh 1.66vh;
+    font-size: 2.08vh;
+    line-height: -1.04vh;
+}
+
+h3 {
+    font-weight: 600;
+    font-size: 3.12vh;
+    margin: 0px;
+    margin-top: 20px;
+}
+
+div.player {
+    display: flex;
+    gap: 10px;
+    transition: scale 0.2s, opacity 0.2s;
+    margin-bottom: 10px;
+}
+div.player > div {
+    display: flex;
+    gap: 10px;
+    border: 2px solid #444;
+    border-radius: 5px;
+    overflow: hidden;
+    width: 100%;
+    padding-inline: 10px;
+    padding-block: 5px;
+}
+div.player > div > div {
+    display: block;
+    min-width: 2.6vh;
+    min-height: 2.6vh;
+    height: 2.6vh;
+    width: 2.6vh;
+}
+
+div.player > div > div div:nth-child(2) {
+    background-color: green;
+}
+div.player p {
+    flex-grow: 1;
+}
+
+div#position {
+    position: "absolute";
+    bottom: 10px;
+    left: 10px;
+    margin: 0;
+    display: flex;
+    gap: 10;
+    color: "white";
+    font-size: 2.08vh;
+    z-index: 10;
+}
+
+div#position div {
+    font-family: "New Super Mario Font U";
+    display: block;
+}
+
+@keyframes startAnim {
+    0% {
+        scale: 2;
+        rotate: -45deg;
+        opacity: 1;
+    }
+    50% {
+        scale: 1;
+        rotate: 0deg;
+        opacity: 1;
+    }
+    100% {
+        scale: 0.5;
+        rotate: 45deg;
+        opacity: 0;
+    }
+}

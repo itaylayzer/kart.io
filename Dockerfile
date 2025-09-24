@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . /app/
 
 # Install dependencies
-RUN bun install
+RUN bun install --cwd server
 
 # Define arguments for runtime configuration
 ARG PORT
@@ -22,4 +22,4 @@ ENV ORIGIN=${ORIGIN}
 EXPOSE ${PORT}
 
 # Command to run your application
-CMD ["bun", "serve"]
+CMD ["bun", "--cwd", "server", "start"]
