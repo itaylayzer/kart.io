@@ -6,8 +6,6 @@ import AssetLoader from "../components/AssetLoader";
 import { FidgetSpinner } from "react-loader-spinner";
 import { BiErrorAlt } from "react-icons/bi";
 import { Settings } from "@/app/Settings";
-import "react-tooltip/dist/react-tooltip.css";
-import { Tooltip } from "react-tooltip";
 import { AudioContainer } from "../lib/AudioContainer";
 import {
     Button,
@@ -60,7 +58,7 @@ function Index() {
                     <></>
                 </AssetLoader>
             </header>
-            <AudioContainer /> 
+            <AudioContainer />
             <Listed
                 index={screenIndex}
                 childrens={[
@@ -114,21 +112,6 @@ function Index() {
                                 justifyContent: "center",
                             }}
                         >
-                            {/* <Button
-                                data-tooltip-id="t"
-                                data-tooltip-content={
-                                    "you need to visit this page to allow your browser reach the servers"
-                                }
-                                onClick={() =>
-                                    window.open(
-                                        `https://${ip}:${port}`,
-                                        "_blank"
-                                    )
-                                }
-                                className="r mini"
-                            >
-                                Servers Page
-                            </Button> */}
                             <TextField
                                 data-tooltip-id="t"
                                 data-tooltip-content={"Player Name"}
