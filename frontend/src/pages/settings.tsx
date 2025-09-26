@@ -1,29 +1,18 @@
-import { Room } from "@/app/Room";
+import { Settings } from "@/app/Settings";
 import AssetLoader from "@/components/AssetLoader";
-import { useRoom } from "@/hooks/useRoom";
 import { AudioContainer } from "@/lib/AudioContainer";
 import { useRouter } from "next/router";
 
 export default function () {
-    const [room] = useRoom();
     const router = useRouter();
-
-    const { roomId } = router.query;
-
-    if (roomId !== room?.id || roomId == null || room == undefined)
-        return <>{JSON.stringify({ roomId, room })}</>;
-
     return (
         <>
             <header>
                 <AssetLoader />
             </header>
             <AudioContainer />
-            <Room
-                roomPort={room.id}
-                roomName={room.name}
-                needPassword={room.hasPassword}
-                tryPassword={room.password}
+
+            <Settings
                 goBack={() => {
                     router.push("/");
                 }}

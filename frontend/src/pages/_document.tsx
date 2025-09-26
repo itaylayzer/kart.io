@@ -1,6 +1,4 @@
 import { Html, Head, Main, NextScript } from "next/document";
-import { ToastContainer } from "react-toastify";
-import { Tooltip } from "react-tooltip";
 
 const vertexShaderWater = `
       #include <fog_pars_vertex>
@@ -141,29 +139,6 @@ export default function Document() {
             <body className="antialiased">
                 <footer></footer>
 
-                <Tooltip
-                    id="t"
-                    style={{
-                        backgroundColor: "#020202",
-                        zIndex: 3,
-                        fontFamily: "monospace",
-                        color: "white",
-                        opacity: 1,
-                        fontWeight: 400,
-                    }}
-                />
-                <ToastContainer
-                    position="bottom-right"
-                    autoClose={5000}
-                    hideProgressBar={false}
-                    newestOnTop={false}
-                    closeOnClick
-                    rtl={false}
-                    pauseOnHover
-                    pauseOnFocusLoss={false}
-                    closeButton={false}
-                    theme="dark"
-                />
                 <Main />
                 <NextScript />
 
