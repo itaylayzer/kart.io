@@ -1,3 +1,4 @@
+import { LoadingWheelSVG } from "@/components/LoadingWheelSVG";
 import { Condition } from "../components/Condition";
 import { COLORS } from "../game/player/Player";
 import { useRoomScreen } from "../viewmodels/useRoomScreen";
@@ -35,7 +36,7 @@ export function Room({
             onTrue={
                 <Play
                     goBack={goBack}
-                    socket={socket!}
+                    client={socket!}
                     players={players!}
                     pid={pid}
                     map={map}
@@ -47,17 +48,7 @@ export function Room({
                         conditions={isConnected}
                         onTrue={
                             players === undefined ? (
-                                <FidgetSpinner
-                                    key={"FidgetSpinner"}
-                                    visible={true}
-                                    height="80"
-                                    width="80"
-                                    ariaLabel="fidget-spinner-loading"
-                                    wrapperStyle={{}}
-                                    backgroundColor="#222"
-                                    ballColors={["#f00", "#444", "#a22"]}
-                                    wrapperClass="fidget-spinner-wrapper"
-                                />
+                                <LoadingWheelSVG size={80} />
                             ) : (
                                 <div style={{ display: "flex", gap: 50 }}>
                                     <div
@@ -127,10 +118,27 @@ export function Room({
                                             marginBlock: "auto",
                                         }}
                                     >
-                                        <h1 style={{ fontSize: "8.34vh" }}>
+                                        <h1
+                                            style={{
+                                                fontSize: "8.34vh",
+                                                marginBottom: 0,
+                                            }}
+                                        >
                                             {roomName}
                                         </h1>
 
+                                        <h2
+                                            style={{
+                                                fontSize: "2vh",
+                                                marginTop: 0,
+                                            }}
+                                        >
+                                            {roomPort}
+                                        </h2>
+
+                                        <br />
+                                        <br />
+                                        <br />
                                         <br />
                                         <div
                                             style={{ display: "flex", gap: 10 }}
@@ -152,19 +160,7 @@ export function Room({
                                 </div>
                             )
                         }
-                        onFalse={
-                            <FidgetSpinner
-                                visible={true}
-                                height="80"
-                                width="80"
-                                key={"FidgetSpinner"}
-                                ariaLabel="fidget-spinner-loading"
-                                wrapperStyle={{}}
-                                backgroundColor="#222"
-                                ballColors={["#f00", "#444", "#a22"]}
-                                wrapperClass="fidget-spinner-wrapper"
-                            />
-                        }
+                        onFalse={<LoadingWheelSVG size={80} color="red" />}
                     />
                 </main>
             }

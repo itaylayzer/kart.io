@@ -1,6 +1,5 @@
 // server codes
 export enum CS {
-    JOIN = "j",
     UPDATE = "u",
     KEY_DOWN = "d",
     KEY_UP = "u",

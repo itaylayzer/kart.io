@@ -1,22 +1,18 @@
 import { ReactNode, useEffect } from "react";
 import { useAssetStore } from "../store/useAssetLoader";
 import { LinearProgress } from "@mui/material";
+import { assetsList } from "@/config/assetsList";
 
-export default function AssetLoader({
-    items,
-}: {
-    children: ReactNode;
-    items?: Record<string, string> | undefined;
-}) {
+export default function AssetLoader() {
     const { progress, skipAssets, loadMeshes } = useAssetStore();
 
     useEffect(() => {
-        console.log("assets loader: use effect");
-        if (items === undefined) {
+        console.log("assets loader: use effect", progress);
+        if (assetsList === undefined) {
             console.log("assets loader: load assets");
-
             skipAssets();
-        } else loadMeshes(items).catch((r) => console.error(r));
+        } else if (progress === 0)
+            loadMeshes(assetsList).catch((r) => console.error(r));
 
         return () => {};
     }, []);

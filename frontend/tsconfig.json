@@ -23,6 +23,9 @@
       ],
       "@shared/*": [
         "./src/shared/*"
+      ],
+      "@schema/*" : [
+        "../colyseus-server/src/rooms/schema/*"
       ]
     },
     "plugins": [
@@ -35,7 +38,8 @@
     "**/*.ts",
     "**/*.tsx",
     "next-env.d.ts",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "src/config/global.d.ts"
   ],
   "exclude": [
     "node_modules"

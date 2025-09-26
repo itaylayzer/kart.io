@@ -38,25 +38,7 @@ function Index() {
     return (
         <>
             <header>
-                <AssetLoader
-                    items={{
-                        car: "/kart.io/fbx/kart.glb",
-                        mystery: "/kart.io/textures/mystery.png",
-                        block: "/kart.io/textures/blocks2.png",
-                        sfx_slow: "/kart.io/sfx/engine_heavy_slow_loop.mp3",
-                        sfx_fast: "/kart.io/sfx/engine_heavy_fast_loop.mp3",
-                        sfx_avg: "/kart.io/sfx/engine_heavy_average_loop.mp3",
-                        dudvMap: "/kart.io/textures/hOIsXiZ.png",
-                        banana: "/kart.io/fbx/low_poly_banana.glb",
-                        boots: "/kart.io/fbx/turbo.glb",
-                        rocket: "/kart.io/fbx/rocket_ship.glb",
-                        wheel: "/kart.io/fbx/blue_shell_-_low_poly_mario_kart_fan_art.glb",
-                        dust: "/kart.io/fbx/dust.glb",
-                        mushroom: "/kart.io/fbx/low_poly_mushroom.glb",
-                    }}
-                >
-                    <></>
-                </AssetLoader>
+                <AssetLoader />
             </header>
             <AudioContainer />
             <Listed
@@ -173,9 +155,11 @@ function Index() {
                                                         className="room"
                                                         onClick={() => {
                                                             setRoom([
-                                                                r[0],
-                                                                r[1],
-                                                                r[3],
+                                                                r.roomId,
+                                                                r.metadata
+                                                                    .roomName,
+                                                                r.metadata
+                                                                    .hasPassword, //r[3],
                                                                 undefined,
                                                             ]);
                                                             setScreen(5);
@@ -198,7 +182,9 @@ function Index() {
                                                                     <tr>
                                                                         <FaLock
                                                                             opacity={
-                                                                                +r[3]
+                                                                                +r
+                                                                                    .metadata
+                                                                                    .hasPassword
                                                                             }
                                                                             color="white"
                                                                             size={
@@ -213,13 +199,23 @@ function Index() {
                                                                             fontWeight: 600,
                                                                         }}
                                                                     >
-                                                                        {r[0].toUpperCase()}
+                                                                        {r.roomId.toUpperCase()}
                                                                     </td>
                                                                     <td>
-                                                                        {r[1]}
+                                                                        {
+                                                                            r
+                                                                                .metadata
+                                                                                .roomName
+                                                                        }
                                                                     </td>
                                                                     <td>
-                                                                        {r[2]}
+                                                                        {
+                                                                            r.clients
+                                                                        }{" "}
+                                                                        /{" "}
+                                                                        {
+                                                                            r.maxClients
+                                                                        }
                                                                     </td>
                                                                 </tr>
                                                             </tbody>

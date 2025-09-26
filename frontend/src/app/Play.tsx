@@ -1,15 +1,16 @@
 import { Socket } from "socket.io-client";
 import { useStyles } from "../hooks/useStyles";
 import { usePlayScreen } from "../viewmodels";
+import { KartClient } from "@/types/KartClient";
 
 export function Play({
-    socket,
+    client,
     players,
     pid,
     map,
     goBack,
 }: {
-    socket: Socket;
+    client: KartClient;
     map: number;
     pid: number;
     goBack: () => void;

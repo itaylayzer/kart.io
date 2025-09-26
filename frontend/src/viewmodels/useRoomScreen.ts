@@ -6,7 +6,9 @@ import { toast } from "react-toastify";
 import { useSettingsStore } from "../store/useSettingsStore";
 import { ip, ip_path } from "./useIndexScreen";
 import Config from "@/config";
-
+import { KartClient } from "@/types/KartClient";
+import { KartRaceState } from '@schema/KartRaceState';
+import { getStateCallbacks } from "colyseus.js";
 type Player = [string, number, boolean];
 
 export const useRoomScreen = (
@@ -17,13 +19,16 @@ export const useRoomScreen = (
 ) => {
 	const [players, setPlayers] = useState<Map<number, Player>>();
 	const [ready, toggleReady] = useToggle(false);
-	const [socket, setSocket] = useState<Socket>();
+	const [client, setClient] = useState<KartClient>();
 	const [startGameScreen, setStartGameScreen] = useState(false);
 	const { playerName } = useSettingsStore();
 	const [pid, setPID] = useState<number>(0);
-	const isConnected = socket !== undefined;
+	const isConnected = client !== undefined;
 	const [map, setMap] = useState<number>(0);
 	useEffect(() => {
+		console.error('useRoomScreen: start');
+
+		let disconnect = () => { };
 		// join server
 		const playersMap = new Map<number, Player>();
 
@@ -35,88 +40,85 @@ export const useRoomScreen = (
 				password = tryPassword;
 			}
 		}
-		const socket = io(
-			`${
-			// @ts-ignore
-			Config.WEBSOCKET_PROTOCOL ?? "wss"
-			}://${ip}${ip_path}/room/${room}`,
-			{
-				path: `${ip_path}/socket.io`,
-				transports: ["websocket"],
-				query: [undefined, { password }][+needPassword],
-			}
-		);
+		global.colyseus.joinById<KartRaceState>(room, { password, playerName }).then((client) => {
+			client.onError(() => {
+				toast("Couldnt Connect", { type: "error" });
+				goBack();
+			})
 
-		socket.on("connect", () => {
-			setSocket(socket);
-			socket.emit(CS.JOIN, playerName);
-		});
-		socket.on("error", () => {
-			toast("Couldnt Connect", { type: "error" });
-			goBack();
-		});
-		socket.on(
-			CC.INIT,
-			(
-				data:
-					| false
-					| true
-					| [number, number, number, [number, ...Player][]]
-			) => {
-				if (data === false) {
-					toast("Game Started", { type: "error" });
-					goBack();
-					return;
-				}
+			setClient(client);
+			const $ = getStateCallbacks(client);
 
-				if (typeof data === "boolean") {
-					toast("Password Incorrect", { type: "error" });
-					goBack();
-					return;
-				}
+			client.onStateChange.once((state) => {
+				state.players;
 
-				const [selfId, mapIndex, selfColor, players] = data;
-				setMap(mapIndex);
-				setPID(selfId);
-				playersMap.set(selfId, [playerName, selfColor, false]);
+				console.log("this is the first room state!", state);
 
-				for (const [pid, pname, pcolor, pready] of players) {
-					playersMap.set(pid, [pname, pcolor, pready]);
+
+				setMap(state.mapId);
+
+				for (const { id, name, color, ready } of state.players.values()) {
+					if (id === client.sessionId) {
+						setPID(color);
+					}
+
+					playersMap.set(color, [name, color, ready]);
 				}
 
 				setPlayers(playersMap);
-			}
-		);
+			});
 
-		socket.on(
-			CC.NEW_PLAYER,
-			([pid, name, color]: [number, string, number]) => {
-				playersMap.set(pid, [name, color, false]);
+			$(client.state).players.onAdd(() => {
 
-				setPlayers(new Map(playersMap));
-			}
-		);
+			});
 
-		socket.on(CC.START_GAME, () => {
-			setStartGameScreen(true);
-		});
+			$(client.state).players.onRemove(({ color }) => {
+				setPlayers((old) => {
+					if (!old) return;
+					old.delete(color);
 
-		socket.on(CC.READY, ([id, ready]: [number, boolean]) => {
-			playersMap.get(id)![2] = ready;
-			setPlayers(new Map(playersMap));
-		});
+					return new Map(old);
+				})
+			});
 
-		socket.on(CC.DISCONNECTED, (disconnectedID: number) => {
-			playersMap.delete(disconnectedID);
-			setPlayers(new Map(playersMap));
-		});
-		const disconnect = () => {
-			socket.disconnect();
-			setSocket(undefined);
-			setPlayers(undefined);
-		};
+			$(client.state).players.onAdd(({ color, name, ready }) => {
+				setPlayers((old) => {
+					if (!old) return;
+					old.set(color, [name, color, ready]);
+
+					return new Map(old);
+				})
+			});
+			$(client.state).players.onChange(({ color, name, ready }) => {
+				setPlayers((old) => {
+					if (!old) return;
+					old.set(color, [name, color, ready]);
+
+					return new Map(old);
+				})
+			})
+
+
+			client.onMessage(CC.START_GAME, () => {
+				setStartGameScreen(true);
+			});
+
+			disconnect = () => {
+				console.error('useRoomScreen: disconnect');
+
+				client.leave();
+				setClient(undefined);
+				setPlayers(undefined);
+			};
+
+		}).catch(() => {
+			disconnect();
+			console.error('useRoomScreen: catch');
+		})
 
 		window.onbeforeunload = window.onunload = () => {
+			console.error('useRoomScreen: onbeforeunload');
+
 			disconnect();
 		};
 
@@ -126,14 +128,14 @@ export const useRoomScreen = (
 	}, []);
 
 	useEffect(() => {
-		if (socket === undefined) return;
+		if (client === undefined) return;
 
-		socket.emit(CS.READY, ready);
-	}, [socket, ready]);
+		client.send(CS.READY, ready);
+	}, [client, ready]);
 
 	const disconnect = () => {
-		socket?.disconnect();
-		setSocket(undefined);
+		client?.leave();
+		setClient(undefined);
 		setPlayers(undefined);
 		goBack();
 	};
@@ -145,7 +147,7 @@ export const useRoomScreen = (
 		ready,
 		startGameScreen,
 		pid,
-		socket,
+		socket: client,
 		disconnect,
 		map,
 	};
