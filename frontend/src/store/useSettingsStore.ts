@@ -22,6 +22,7 @@ export type settingsType = {
     displayPillars: boolean;
     motionBlur: number;
     displayStars: boolean;
+    fogLevel: 1 | 2 | 3 | 4;
 };
 
 const defualtValue: settingsType = {
@@ -45,6 +46,7 @@ const defualtValue: settingsType = {
     displayWater: true,
     displayStars: true,
     motionBlur: 0.5,
+    fogLevel: 2,
 };
 
 type SettingsStore = settingsType & {

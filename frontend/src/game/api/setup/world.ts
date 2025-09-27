@@ -13,7 +13,7 @@ import {
     UnrealBloomPass,
 } from "three/examples/jsm/Addons.js";
 import Stats from "three/examples/jsm/libs/stats.module.js";
-import { colors } from "../../constants";
+import { colors, FOG } from "../../constants";
 import { AudioController } from "../../controller/AudioController";
 import { CameraController } from "../../controller/CameraController";
 import { MouseController } from "../../controller/MouseController";
@@ -95,7 +95,8 @@ function setupScene() {
     Global.renderer.shadowMap.enabled = true;
     Global.scene = new THREE.Scene();
     Global.scene.background = new THREE.Color(colors.background);
-    Global.scene.fog = new THREE.Fog(Global.scene.background, 10, 20);
+
+    Global.scene.fog = new THREE.Fog(Global.scene.background, FOG[Global.settings.fogLevel][1], FOG[Global.settings.fogLevel][2]);
 
     Global.lod = new THREE.LOD();
     Global.scene.add(Global.lod);
@@ -135,7 +136,7 @@ function setupRoad() {
     Global.roadMesh = roadsSegments;
 
     if (Global.settings.displayStars) {
-        const points = createStarfield(1000, 500);
+        const points = createStarfield(1000, 50);
         Global.lod.add(points);
     }
     if (Global.settings.displayFences) {

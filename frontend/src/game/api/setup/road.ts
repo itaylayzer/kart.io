@@ -509,10 +509,10 @@ export function createWater(
 export function createStarfield(radius: number, count: number) {
     const starGeometry = new THREE.BufferGeometry();
     const starMaterial = new THREE.PointsMaterial({
-        color: 0xff2b00,
-        opacity: 0.1,
+        color: 'white',
+        opacity: 0.2,
         transparent: true,
-        size: 5,
+        size: 10,
         fog: false,
     });
 

@@ -42,10 +42,11 @@ export function Play({
 
             <main
                 style={{
-                    backgroundColor: "rgba(8,8,8, 100%)",
+                    backgroundColor: "rgba(8,8,8, 0%)",
                     boxShadow: `0px 0px 10px 0px rgba(0, 0, 0, 50%)`,
                     borderRadius: 10,
                     zIndex: 12,
+                    visibility: "hidden",
                 }}
             >
                 <center>
@@ -66,7 +67,10 @@ export function Play({
             </main>
 
             <main>
-                <div id="pauseMenu">
+                <div
+                    id="pauseMenu"
+                    style={{ visibility: "hidden", pointerEvents: "none" }}
+                >
                     <h5>Game Paused</h5>
                     <p>but the server, keeps playing</p>
                     <center>

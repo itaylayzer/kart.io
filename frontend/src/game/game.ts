@@ -10,6 +10,7 @@ import { Scoreboard } from "./player/Scoreboard";
 import { WorldMap } from "./player/WorldMap";
 import { Global } from "./store/Global";
 import { KartClient } from "@/types/KartClient";
+import { FOG } from "./constants";
 
 const game = (
     assets: loadedAssets,
@@ -43,8 +44,7 @@ const game = (
             Global.elapsedTime = clock.getElapsedTime();
 
             for (const mesh of Global.optimizedObjects) {
-                mesh.visible =
-                    mesh.position.distanceTo(Global.camera.position) < 50;
+                mesh.visible = mesh.position.distanceTo(Global.camera.position) < FOG[Global.settings.fogLevel][0];
             }
 
             Global.updates
