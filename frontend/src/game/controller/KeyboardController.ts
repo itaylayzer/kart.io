@@ -83,7 +83,7 @@ export class KeyboardController extends IKeyboardController {
             data.push(local.quaternion.w);
         }
 
-        Global.socket?.emitWithAck(CS.KEY_DOWN, msgpack.encode(data));
+        // Global.socket?.emitWithAck(CS.KEY_DOWN, msgpack.encode(data));
     }
 
     private onKeyUp(event: KeyboardEvent) {
@@ -104,6 +104,6 @@ export class KeyboardController extends IKeyboardController {
             data.push(local.quaternion.w);
         }
 
-        Global.socket?.emitWithAck(CS.KEY_UP, msgpack.encode([event.which]));
+        // Global.socket?.emitWithAck(CS.KEY_UP, msgpack.encode([event.which]));
     }
 }

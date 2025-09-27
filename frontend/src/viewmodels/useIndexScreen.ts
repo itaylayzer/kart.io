@@ -79,7 +79,6 @@ export const useIndexScreen = () => {
 		playerName: currentPlayerName,
 		setPlayerName,
 		screenIndex,
-		setScreen,
 		loadRooms,
 		rooms,
 		onPlayButton

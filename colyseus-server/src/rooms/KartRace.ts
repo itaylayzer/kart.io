@@ -1,13 +1,15 @@
 import { Room, Client, AuthContext, Delayed } from "@colyseus/core";
 import { KartRaceState, PlayerSchema } from "./schema/KartRaceState";
-import { roadUtils } from "@/utils/roadUtils";
+import { roadUtils as RoadUtils } from "@/utils/roadUtils";
 import { KartScene } from "@/scenes/KartScene";
-import { CS } from "@shared/types/codes";
+import { CC, CS } from "@shared/types/codes";
+import { randInt } from "three/src/math/MathUtils";
 
 export class KartRace extends Room<KartRaceState, { hasPassword: boolean, roomName: string }> {
   maxClients = 16;
   autoDispose = false;
   state = new KartRaceState();
+  private roadUtils: ReturnType<typeof RoadUtils>;
   private scene: KartScene;
   private password: string;
   private firstJoinTimer: Delayed;
@@ -32,6 +34,7 @@ export class KartRace extends Room<KartRaceState, { hasPassword: boolean, roomNa
     }, 60_000);
 
     this.setMetadata({ hasPassword: options.password.length > 0, roomName: options.roomName })
+    this.roadUtils = RoadUtils(options.mapId);
 
     this.state.mapId = options.mapId;
     this.password = options.password;
@@ -48,12 +51,34 @@ export class KartRace extends Room<KartRaceState, { hasPassword: boolean, roomNa
         this.lock();
       }
     });
+
+    this.onMessage(CS.TOUCH_MYSTERY, (client, id: number) => {
+      const toggleMystery = (id: number, visible: boolean) => {
+        this.state.mysteries[id] = this.state.mysteries[id].assign({ visible }).clone();
+      }
+      toggleMystery(id, false);
+
+      client.send(CC.MYSTERY_ITEM, randInt(0, 4));
+
+      setTimeout(() => {
+        toggleMystery(id, true);
+      }, 1000);
+    })
   }
 
   onGameStart() {
     this.state.startTime = Date.now() + 5_000;
 
     this.scene = new KartScene(this.state.mapId, this.state.mysteries, this.state.players);
+
+    const generator = this.roadUtils.positionsGenerator();
+    this.state.players.forEach((player, key) => {
+      this.state.players.set(key, player.assign({ startTransform: generator() }).clone())
+    })
+
+    this.clock.setTimeout(() => {
+      this.clients.forEach(client => (client.send(CC.START_GAME)));
+    }, this.patchRate * 3);
   }
 
   onJoin(client: Client, options: { playerName: string }) {

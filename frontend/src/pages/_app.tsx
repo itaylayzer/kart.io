@@ -1,3 +1,5 @@
+import "reflect-metadata";
+
 import "@/styles/globals.css";
 import "@/styles/audio.css";
 import "react-toastify/dist/ReactToastify.css";

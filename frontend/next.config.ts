@@ -4,7 +4,15 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactStrictMode: false,
   basePath: "/kart.io",
-  output: "export"
+  output: "export",
+
+  transpilePackages: [
+    "@colyseus/schema"           // make sure schema package is transpiled
+  ],
+
+  experimental: {
+    externalDir: true,           // lets Next process ../colyseus-server sources
+  },
 };
 
 export default nextConfig;

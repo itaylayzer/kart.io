@@ -51,10 +51,10 @@ export class DriveController {
                 intercetions.length === 0
                     ? undefined
                     : intercetions.length === 1
-                    ? intercetions[0]
-                    : intercetions.reduce((a, b) =>
-                          a.distance > b.distance ? b : a
-                      );
+                        ? intercetions[0]
+                        : intercetions.reduce((a, b) =>
+                            a.distance > b.distance ? b : a
+                        );
 
             if (
                 closestIntersection === undefined ||
@@ -115,19 +115,19 @@ export class DriveController {
         islocal &&
             setInterval(() => {
                 if (rocketMode || shakeMode || body.velocity.isZero()) return;
-                Global.socket?.emit(
-                    CS.UPDATE_TRANSFORM,
-                    msgpack.encode([
-                        body.pid,
-                        body.position.x,
-                        body.position.y,
-                        body.position.z,
-                        body.quaternion.x,
-                        body.quaternion.y,
-                        body.quaternion.z,
-                        body.quaternion.w,
-                    ])
-                );
+                // Global.socket?.emit(
+                //     CS.UPDATE_TRANSFORM,
+                //     msgpack.encode([
+                //         body.pid,
+                //         body.position.x,
+                //         body.position.y,
+                //         body.position.z,
+                //         body.quaternion.x,
+                //         body.quaternion.y,
+                //         body.quaternion.z,
+                //         body.quaternion.w,
+                //     ])
+                // );
             }, 1000);
 
         const keyboardUpdate = () => {
@@ -169,13 +169,13 @@ export class DriveController {
             // Apply forward/reverse force
             const drivingForce = forward.scale(
                 keyboard.vertical *
-                    (maxSpeed +
-                        +turboMode * maxSpeed +
-                        driftSpeedMultiplier +
-                        timeSpeedMultiplier) *
-                    2 *
-                    +!shakeMode *
-                    +!StartTimer.locked
+                (maxSpeed +
+                    +turboMode * maxSpeed +
+                    driftSpeedMultiplier +
+                    timeSpeedMultiplier) *
+                2 *
+                +!shakeMode *
+                +!StartTimer.locked
             );
             // Calculate and apply friction (simplified)
             const velocity = body.velocity.clone();

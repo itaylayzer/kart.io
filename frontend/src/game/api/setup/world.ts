@@ -38,7 +38,8 @@ import { Wheels } from "../../player/Items/Wheel";
 import { TrackerController } from "../../controller/TrackerController";
 import { Scoreboard } from "../../player/Scoreboard";
 import { StartTimer } from "../../player/StartTimer";
-import { GlobalStyles } from "@mui/material";
+import { KartClient } from "@/types/KartClient";
+import { getStateCallbacks } from "colyseus.js";
 
 function setupLights() {
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 1);
@@ -211,11 +212,11 @@ function setupRoad() {
 }
 
 function setupSocket(
-    socket: Socket,
+    client: KartClient,
     localID: number,
     players: Map<number, [string, number, boolean]>
 ) {
-    Global.socket = socket;
+    Global.client = client;
 
     for (const [playerID, playerInfo] of players.entries()) {
         if (localID === playerID)
@@ -223,75 +224,86 @@ function setupSocket(
         else new OnlinePlayer(playerID, playerInfo[0], playerInfo[1]);
     }
 
-    Global.socket.on(
-        CC.INIT_GAME,
-        ([playerTransforms, mysteryBoxLocations, startTime]: [
-            [number, number[]][],
-            number[],
-            number
-        ]) => {
-            for (const [playerID, ptTransform] of playerTransforms) {
-                const xplayer = Player.clients.get(playerID);
-                if (xplayer === undefined) continue;
-                xplayer.applyTransform(ptTransform);
-                xplayer.tracker.reset();
-            }
-            AudioController.init();
+    const $ = getStateCallbacks(client);
 
-            const pts = createVectorsFromNumbers(mysteryBoxLocations);
-            for (const [id, p] of pts.entries()) {
-                new MysteryBox(id, new CANNON.Vec3(p.x, p.y, p.z));
-            }
-            requestAnimationFrame(() => {
-                Global.container.appendChild(Global.renderer.domElement);
-                Global.lockController.lock();
-            });
+    $(client.state).mysteries.onChange((mystery, index) => {
+        MysteryBox.toggleMystery(index, mystery.visible);
+    })
 
-            StartTimer.start(startTime);
+    StartTimer.start(client.state.startTime);
+
+
+    requestAnimationFrame(() => {
+        Global.container.appendChild(Global.renderer.domElement);
+        Global.lockController.lock();
+    });
+
+    client.state.mysteries.forEach(({ position: { x, y, z } }, id) => {
+        new MysteryBox(id, new CANNON.Vec3(x, y, z));
+    })
+
+    client.state.players.forEach(({ color, startTransform }, key) => {
+        const xplayer = Player.clients.get(color);
+        if (xplayer === undefined) return;
+        {
+            const { x, y, z } = startTransform.position;
+            xplayer.position.set(x, y, z);
         }
-    );
 
-    Global.socket.on(CC.MYSTERY_ITEM, (itemIndex) => {
+        {
+            const { x, y, z, w } = startTransform.quaternion;
+            xplayer.quaternion.set(x, y, z, w);
+        }
+
+        xplayer.velocity.setZero();
+        xplayer.force.setZero();
+
+        xplayer.tracker.reset();
+    })
+
+    AudioController.init();
+
+    client.onMessage(CC.MYSTERY_ITEM, (itemIndex: number) => {
         LocalPlayer.getInstance().items.setItem(itemIndex);
-    });
+    })
 
-    Global.socket?.on(CC.KEY_DOWN, (args: { pid: number; buffer: Buffer }) => {
-        const xplayer = Player.clients.get(args.pid);
+    // Global.socket?.on(CC.KEY_DOWN, (args: { pid: number; buffer: Buffer }) => {
+    //     const xplayer = Player.clients.get(args.pid);
 
-        const [key, ...data] = msgpack.decode(
-            new Uint8Array(args.buffer)
-        ) as number[];
-        if (data.length) {
-            const [x, y, z, rx, ry, rz, rw] = data;
-            xplayer?.position.set(x, y, z);
-            xplayer?.quaternion.set(rx, ry, rz, rw);
-        }
-        xplayer?.keyboard.keysDown.add(key);
-    });
+    //     const [key, ...data] = msgpack.decode(
+    //         new Uint8Array(args.buffer)
+    //     ) as number[];
+    //     if (data.length) {
+    //         const [x, y, z, rx, ry, rz, rw] = data;
+    //         xplayer?.position.set(x, y, z);
+    //         xplayer?.quaternion.set(rx, ry, rz, rw);
+    //     }
+    //     xplayer?.keyboard.keysDown.add(key);
+    // });
 
-    Global.socket?.on(CC.UPDATE_TRANSFORM, (buffer: Buffer) => {
-        const [pid, ...data] = msgpack.decode(
-            new Uint8Array(buffer)
-        ) as number[];
-        const xplayer = Player.clients.get(pid);
-        const [x, y, z, rx, ry, rz, rw] = data;
-        xplayer?.position.set(x, y, z);
-        xplayer?.quaternion.set(rx, ry, rz, rw);
-    });
+    // Global.socket?.on(CC.UPDATE_TRANSFORM, (buffer: Buffer) => {
+    //     const [pid, ...data] = msgpack.decode(
+    //         new Uint8Array(buffer)
+    //     ) as number[];
+    //     const xplayer = Player.clients.get(pid);
+    //     const [x, y, z, rx, ry, rz, rw] = data;
+    //     xplayer?.position.set(x, y, z);
+    //     xplayer?.quaternion.set(rx, ry, rz, rw);
+    // });
 
-    Global.socket?.on(CC.FINISH_LINE, (pid: number) => {
-        TrackerController.FINALS.push(pid);
-    });
+    // Global.socket?.on(CC.FINISH_LINE, (pid: number) => {
+    //     TrackerController.FINALS.push(pid);
+    // });
 
     Scoreboard.finishMacth = false;
-    Global.socket?.on(CC.SHOW_WINNERS, () => {
-        // TODO: SHOW NEXT SCREEN
-        Scoreboard.finishMacth = true;
-        Global.lockController.unlock();
-        console.warn("finished");
-    });
+    // Global.socket?.on(CC.SHOW_WINNERS, () => {
+    //     // TODO: SHOW NEXT SCREEN
+    //     Scoreboard.finishMacth = true;
+    //     Global.lockController.unlock();
+    //     console.warn("finished");
+    // });
 
-    Global.socket?.on(
+    Global.client.onMessage(
         CC.APPLY_MYSTERY,
         ([xpid, mysteryNum, ...rest]: number[]) => {
             if (mysteryNum === 0) {
@@ -328,40 +340,34 @@ function setupSocket(
             }
         }
     );
-    Global.socket?.on(CC.KEY_UP, (args: { pid: number; buffer: Buffer }) => {
-        const xplayer = Player.clients.get(args.pid);
-        const [key, ...data] = msgpack.decode(
-            new Uint8Array(args.buffer)
-        ) as number[];
-        if (data.length) {
-            const [x, y, z, rx, ry, rz, rw] = data;
-            xplayer?.position.set(x, y, z);
-            xplayer?.quaternion.set(rx, ry, rz, rw);
-        }
-        xplayer?.keyboard.keysUp.add(key);
-        xplayer?.keyboard.keysPressed.delete(key);
-    });
+    // Global.socket?.on(CC.KEY_UP, (args: { pid: number; buffer: Buffer }) => {
+    //     const xplayer = Player.clients.get(args.pid);
+    //     const [key, ...data] = msgpack.decode(
+    //         new Uint8Array(args.buffer)
+    //     ) as number[];
+    //     if (data.length) {
+    //         const [x, y, z, rx, ry, rz, rw] = data;
+    //         xplayer?.position.set(x, y, z);
+    //         xplayer?.quaternion.set(rx, ry, rz, rw);
+    //     }
+    //     xplayer?.keyboard.keysUp.add(key);
+    //     xplayer?.keyboard.keysPressed.delete(key);
+    // });
 
-    Global.socket?.on(CC.DISCONNECTED, (disconnectedID) => {
-        OnlinePlayer.clients.get(disconnectedID)?.disconnect();
-    });
+    $(client.state).players.onRemove(({ color }) => {
+        OnlinePlayer.clients.get(color)?.disconnect();
 
-    Global.socket?.on(
-        CC.MYSTERY_VISIBLE,
-        ([id, isVisible]: [number, boolean]) => {
-            MysteryBox.toggleMystery(id, isVisible);
-        }
-    );
-    Global.socket?.on("disconnect", () => {
-        Global.socket = undefined;
-    });
+    })
 
-    Global.socket.emit(CS.INIT_GAME);
+    client.onLeave.once = () => {
+        Global.goBack();
+    };
+
     window.addEventListener("beforeunload", () => {
-        Global.socket?.disconnect();
+        Global.client.leave();
     });
     window.addEventListener("unload", () => {
-        Global.socket?.disconnect();
+        Global.client.leave();
     });
 }
 function setupRenderer() {
@@ -449,7 +455,7 @@ function setupSTATS() {
 }
 
 export default function (
-    socket: Socket,
+    client: KartClient,
     pid: number,
     players: Map<number, [string, number, boolean]>
 ) {
@@ -467,6 +473,6 @@ export default function (
     setupSTATS();
 
     requestAnimationFrame(() => {
-        setupSocket(socket, pid, players);
+        setupSocket(client, pid, players);
     });
 }

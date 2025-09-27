@@ -2,9 +2,21 @@ import { ArraySchema, MapSchema, Schema, type } from "@colyseus/schema";
 
 
 export class VectorSchema extends Schema {
-  @type("float32") x: number;
-  @type("float32") y: number;
-  @type("float32") z: number;
+  @type("float32") x: number = 0;
+  @type("float32") y: number = 0;
+  @type("float32") z: number = 0;
+}
+
+export class QuaternionSchema extends Schema {
+  @type("float32") x: number = 0;
+  @type("float32") y: number = 0;
+  @type("float32") z: number = 0;
+  @type("float32") w: number = 0;
+}
+
+export class TransformSchema extends Schema {
+  @type(VectorSchema) position: VectorSchema = new VectorSchema();
+  @type(QuaternionSchema) quaternion: QuaternionSchema = new QuaternionSchema();
 }
 
 export class PlayerSchema extends Schema {
@@ -12,11 +24,12 @@ export class PlayerSchema extends Schema {
   @type("string") name = "Guest";
   @type("uint8") color: number = 0;
   @type("string") id: string = "-1";
+  @type(TransformSchema) startTransform: TransformSchema = new TransformSchema();
 }
 
 export class MysteryBoxSchema extends Schema {
-  @type("uint8") index: number;
-  @type(VectorSchema) position: VectorSchema;
+  @type("uint8") index: number = 0;
+  @type(VectorSchema) position: VectorSchema = new VectorSchema();
   @type("boolean") visible: boolean = true;
 }
 

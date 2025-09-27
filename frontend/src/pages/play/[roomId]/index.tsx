@@ -8,6 +8,7 @@ import { AudioContainer } from "@/lib/AudioContainer";
 import { useRoomScreen } from "@/viewmodels/useRoomScreen";
 import { useRouter } from "next/router";
 import { GoDotFill } from "react-icons/go";
+import { ShaderScripts } from "@/components/ShaderScripts";
 
 export default function () {
     const [room] = useRoom();
@@ -191,6 +192,7 @@ export default function () {
                         </main>
                     }
                 />
+                <ShaderScripts />
             </>
         );
     };

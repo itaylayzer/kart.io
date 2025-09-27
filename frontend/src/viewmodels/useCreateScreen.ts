@@ -33,7 +33,7 @@ export const useCreateScreen = () => {
                 roomPassword.length > 0,
                 roomPassword,
             );
-            router.push(`/room/${response.data}`);
+            router.push(`/play/${response.data}`);
 
         } catch (err) {
             toast("Cannot Connect", {

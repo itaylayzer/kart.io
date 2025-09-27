@@ -8,6 +8,7 @@ import { PlayerModel } from "./PlayerModel";
 import { TrackerController } from "../controller/TrackerController";
 import { AudioController } from "../controller/AudioController";
 import { ItemController } from "../controller/ItemController";
+import { TransformSchema } from "@schema/KartRaceState";
 
 export const COLORS = [
     "#f56505",
@@ -117,20 +118,5 @@ export class Player extends PhysicsObject {
 
         Global.world.addBody(this);
         Global.lod.add(this.model);
-    }
-
-    public applyTransform(transform: number[]) {
-        [
-            this.position.x,
-            this.position.y,
-            this.position.z,
-            this.quaternion.x,
-            this.quaternion.y,
-            this.quaternion.z,
-            this.quaternion.w,
-        ] = transform;
-
-        this.velocity.setZero();
-        this.force.setZero();
     }
 }

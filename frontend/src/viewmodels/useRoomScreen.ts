@@ -9,13 +9,13 @@ import Config from "@/config";
 import { KartClient } from "@/types/KartClient";
 import { KartRaceState } from '@schema/KartRaceState';
 import { getStateCallbacks } from "colyseus.js";
+import { StorageRoom } from "@/hooks/useRoom";
+import { NextRouter } from "next/router";
 type Player = [string, number, boolean];
 
 export const useRoomScreen = (
-	room: string,
-	goBack: () => void,
-	needPassword: boolean,
-	tryPassword: string | undefined
+	room: StorageRoom,
+	router: NextRouter
 ) => {
 	const [players, setPlayers] = useState<Map<number, Player>>();
 	const [ready, toggleReady] = useToggle(false);
@@ -25,6 +25,11 @@ export const useRoomScreen = (
 	const [pid, setPID] = useState<number>(0);
 	const isConnected = client !== undefined;
 	const [map, setMap] = useState<number>(0);
+
+	const goBack = () => {
+		router.push('/');
+	}
+
 	useEffect(() => {
 		console.error('useRoomScreen: start');
 
@@ -33,14 +38,14 @@ export const useRoomScreen = (
 		const playersMap = new Map<number, Player>();
 
 		let password = "";
-		if (needPassword) {
-			if (tryPassword === undefined) {
+		if (room.hasPassword) {
+			if (room.password === undefined) {
 				password = prompt("Room password") ?? "";
 			} else {
-				password = tryPassword;
+				password = room.password;
 			}
 		}
-		global.colyseus.joinById<KartRaceState>(room, { password, playerName }).then((client) => {
+		global.colyseus.joinById<KartRaceState>(room.id, { password, playerName }).then((client) => {
 			client.onError(() => {
 				toast("Couldnt Connect", { type: "error" });
 				goBack();

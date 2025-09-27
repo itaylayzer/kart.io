@@ -25,12 +25,12 @@ export const roadUtils = (mapId: number) => {
         mysteries(array: ArraySchema<MysteryBoxSchema>) {
             calculatesMysteries(array, curve, 700);
         },
+        positionsGenerator() {
+            return createStartLocationsGenerator(
+                curve.getPoints(1000),
+                1000,
+                990
+            );
+        }
     }
-
-    const startsLocationsGenerator = createStartLocationsGenerator(
-        curve.getPoints(1000),
-        1000,
-        990
-    );
-    // return { mysteryLocations, startsLocationsGenerator };
 }
