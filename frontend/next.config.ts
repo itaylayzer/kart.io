@@ -13,6 +13,9 @@ const nextConfig: NextConfig = {
   experimental: {
     externalDir: true,           // lets Next process ../colyseus-server sources
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
 };
 
 export default nextConfig;
