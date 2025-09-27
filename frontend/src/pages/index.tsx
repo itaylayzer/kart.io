@@ -1,18 +1,10 @@
-import { ToastContainer } from "react-toastify";
 import { Listed } from "../components/Listed";
 import { useIndexScreen } from "../viewmodels/useIndexScreen";
-import { Room } from "@/app/Room";
 import AssetLoader from "../components/AssetLoader";
 import { FidgetSpinner } from "react-loader-spinner";
 import { BiErrorAlt } from "react-icons/bi";
-import { Settings } from "@/app/Settings";
 import { AudioContainer } from "../lib/AudioContainer";
-import {
-    Button,
-    TextField,
-    ToggleButton,
-    ToggleButtonGroup,
-} from "@mui/material";
+import { Button, TextField } from "@mui/material";
 import { FaLock } from "react-icons/fa";
 import { useRouter } from "next/router";
 import { useRoom } from "@/hooks/useRoom";
@@ -22,7 +14,6 @@ function Index() {
         loadRooms,
         rooms,
         screenIndex,
-        setScreen,
         playerName,
         setPlayerName,
         onPlayButton,
@@ -156,7 +147,7 @@ function Index() {
                                                                 undefined
                                                             );
                                                             router.push(
-                                                                `/room/${r.roomId}/`
+                                                                `/play/${r.roomId}/`
                                                             );
                                                         }}
                                                     >

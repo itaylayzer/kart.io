@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-type StorageRoom = { id: string, name: string, hasPassword: boolean, password: string | undefined }
+export type StorageRoom = { id: string, name: string, hasPassword: boolean, password: string | undefined }
 
 export const useRoom = () => {
     const [_room, _setRoom] = useState<StorageRoom>();

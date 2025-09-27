@@ -1,4 +1,4 @@
-import { Settings } from "@/app/Settings";
+import { Settings } from "@/components/Settings";
 import AssetLoader from "@/components/AssetLoader";
 import { AudioContainer } from "@/lib/AudioContainer";
 import { useRouter } from "next/router";
