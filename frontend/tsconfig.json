@@ -17,12 +17,20 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
+
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "useDefineForClassFields": false,
+
     "paths": {
       "@/*": [
         "./src/*"
       ],
       "@shared/*": [
         "./src/shared/*"
+      ],
+      "@schema/*" : [
+        "../colyseus-server/src/rooms/schema/*"
       ]
     },
     "plugins": [
@@ -35,7 +43,8 @@
     "**/*.ts",
     "**/*.tsx",
     "next-env.d.ts",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "src/config/global.d.ts"
   ],
   "exclude": [
     "node_modules"

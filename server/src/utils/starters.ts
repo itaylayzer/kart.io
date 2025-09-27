@@ -1,3 +1,4 @@
+import { QuaternionSchema, TransformSchema, VectorSchema } from "@/rooms/schema/KartRaceState";
 import * as THREE from "three";
 
 const pointsInHorizontal = [0, 1, -1, 2, -2];
@@ -30,14 +31,19 @@ export function createStartLocationsGenerator(
             right.multiplyScalar(1.5 * pointsInHorizontal[horizontalIndex])
         );
         horizontalIndex++;
-        return [
-            dummy.position.x,
-            dummy.position.y,
-            dummy.position.z,
-            dummy.quaternion.x,
-            dummy.quaternion.y,
-            dummy.quaternion.z,
-            dummy.quaternion.w,
-        ];
+
+        return new TransformSchema().assign({
+            position: new VectorSchema().assign({
+                x: dummy.position.x,
+                y: dummy.position.y,
+                z: dummy.position.z
+            }),
+            quaternion: new QuaternionSchema().assign({
+                x: dummy.quaternion.x,
+                y: dummy.quaternion.y,
+                z: dummy.quaternion.z,
+                w: dummy.quaternion.w,
+            })
+        });
     };
 }

@@ -51,10 +51,10 @@ export class DriveController {
                 intercetions.length === 0
                     ? undefined
                     : intercetions.length === 1
-                    ? intercetions[0]
-                    : intercetions.reduce((a, b) =>
-                          a.distance > b.distance ? b : a
-                      );
+                        ? intercetions[0]
+                        : intercetions.reduce((a, b) =>
+                            a.distance > b.distance ? b : a
+                        );
 
             if (
                 closestIntersection === undefined ||
@@ -115,7 +115,7 @@ export class DriveController {
         islocal &&
             setInterval(() => {
                 if (rocketMode || shakeMode || body.velocity.isZero()) return;
-                Global.socket?.emit(
+                Global.client.send(
                     CS.UPDATE_TRANSFORM,
                     msgpack.encode([
                         body.pid,
@@ -169,13 +169,13 @@ export class DriveController {
             // Apply forward/reverse force
             const drivingForce = forward.scale(
                 keyboard.vertical *
-                    (maxSpeed +
-                        +turboMode * maxSpeed +
-                        driftSpeedMultiplier +
-                        timeSpeedMultiplier) *
-                    2 *
-                    +!shakeMode *
-                    +!StartTimer.locked
+                (maxSpeed +
+                    +turboMode * maxSpeed +
+                    driftSpeedMultiplier +
+                    timeSpeedMultiplier) *
+                2 *
+                +!shakeMode *
+                +!StartTimer.locked
             );
             // Calculate and apply friction (simplified)
             const velocity = body.velocity.clone();

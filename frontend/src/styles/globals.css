@@ -362,3 +362,16 @@ div#position div {
         opacity: 0;
     }
 }
+
+@keyframes rotate-animations {
+    0% {
+        rotate: 0deg;
+    }
+    100% {
+        rotate: 359deg;
+    }
+}
+
+.animate-rotate {
+    animation: rotate-animations linear 1s infinite;
+}

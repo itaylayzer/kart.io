@@ -23,6 +23,7 @@ import { Socket } from "socket.io-client";
 import * as CANNON from "cannon-es";
 import { settingsType } from "@/store/useSettingsStore";
 import Stats from "three/examples/jsm/libs/stats.module.js";
+import { KartClient } from "@/types/KartClient";
 
 export class Global {
     public static mouseController: MouseController;
@@ -40,7 +41,7 @@ export class Global {
     public static localPlayer: LocalPlayer;
     public static system: System;
     public static roadMesh: Mesh[];
-    public static socket: Socket | undefined;
+    public static client: KartClient;
     public static world: CANNON.World;
     public static lod: LOD;
     public static composer: EffectComposer;

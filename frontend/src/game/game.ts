@@ -1,4 +1,3 @@
-import { Socket } from "socket.io-client";
 import * as THREE from "three";
 import System, { SpriteRenderer } from "three-nebula";
 import { loadedAssets } from "../store/useAssetLoader";
@@ -10,10 +9,11 @@ import { PhysicsObject } from "./physics/PhysicsMesh";
 import { Scoreboard } from "./player/Scoreboard";
 import { WorldMap } from "./player/WorldMap";
 import { Global } from "./store/Global";
+import { KartClient } from "@/types/KartClient";
 
 const game = (
     assets: loadedAssets,
-    socket: Socket,
+    client: KartClient,
     pid: number,
     players: Map<number, [string, number, boolean]>,
     settings: settingsType,
@@ -27,7 +27,7 @@ const game = (
     );
 
     const scoreboard = new Scoreboard();
-    setupWorld(socket, pid, players);
+    setupWorld(client, pid, players);
 
     Global.system = new System();
     Global.system.addRenderer(new SpriteRenderer(Global.scene, THREE));
@@ -86,7 +86,7 @@ const game = (
     Global.goBack = () => {
         setTimeout(() => {
             try {
-                Global.socket?.disconnect();
+                Global.client.leave();
             } catch { }
 
             Global.renderer.dispose();
@@ -100,7 +100,7 @@ const game = (
 
     return {
         destroyer: () => {
-            // Global.goBack();
+            Global.goBack();
         },
     };
 };

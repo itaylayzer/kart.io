@@ -1,0 +1,15 @@
+export const assetsList = {
+    car: "/kart.io/fbx/kart.glb",
+    mystery: "/kart.io/textures/mystery.png",
+    block: "/kart.io/textures/blocks2.png",
+    sfx_slow: "/kart.io/sfx/engine_heavy_slow_loop.mp3",
+    sfx_fast: "/kart.io/sfx/engine_heavy_fast_loop.mp3",
+    sfx_avg: "/kart.io/sfx/engine_heavy_average_loop.mp3",
+    dudvMap: "/kart.io/textures/hOIsXiZ.png",
+    banana: "/kart.io/fbx/low_poly_banana.glb",
+    boots: "/kart.io/fbx/turbo.glb",
+    rocket: "/kart.io/fbx/rocket_ship.glb",
+    wheel: "/kart.io/fbx/blue_shell_-_low_poly_mario_kart_fan_art.glb",
+    dust: "/kart.io/fbx/dust.glb",
+    mushroom: "/kart.io/fbx/low_poly_mushroom.glb",
+} as Record<string, string>;

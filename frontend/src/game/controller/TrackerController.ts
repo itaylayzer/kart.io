@@ -64,7 +64,7 @@ export class TrackerController {
                 this.round++;
                 if (isLocal && this.round >= MAX_ROUNDS) {
                     toast("You Can Switch Cameras Now", { type: "info" });
-                    Global.socket?.emit(CS.FINISH_LINE);
+                    Global.client.send(CS.FINISH_LINE);
                 }
             }
             if (forwardPos[0] === 0 && this.lastIndex === 1) {
@@ -75,7 +75,7 @@ export class TrackerController {
             dummy.position.copy(forwardPos[1]);
             dummy.lookAt(
                 TrackerController.points[
-                    (forwardPos[0] + 1) % TrackerController.points.length
+                (forwardPos[0] + 1) % TrackerController.points.length
                 ]
             );
 
@@ -104,7 +104,7 @@ export class TrackerController {
             );
             dummy.lookAt(
                 TrackerController.points[
-                    (this.lastIndex + 1) % TrackerController.ls
+                (this.lastIndex + 1) % TrackerController.ls
                 ]
             );
 
@@ -145,9 +145,8 @@ export class TrackerController {
             roundInMatch,
             0
         )} / 3</p>`;
-        positionHTML.item(1).innerHTML = `<p>${posInMatch} ${
-            ["st", "th", "rd", "th"][Math.min(posInMatch - 1, 3)]
-        }</p>`;
+        positionHTML.item(1).innerHTML = `<p>${posInMatch} ${["st", "th", "rd", "th"][Math.min(posInMatch - 1, 3)]
+            }</p>`;
     }
     public static getScoreboard(): [string, string, number, number][] {
         return this.sortedTrackers.map(

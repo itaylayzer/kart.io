@@ -48,7 +48,7 @@ export class ItemController {
                     );
                 }
 
-                Global.socket?.emit(CS.APPLY_MYSTERY, data);
+                Global.client.send(CS.APPLY_MYSTERY, data);
             }
             upperItem?.update();
         };

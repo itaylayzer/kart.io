@@ -1,6 +1,9 @@
+import { MysteryBoxSchema, VectorSchema } from "@/rooms/schema/KartRaceState";
 import * as THREE from "three";
+import { ArraySchema } from "@colyseus/schema";
 
-export function createMysteryBoxes(
+export function calculatesMysteries(
+    array: ArraySchema<MysteryBoxSchema>,
     curve: THREE.CatmullRomCurve3,
     ls: number,
     devideVertical: number = 10
@@ -9,8 +12,6 @@ export function createMysteryBoxes(
 
     const dummyHorizontal = new THREE.Object3D();
     const dummyVertical = new THREE.Object3D();
-
-    let mysteryBoxLocations: number[] = [];
 
     const devideHorizontal = 5;
     for (let x = 0; x < devideVertical + 1; x++) {
@@ -36,13 +37,12 @@ export function createMysteryBoxes(
                     )
                 );
 
-            mysteryBoxLocations.push(
-                dummyHorizontal.position.x,
-                dummyHorizontal.position.y,
-                dummyHorizontal.position.z
-            );
+            const position = new VectorSchema().assign(dummyHorizontal.position)
+            const mysteryBox = new MysteryBoxSchema().assign({ index: array.length, visible: true, position });
+
+            array.push(mysteryBox)
+
         }
     }
 
-    return mysteryBoxLocations;
 }
