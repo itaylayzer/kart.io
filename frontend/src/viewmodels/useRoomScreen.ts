@@ -4,7 +4,6 @@ import { io, Socket } from "socket.io-client";
 import { CC, CS } from "@shared/types/codes";
 import { toast } from "react-toastify";
 import { useSettingsStore } from "../store/useSettingsStore";
-import { ip, ip_path } from "./useIndexScreen";
 import Config from "@/config";
 import { KartClient } from "@/types/KartClient";
 import { KartRaceState } from '@schema/KartRaceState';

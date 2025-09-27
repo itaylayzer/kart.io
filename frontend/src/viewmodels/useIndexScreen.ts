@@ -5,8 +5,6 @@ import { audio } from "../lib/AudioContainer";
 import Config from "@/config";
 import { RoomData } from "@/types/room";
 
-export const ip = Config.BASE_URL!;
-export const ip_path = Config.PATH ?? "";
 
 export const useIndexScreen = () => {
 	const settingsStore = useSettingsStore();
