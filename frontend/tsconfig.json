@@ -30,7 +30,7 @@
         "./src/shared/*"
       ],
       "@schema/*" : [
-        "../colyseus-server/src/rooms/schema/*"
+        "../server/src/rooms/schema/*"
       ]
     },
     "plugins": [
