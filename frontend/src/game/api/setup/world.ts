@@ -1,7 +1,6 @@
 import * as CANNON from "cannon-es";
 import CannonDebugger from "cannon-es-debugger";
 import msgpack from "msgpack-lite";
-import { Socket } from "socket.io-client";
 import * as THREE from "three";
 import {
     BlendShader,

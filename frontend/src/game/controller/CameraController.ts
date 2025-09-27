@@ -82,14 +82,14 @@ export class CameraController {
                     .clone()
                     .multiplyScalar(
                         -1 / 2 +
-                            (-(
-                                vertical * (1 + this.turboMode) +
-                                Math.abs(
-                                    driftSide - Math.abs(driftSide) * horizontal
-                                )
-                            ) *
-                                Global.settings.fovChange) /
-                                5
+                        (-(
+                            vertical * (1 + this.turboMode) +
+                            Math.abs(
+                                driftSide - Math.abs(driftSide) * horizontal
+                            )
+                        ) *
+                            Global.settings.fovChange) /
+                        5
                     )
             )
             .add(rightVec.clone().multiplyScalar(0.5 / 2))

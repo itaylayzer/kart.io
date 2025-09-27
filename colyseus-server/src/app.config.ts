@@ -1,14 +1,18 @@
 import config from "@colyseus/tools";
 import { monitor } from "@colyseus/monitor";
 import { playground } from "@colyseus/playground";
-import { matchMaker } from "colyseus";
+import { LocalDriver, LocalPresence, matchMaker } from "colyseus";
 /**
  * Import your Room files
  */
 import { KartRace } from "./rooms/KartRace";
+import cors from 'cors';
 
 export default config({
-
+    options: {
+        driver: new LocalDriver(),
+        presence: new LocalPresence()
+    },
     initializeGameServer: (gameServer) => {
         /**
          * Define your room handlers:
@@ -18,6 +22,7 @@ export default config({
     },
 
     initializeExpress: (app) => {
+        app.use(cors({ origin: process.env.ORIGIN ?? "*" }))
         /**
          * Bind your custom express routes here:
          * Read more: https://expressjs.com/en/starter/basic-routing.html

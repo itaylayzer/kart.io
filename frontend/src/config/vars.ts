@@ -1,2 +1,3 @@
 import { Client as ColyseusClient } from 'colyseus.js';
-global.colyseus = new ColyseusClient("ws://localhost:2567");
+import CONFIG from "@/config";
+global.colyseus = new ColyseusClient(CONFIG.COLYSEUS_CONNECT_STRNIG);

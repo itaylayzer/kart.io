@@ -3,7 +3,7 @@ import { KartRaceState, PlayerSchema } from "./schema/KartRaceState";
 import { roadUtils as RoadUtils } from "@/utils/roadUtils";
 import { KartScene } from "@/scenes/KartScene";
 import { CC, CS } from "@shared/types/codes";
-import { randInt } from "three/src/math/MathUtils";
+import { MathUtils } from "three";
 
 export class KartRace extends Room<
   KartRaceState,
@@ -86,7 +86,7 @@ export class KartRace extends Room<
       };
       toggleMystery(id, false);
 
-      client.send(CC.MYSTERY_ITEM, randInt(0, 4));
+      client.send(CC.MYSTERY_ITEM, MathUtils.randInt(0, 4));
 
       setTimeout(() => {
         toggleMystery(id, true);

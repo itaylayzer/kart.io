@@ -2,7 +2,9 @@ import { PhysicsObject } from "../../physics/PhysicsMesh";
 import * as THREE from "three";
 import * as CANNON from "cannon-es";
 import { Global } from "../../store/Global";
-import { randFloat } from "three/src/math/MathUtils.js";
+import { MathUtils } from "three";
+
+
 import { CS } from "@shared/types/codes";
 import { LocalPlayer } from "../../player/LocalPlayer";
 export class MysteryBox extends PhysicsObject {
@@ -51,9 +53,9 @@ export class MysteryBox extends PhysicsObject {
         group.position.copy(position);
         this.position.set(position.x, position.y - 0.25, position.z);
 
-        let x = randFloat(-2, 2);
-        let y = randFloat(-2, 2);
-        let z = randFloat(-2, 2);
+        let x = MathUtils.randFloat(-2, 2);
+        let y = MathUtils.randFloat(-2, 2);
+        let z = MathUtils.randFloat(-2, 2);
         this.update = [
             () => {
                 mesh.rotateX(x * Global.deltaTime);
