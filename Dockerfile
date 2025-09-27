@@ -8,8 +8,8 @@ WORKDIR /app
 COPY . /app/
 
 # Install dependencies
-RUN bun install --cwd colyseus-server
-RUN bun add @colyseus/bun-websockets
+RUN bun install --cwd server
+RUN bun add --cwd server @colyseus/bun-websockets
 
 # Define arguments for runtime configuration
 ENV NODE_ENV="production"
@@ -24,4 +24,4 @@ ENV ORIGIN=${ORIGIN}
 EXPOSE ${PORT}
 
 # Command to run your application
-CMD ["bun", "run", "--cwd", "colyseus-server", "src/index.ts"]
+CMD ["bun", "run", "--cwd", "server", "src/index.ts"]
