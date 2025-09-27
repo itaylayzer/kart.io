@@ -5,7 +5,10 @@ import { KartScene } from "@/scenes/KartScene";
 import { CC, CS } from "@shared/types/codes";
 import { randInt } from "three/src/math/MathUtils";
 
-export class KartRace extends Room<KartRaceState, { hasPassword: boolean, roomName: string }> {
+export class KartRace extends Room<
+  KartRaceState,
+  { hasPassword: boolean; roomName: string }
+> {
   maxClients = 16;
   autoDispose = false;
   state = new KartRaceState();
@@ -14,9 +17,13 @@ export class KartRace extends Room<KartRaceState, { hasPassword: boolean, roomNa
   private password: string;
   private firstJoinTimer: Delayed;
 
-
   onAuth(client: Client<any, any>, options: any, context: AuthContext) {
-    console.log('clients', client.sessionId, 'attempts to join with options', options)
+    console.log(
+      "clients",
+      client.sessionId,
+      "attempts to join with options",
+      options
+    );
     if (this.password.length > 0 && options.password !== this.password) {
       client.leave(1);
       return false;
@@ -25,15 +32,23 @@ export class KartRace extends Room<KartRaceState, { hasPassword: boolean, roomNa
     return true;
   }
 
-  onCreate(options: { mapId: number, password: string, roomName: string }) {
-    console.log("room", this.roomId, "created:", JSON.stringify(options, null, 4));
+  onCreate(options: { mapId: number; password: string; roomName: string }) {
+    console.log(
+      "room",
+      this.roomId,
+      "created:",
+      JSON.stringify(options, null, 4)
+    );
 
     this.firstJoinTimer = this.clock.setTimeout(() => {
       this.autoDispose = true;
       this.disconnect(); // triggers dispose when empty
     }, 60_000);
 
-    this.setMetadata({ hasPassword: options.password.length > 0, roomName: options.roomName })
+    this.setMetadata({
+      hasPassword: options.password.length > 0,
+      roomName: options.roomName,
+    });
     this.roadUtils = RoadUtils(options.mapId);
 
     this.state.mapId = options.mapId;
@@ -43,10 +58,21 @@ export class KartRace extends Room<KartRaceState, { hasPassword: boolean, roomNa
       const xplayer = this.state.players.get(client.sessionId);
       xplayer.assign({ ready });
 
-      console.log('CS.READY', client.sessionId, "from:", xplayer.ready, "to:", !xplayer.ready)
+      console.log(
+        "CS.READY",
+        client.sessionId,
+        "from:",
+        xplayer.ready,
+        "to:",
+        !xplayer.ready
+      );
       this.state.players.set(client.sessionId, xplayer.clone());
 
-      if (Array.from(this.state.players.values()).filter(player => !player.ready).length === 0) {
+      if (
+        Array.from(this.state.players.values()).filter(
+          (player) => !player.ready
+        ).length === 0
+      ) {
         this.onGameStart();
         this.lock();
       }
@@ -54,8 +80,10 @@ export class KartRace extends Room<KartRaceState, { hasPassword: boolean, roomNa
 
     this.onMessage(CS.TOUCH_MYSTERY, (client, id: number) => {
       const toggleMystery = (id: number, visible: boolean) => {
-        this.state.mysteries[id] = this.state.mysteries[id].assign({ visible }).clone();
-      }
+        this.state.mysteries[id] = this.state.mysteries[id]
+          .assign({ visible })
+          .clone();
+      };
       toggleMystery(id, false);
 
       client.send(CC.MYSTERY_ITEM, randInt(0, 4));
@@ -63,27 +91,93 @@ export class KartRace extends Room<KartRaceState, { hasPassword: boolean, roomNa
       setTimeout(() => {
         toggleMystery(id, true);
       }, 1000);
-    })
+    });
+
+    const getPID = (client: Client) =>
+      this.state.players.get(client.sessionId).color;
+
+    this.onMessage(CS.KEY_DOWN, (client, buffer: Buffer) => {
+      this.clients.forEach(
+        (c) =>
+          c.sessionId !== client.sessionId &&
+          c.send(CC.KEY_DOWN, { pid: getPID(client), buffer })
+      );
+    });
+
+    this.onMessage(CS.KEY_UP, (client, buffer: Buffer) => {
+      this.clients.forEach(
+        (c) =>
+          c.sessionId !== client.sessionId &&
+          c.send(CC.KEY_UP, { pid: getPID(client), buffer })
+      );
+    });
+
+    this.onMessage(CS.APPLY_MYSTERY, (client, data: number[]) => {
+      this.clients.forEach((c) =>
+        c.send(CC.APPLY_MYSTERY, [getPID(client), ...data])
+      );
+    });
+
+    this.onMessage(CS.UPDATE_TRANSFORM, (client, buffer: Buffer) => {
+      this.clients.forEach(
+        (c) =>
+          c.sessionId !== client.sessionId &&
+          c.send(CC.UPDATE_TRANSFORM, buffer)
+      );
+    });
+
+    this.onMessage(CS.FINISH_LINE, (client) => {
+      this.clients.forEach((c) => c.send(CC.FINISH_LINE, getPID(client)));
+
+      this.state.players.set(client.sessionId, this.state.players.get(client.sessionId).assign({ finished: true }));
+
+      const allFinishes = Array.from(this.state.players.values()).map(
+        (v) => v.finished
+      );
+
+      const allFinished =
+        allFinishes.filter((v) => !v).length === 0;
+
+      if (allFinished) {
+        this.clients.forEach((c) => c.send(CC.SHOW_WINNERS, getPID(client)));
+      }
+    });
   }
 
   onGameStart() {
     this.state.startTime = Date.now() + 5_000;
 
-    this.scene = new KartScene(this.state.mapId, this.state.mysteries, this.state.players);
+    this.scene = new KartScene(
+      this.state.mapId,
+      this.state.mysteries,
+      this.state.players
+    );
 
     const generator = this.roadUtils.positionsGenerator();
     this.state.players.forEach((player, key) => {
-      this.state.players.set(key, player.assign({ startTransform: generator() }).clone())
-    })
+      this.state.players.set(
+        key,
+        player.assign({ startTransform: generator() }).clone()
+      );
+    });
 
     this.clock.setTimeout(() => {
-      this.clients.forEach(client => (client.send(CC.START_GAME)));
+      this.clients.forEach((client) => client.send(CC.START_GAME));
     }, this.patchRate * 3);
   }
 
   onJoin(client: Client, options: { playerName: string }) {
     console.log(client.sessionId, "joined!");
-    this.state.players.set(client.sessionId, new PlayerSchema().assign({ ready: false, name: options.playerName, color: this.state.players.size, id: client.sessionId }))
+    this.state.players.set(
+      client.sessionId,
+      new PlayerSchema().assign({
+        ready: false,
+        name: options.playerName,
+        color: this.state.players.size,
+        id: client.sessionId,
+        finished: false,
+      })
+    );
 
     this.firstJoinTimer.clear();
     this.autoDispose = true;

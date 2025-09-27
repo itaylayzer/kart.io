@@ -115,19 +115,19 @@ export class DriveController {
         islocal &&
             setInterval(() => {
                 if (rocketMode || shakeMode || body.velocity.isZero()) return;
-                // Global.socket?.emit(
-                //     CS.UPDATE_TRANSFORM,
-                //     msgpack.encode([
-                //         body.pid,
-                //         body.position.x,
-                //         body.position.y,
-                //         body.position.z,
-                //         body.quaternion.x,
-                //         body.quaternion.y,
-                //         body.quaternion.z,
-                //         body.quaternion.w,
-                //     ])
-                // );
+                Global.client.send(
+                    CS.UPDATE_TRANSFORM,
+                    msgpack.encode([
+                        body.pid,
+                        body.position.x,
+                        body.position.y,
+                        body.position.z,
+                        body.quaternion.x,
+                        body.quaternion.y,
+                        body.quaternion.z,
+                        body.quaternion.w,
+                    ])
+                );
             }, 1000);
 
         const keyboardUpdate = () => {

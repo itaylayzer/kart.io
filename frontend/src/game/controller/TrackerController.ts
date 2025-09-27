@@ -64,7 +64,7 @@ export class TrackerController {
                 this.round++;
                 if (isLocal && this.round >= MAX_ROUNDS) {
                     toast("You Can Switch Cameras Now", { type: "info" });
-                    // Global.socket?.emit(CS.FINISH_LINE);
+                    Global.client.send(CS.FINISH_LINE);
                 }
             }
             if (forwardPos[0] === 0 && this.lastIndex === 1) {
@@ -75,7 +75,7 @@ export class TrackerController {
             dummy.position.copy(forwardPos[1]);
             dummy.lookAt(
                 TrackerController.points[
-                    (forwardPos[0] + 1) % TrackerController.points.length
+                (forwardPos[0] + 1) % TrackerController.points.length
                 ]
             );
 

@@ -267,41 +267,41 @@ function setupSocket(
         LocalPlayer.getInstance().items.setItem(itemIndex);
     })
 
-    // Global.socket?.on(CC.KEY_DOWN, (args: { pid: number; buffer: Buffer }) => {
-    //     const xplayer = Player.clients.get(args.pid);
+    Global.client.onMessage(CC.KEY_DOWN, (args: { pid: number; buffer: Buffer }) => {
+        const xplayer = Player.clients.get(args.pid);
 
-    //     const [key, ...data] = msgpack.decode(
-    //         new Uint8Array(args.buffer)
-    //     ) as number[];
-    //     if (data.length) {
-    //         const [x, y, z, rx, ry, rz, rw] = data;
-    //         xplayer?.position.set(x, y, z);
-    //         xplayer?.quaternion.set(rx, ry, rz, rw);
-    //     }
-    //     xplayer?.keyboard.keysDown.add(key);
-    // });
+        const [key, ...data] = msgpack.decode(
+            new Uint8Array(args.buffer)
+        ) as number[];
+        if (data.length) {
+            const [x, y, z, rx, ry, rz, rw] = data;
+            xplayer?.position.set(x, y, z);
+            xplayer?.quaternion.set(rx, ry, rz, rw);
+        }
+        xplayer?.keyboard.keysDown.add(key);
+    });
 
-    // Global.socket?.on(CC.UPDATE_TRANSFORM, (buffer: Buffer) => {
-    //     const [pid, ...data] = msgpack.decode(
-    //         new Uint8Array(buffer)
-    //     ) as number[];
-    //     const xplayer = Player.clients.get(pid);
-    //     const [x, y, z, rx, ry, rz, rw] = data;
-    //     xplayer?.position.set(x, y, z);
-    //     xplayer?.quaternion.set(rx, ry, rz, rw);
-    // });
+    Global.client.onMessage(CC.UPDATE_TRANSFORM, (buffer: Buffer) => {
+        const [pid, ...data] = msgpack.decode(
+            new Uint8Array(buffer)
+        ) as number[];
+        const xplayer = Player.clients.get(pid);
+        const [x, y, z, rx, ry, rz, rw] = data;
+        xplayer?.position.set(x, y, z);
+        xplayer?.quaternion.set(rx, ry, rz, rw);
+    });
 
-    // Global.socket?.on(CC.FINISH_LINE, (pid: number) => {
-    //     TrackerController.FINALS.push(pid);
-    // });
+    Global.client.onMessage(CC.FINISH_LINE, (pid: number) => {
+        TrackerController.FINALS.push(pid);
+    });
 
     Scoreboard.finishMacth = false;
-    // Global.socket?.on(CC.SHOW_WINNERS, () => {
-    //     // TODO: SHOW NEXT SCREEN
-    //     Scoreboard.finishMacth = true;
-    //     Global.lockController.unlock();
-    //     console.warn("finished");
-    // });
+    Global.client.onMessage(CC.SHOW_WINNERS, () => {
+        // TODO: SHOW NEXT SCREEN
+        Scoreboard.finishMacth = true;
+        Global.lockController.unlock();
+        console.warn("finished");
+    });
 
     Global.client.onMessage(
         CC.APPLY_MYSTERY,
@@ -340,19 +340,19 @@ function setupSocket(
             }
         }
     );
-    // Global.socket?.on(CC.KEY_UP, (args: { pid: number; buffer: Buffer }) => {
-    //     const xplayer = Player.clients.get(args.pid);
-    //     const [key, ...data] = msgpack.decode(
-    //         new Uint8Array(args.buffer)
-    //     ) as number[];
-    //     if (data.length) {
-    //         const [x, y, z, rx, ry, rz, rw] = data;
-    //         xplayer?.position.set(x, y, z);
-    //         xplayer?.quaternion.set(rx, ry, rz, rw);
-    //     }
-    //     xplayer?.keyboard.keysUp.add(key);
-    //     xplayer?.keyboard.keysPressed.delete(key);
-    // });
+    Global.client.onMessage(CC.KEY_UP, (args: { pid: number; buffer: Buffer }) => {
+        const xplayer = Player.clients.get(args.pid);
+        const [key, ...data] = msgpack.decode(
+            new Uint8Array(args.buffer)
+        ) as number[];
+        if (data.length) {
+            const [x, y, z, rx, ry, rz, rw] = data;
+            xplayer?.position.set(x, y, z);
+            xplayer?.quaternion.set(rx, ry, rz, rw);
+        }
+        xplayer?.keyboard.keysUp.add(key);
+        xplayer?.keyboard.keysPressed.delete(key);
+    });
 
     $(client.state).players.onRemove(({ color }) => {
         OnlinePlayer.clients.get(color)?.disconnect();
