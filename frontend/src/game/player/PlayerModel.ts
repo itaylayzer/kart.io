@@ -7,6 +7,7 @@ import * as CANNON from "cannon-es";
 import { Dust } from "../api/meshes/Dust";
 import { Easing, Tween } from "@tweenjs/tween.js";
 import { Trail } from "../api/meshes/Trail";
+import { makeAutoLOD } from "../api/autoLLD";
 
 const namesToColor = [
     "Object_43",
@@ -88,7 +89,7 @@ export class PlayerModel extends THREE.Group {
         {
             const trail = new Trail(rocket, 3, ["gray", 0], 0.1, 100, 1);
 
-            Global.lod.add(trail);
+            makeAutoLOD(trail);
             trails.push(trail);
         }
 
@@ -102,7 +103,7 @@ export class PlayerModel extends THREE.Group {
                 [0.5, 0.05][+isLocal]
             );
 
-            Global.lod.add(trail);
+            makeAutoLOD(trail);
             trails.push(trail);
         }
 
@@ -116,7 +117,7 @@ export class PlayerModel extends THREE.Group {
                 [0.5, 0.05][+isLocal]
             );
 
-            Global.lod.add(trail);
+            makeAutoLOD(trail);
             trails.push(trail);
         }
 

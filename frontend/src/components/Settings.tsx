@@ -47,7 +47,6 @@ export function Settings({
         displayWater,
         displayStars,
         motionBlur,
-        fogLevel,
     } = useSettingsScreen();
 
     return (
@@ -476,65 +475,6 @@ export function Settings({
                                                     })
                                                 }
                                             />
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            Fog Level{" "}
-                                            <BsFillQuestionCircleFill
-                                                size={12}
-                                                color="#999"
-                                                data-tooltip-id="t"
-                                                data-tooltip-content={
-                                                    "This Impacts greatly at performance"
-                                                }
-                                                style={{
-                                                    transform: "10px 0px",
-                                                }}
-                                            />
-                                        </td>
-                                        <td
-                                            style={{
-                                                display: "flex",
-                                                justifyContent: "end",
-                                                width: "22.419vh",
-                                            }}
-                                        >
-                                            <Select
-                                                key={"useArrow"}
-                                                color="info"
-                                                style={{
-                                                    color: "white",
-                                                    width: "22.419vh",
-                                                    height: "4.17vh",
-                                                    textAlign: "center",
-                                                    border: "1px solid #444",
-                                                }}
-                                                onChange={(event) => {
-                                                    set({
-                                                        fogLevel: event.target
-                                                            .value as
-                                                            | 1
-                                                            | 2
-                                                            | 3
-                                                            | 4,
-                                                    });
-                                                }}
-                                                value={fogLevel}
-                                            >
-                                                <MenuItem value={1}>
-                                                    Short
-                                                </MenuItem>
-                                                <MenuItem value={2}>
-                                                    Medium
-                                                </MenuItem>
-                                                <MenuItem value={3}>
-                                                    High
-                                                </MenuItem>
-                                                <MenuItem value={4}>
-                                                    Ultra
-                                                </MenuItem>
-                                            </Select>
                                         </td>
                                     </tr>
                                 </>,

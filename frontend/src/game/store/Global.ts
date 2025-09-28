@@ -43,7 +43,6 @@ export class Global {
     public static roadMesh: Mesh[];
     public static client: KartClient;
     public static world: CANNON.World;
-    public static lod: LOD;
     public static composer: EffectComposer;
     public static render: Action;
     public static curve: CatmullRomCurve3;
@@ -51,5 +50,6 @@ export class Global {
     public static settings: settingsType;
     public static stats: Stats;
     public static optimizedObjects: Object3D[];
+    public static unoptimizedObjects: Object3D[];
     public static goBack: () => void;
 }

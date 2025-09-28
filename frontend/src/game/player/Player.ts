@@ -110,13 +110,13 @@ export class Player extends PhysicsObject {
         ];
 
         this.disconnect = () => {
-            Global.lod.remove(this.model);
+            Global.scene.remove(this.model);
             Global.world.removeBody(this);
 
             Player.clients.delete(pid);
         };
 
         Global.world.addBody(this);
-        Global.lod.add(this.model);
+        Global.scene.add(this.model);
     }
 }

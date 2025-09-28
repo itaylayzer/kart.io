@@ -44,7 +44,10 @@ const game = (
             Global.elapsedTime = clock.getElapsedTime();
 
             for (const mesh of Global.optimizedObjects) {
-                mesh.visible = mesh.position.distanceTo(Global.camera.position) < FOG[Global.settings.fogLevel][0];
+                mesh.visible = mesh.position.distanceTo(Global.camera.position) < 50;
+            }
+            for (const mesh of Global.unoptimizedObjects) {
+                mesh.visible = mesh.position.distanceTo(Global.camera.position) >= 50;
             }
 
             Global.updates
@@ -53,7 +56,6 @@ const game = (
             Global.lateUpdates.map((f) => f());
 
             scoreboard.update();
-            Global.lod.update(Global.camera);
             Global.system.update();
             Global.render();
             try {

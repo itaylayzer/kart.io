@@ -39,6 +39,7 @@ import { Scoreboard } from "../../player/Scoreboard";
 import { StartTimer } from "../../player/StartTimer";
 import { KartClient } from "@/types/KartClient";
 import { getStateCallbacks } from "colyseus.js";
+import { makeAutoLOD } from "../autoLLD";
 
 function setupLights() {
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 1);
@@ -96,10 +97,7 @@ function setupScene() {
     Global.scene = new THREE.Scene();
     Global.scene.background = new THREE.Color(colors.background);
 
-    Global.scene.fog = new THREE.Fog(Global.scene.background, FOG[Global.settings.fogLevel][1], FOG[Global.settings.fogLevel][2]);
-
-    Global.lod = new THREE.LOD();
-    Global.scene.add(Global.lod);
+    Global.scene.fog = new THREE.Fog(Global.scene.background, FOG[3][1], FOG[3][2]);
 }
 function setupPhysicsWorld() {
     Global.world = new CANNON.World();
@@ -130,19 +128,23 @@ function setupWindowEvents() {
     });
 }
 
+const add = (object: THREE.Mesh) => makeAutoLOD(object, Global.scene, [0, 50, 120], [1.0, 0.35, 0.08]);;
 function setupRoad() {
-    const roadsSegments = createRoad(Global.curve, 5, 200, 3000);
-    Global.lod.add(...roadsSegments);
-    Global.roadMesh = roadsSegments;
+    const fullRoadsSegments = createRoad(Global.curve, 5, 50, 3000);
+    const lowRoadsSegments = createRoad(Global.curve, 5, 50, 100);
+
+
+    Global.roadMesh = fullRoadsSegments;
+    Global.scene.add(...fullRoadsSegments);
+    Global.scene.add(...lowRoadsSegments);
 
     if (Global.settings.displayStars) {
         const points = createStarfield(1000, 50);
-        Global.lod.add(points);
+        Global.scene.add(points);
     }
     if (Global.settings.displayFences) {
         const fences = createFences(Global.curve, 5, 100, 1400);
-        Global.lod.add(...fences);
-        Global.optimizedObjects.push(...fences);
+        fences.forEach((f) => add(f))
     }
 
     if (Global.settings.displayPillars) {
@@ -152,10 +154,9 @@ function setupRoad() {
                 5.1,
                 100,
                 1400,
-                roadsSegments
+                fullRoadsSegments
             );
-            Global.lod.add(...tiles);
-            Global.optimizedObjects.push(...tiles);
+            tiles.forEach((f) => add(f));
         }, 100);
     }
 
@@ -185,13 +186,13 @@ function setupRoad() {
         .add(new THREE.Vector3(0, 1.5, 0))
         .add(new THREE.Vector3(0, 0, 5).applyQuaternion(flagBlock.quaternion));
     const crod = rod.clone();
-    Global.lod.add(flagBlock);
-    Global.lod.add(crod);
+    Global.scene.add(flagBlock);
+    add(crod);
     rod.position
         .copy(flagPos)
         .add(new THREE.Vector3(0, 1.5, 0))
         .add(new THREE.Vector3(0, 0, -5).applyQuaternion(flagBlock.quaternion));
-    Global.lod.add(rod);
+    add(rod);
 
     const sun = new THREE.Mesh(
         new THREE.SphereGeometry(25, 5, 5),
@@ -206,9 +207,10 @@ function setupRoad() {
     );
     sun.position.set(500, 150, 500);
 
-    if (Global.settings.displaySun) Global.lod.add(sun);
+    if (Global.settings.displaySun) add(sun);
 
-    Global.optimizedObjects.push(...Global.roadMesh, rod, crod);
+    Global.optimizedObjects.push(...Global.roadMesh);
+    Global.unoptimizedObjects.push(...lowRoadsSegments);
 }
 
 function setupSocket(
@@ -437,7 +439,7 @@ function setupRenderer() {
         }
         Global.optimizedObjects.push(...waterGround);
         beforeUpdate = _beforeUpdate;
-        Global.lod.add(...waterGround);
+        waterGround.forEach((c) => Global.scene.add(c));
     }
 
     Global.render = () => {
@@ -460,6 +462,8 @@ export default function (
     players: Map<number, [string, number, boolean]>
 ) {
     Global.optimizedObjects = [];
+    Global.unoptimizedObjects = [];
+
     setupScene();
     setupPhysicsWorld();
     setupLights();

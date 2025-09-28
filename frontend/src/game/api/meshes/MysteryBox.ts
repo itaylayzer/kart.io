@@ -7,6 +7,7 @@ import { MathUtils } from "three";
 
 import { CS } from "@shared/types/codes";
 import { LocalPlayer } from "../../player/LocalPlayer";
+import { makeAutoLOD } from "../autoLLD";
 export class MysteryBox extends PhysicsObject {
     public static boxes: Map<number, MysteryBox>;
     public group: THREE.Group;
@@ -28,7 +29,8 @@ export class MysteryBox extends PhysicsObject {
                 emissive: "orange",
             })
         );
-        group.add(mesh);
+        makeAutoLOD(mesh, group)
+
         mesh.castShadow = true;
         mesh.receiveShadow = true;
         super(group, {
@@ -48,7 +50,7 @@ export class MysteryBox extends PhysicsObject {
         this.mysteryVisible = true;
         this.group = group;
 
-        Global.lod.add(group);
+        Global.scene.add(group);
 
         group.position.copy(position);
         this.position.set(position.x, position.y - 0.25, position.z);
