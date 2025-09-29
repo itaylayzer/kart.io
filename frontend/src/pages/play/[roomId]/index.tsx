@@ -9,6 +9,7 @@ import { useRoomScreen } from "@/viewmodels/useRoomScreen";
 import { useRouter } from "next/router";
 import { GoDotFill } from "react-icons/go";
 import { ShaderScripts } from "@/components/ShaderScripts";
+import { Button } from "@/components/ui/button";
 
 export default function () {
     const [room] = useRoom();
@@ -159,16 +160,16 @@ export default function () {
                                                         gap: 10,
                                                     }}
                                                 >
-                                                    <button
-                                                        className="r"
+                                                    <Button
+                                                        className="min-w-[8rem]"
                                                         onClick={() =>
                                                             disconnect()
                                                         }
                                                     >
                                                         Disconnect
-                                                    </button>
-                                                    <button
-                                                        className="r"
+                                                    </Button>
+                                                    <Button
+                                                        className="min-w-[8rem]"
                                                         onClick={() =>
                                                             toggleReady()
                                                         }
@@ -179,7 +180,7 @@ export default function () {
                                                                 "Unready",
                                                             ][+ready]
                                                         }
-                                                    </button>
+                                                    </Button>
                                                 </div>
                                             </div>
                                         </div>

@@ -10,8 +10,6 @@
     },
     "dependencies": {
         "@colyseus/schema": "^3.0.60",
-        "@emotion/styled": "^11.13.0",
-        "@mui/material": "^6.0.1",
         "@tweenjs/tween.js": "^25.0.0",
         "@types/cannon": "^0.1.12",
         "@types/cli-progress": "^3.11.6",

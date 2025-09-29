@@ -2,6 +2,7 @@ import { Socket } from "socket.io-client";
 import { useStyles } from "../hooks/useStyles";
 import { usePlayScreen } from "../viewmodels";
 import { KartClient } from "@/types/KartClient";
+import { Button } from "@/components/ui/button";
 
 export function Play({
     client,
@@ -54,15 +55,15 @@ export function Play({
                     <table id="scoreboard">
                         <tbody></tbody>
                     </table>
-                    <button
+                    <Button
                         style={{
                             pointerEvents: "all",
                             marginBottom: 10,
                         }}
-                        className="r scoreboard_finish"
+                        className="scoreboard_finish"
                     >
                         Disconnect
-                    </button>
+                    </Button>
                 </center>
             </main>
 
@@ -74,12 +75,15 @@ export function Play({
                     <h5>Game Paused</h5>
                     <p>but the server, keeps playing</p>
                     <center>
-                        <button className="r" id="resume">
+                        <Button id="resume" className="mt-4 min-w-[10rem]">
                             Resume
-                        </button>
-                        <button className="r" id="disconnect">
+                        </Button>
+                        <Button
+                            id="disconnect"
+                            className="mt-4 min-w-[10rem]"
+                        >
                             Disconnect
-                        </button>
+                        </Button>
                     </center>
                 </div>
             </main>

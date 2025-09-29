@@ -1,6 +1,7 @@
 import AssetLoader from "@/components/AssetLoader";
 import { AudioContainer } from "@/lib/AudioContainer";
 import { useRouter } from "next/router";
+import { Button } from "@/components/ui/button";
 
 export default function () {
     const router = useRouter();
@@ -106,14 +107,14 @@ export default function () {
                 </div>
                 <br />
                 <center>
-                    <button
-                        className="r"
+                    <Button
+                        className="min-w-[8rem]"
                         onClick={() => {
                             goBack();
                         }}
                     >
                         back
-                    </button>
+                    </Button>
                 </center>
             </main>
         </>

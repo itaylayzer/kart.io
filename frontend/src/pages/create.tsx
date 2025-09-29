@@ -1,7 +1,9 @@
 import AssetLoader from "@/components/AssetLoader";
 import { AudioContainer } from "@/lib/AudioContainer";
 import { useCreateScreen } from "@/viewmodels/useCreateScreen";
-import { ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function () {
     const {
@@ -22,57 +24,52 @@ export default function () {
             </header>
             <AudioContainer />
 
-            <main style={{ display: "flex", gap: 100 }}>
+            <main className="flex gap-24">
                 <div>
-                    <h1 style={{ fontSize: "4.17vh" }}>Map Selection</h1>
-                    <center>
-                        <ToggleButtonGroup
-                            color="primary"
+                    <h1 className="text-[4.17vh]">Map Selection</h1>
+                    <div className="flex justify-center">
+                        <ToggleGroup
                             value={roomMap}
-                            onChange={(_, i) => {
-                                if (i === null) return;
-                                setRoomMap(i as number);
-                            }}
-                            exclusive
+                            onValueChange={(value) => setRoomMap(Number(value))}
+                            className="gap-3"
                         >
-                            <ToggleButton className="r mini" value={0}>
+                            <ToggleGroupItem
+                                value={0}
+                                className="h-12 min-w-[6rem] rounded-md border border-neutral-700 bg-neutral-950 px-6 text-lg text-white hover:border-neutral-500 hover:bg-neutral-900"
+                            >
                                 Horde
-                            </ToggleButton>
-                            <ToggleButton className="r mini" value={1}>
+                            </ToggleGroupItem>
+                            <ToggleGroupItem
+                                value={1}
+                                className="h-12 min-w-[6rem] rounded-md border border-neutral-700 bg-neutral-950 px-6 text-lg text-white hover:border-neutral-500 hover:bg-neutral-900"
+                            >
                                 Hotel
-                            </ToggleButton>
-                        </ToggleButtonGroup>
-                    </center>
+                            </ToggleGroupItem>
+                        </ToggleGroup>
+                    </div>
                     <br />
                     <canvas
                         width={500}
                         height={500}
-                        style={{ width: "36.49vh", height: "36.49vh" }}
+                        className="h-[36.49vh] w-[36.49vh]"
                         ref={roomMapCanvasRef}
                     ></canvas>
                 </div>
                 <div
-                    style={{
-                        display: "block",
-                        marginBlock: "auto",
-                        height: "31.28vh",
-                        width: "0.52vh",
-                        borderRadius: 10,
-                        backgroundColor: "rgba(255,255,255,25%)",
-                    }}
+                    className="my-auto block h-[31.28vh] w-[0.52vh] rounded-[10px] bg-[rgba(255,255,255,0.25)]"
                 ></div>
-                <div style={{ width: "62.5vh", marginBlock: "auto" }}>
-                    <h1 style={{ fontSize: "5.21vh" }}>Create Room</h1>
-                    <input
-                        style={{ marginBottom: 10, width: "100%" }}
+                <div className="my-auto w-[62.5vh]">
+                    <h1 className="text-[5.21vh]">Create Room</h1>
+                    <Input
+                        className="mb-2 w-full"
                         type="text"
                         defaultValue={roomName}
                         placeholder="Room's Name"
                         onChange={(e) => setRoomName(e.currentTarget.value)}
                     />
                     <br />
-                    <input
-                        style={{ width: "100%" }}
+                    <Input
+                        className="w-full"
                         defaultValue={roomPassword}
                         type="password"
                         placeholder="Room's Password"
@@ -83,27 +80,24 @@ export default function () {
                     <center>
                         <br />
                         <div
-                            style={{
-                                display: "flex",
-                                justifyContent: "space-around",
-                            }}
+                            className="flex justify-around"
                         >
-                            <button
-                                className="r"
+                            <Button
+                                className="min-w-[8rem]"
                                 onClick={() => {
                                     router.push("/");
                                 }}
                             >
                                 cancel
-                            </button>
-                            <button
-                                className="r"
+                            </Button>
+                            <Button
+                                className="min-w-[8rem]"
                                 onClick={() => {
                                     createRoom();
                                 }}
                             >
                                 create room
-                            </button>
+                            </Button>
                         </div>
                     </center>
                 </div>

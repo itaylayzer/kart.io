@@ -1,8 +1,4 @@
 import { useSettingsScreen } from "../viewmodels/useSettingsScreen";
-import Slider from "@mui/material/Slider";
-import Select from "@mui/material/Select";
-import { MenuItem, Input, Switch } from "@mui/material";
-import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 import { AiFillSound } from "react-icons/ai";
 import { IoIosSettings } from "react-icons/io";
 import { PiGraphicsCardFill } from "react-icons/pi";
@@ -11,6 +7,12 @@ import { Listed } from "../components/Listed";
 import { Condition } from "../components/Condition";
 import { CSSProperties } from "react";
 import { BsFillQuestionCircleFill } from "react-icons/bs";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectOption } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { Slider } from "@/components/ui/slider";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 export function Settings({
     goBack,
     style,
@@ -52,50 +54,46 @@ export function Settings({
     return (
         <main style={style}>
             <h1 style={{ fontSize: "6.0vh" }}>Settings</h1>
-            <center>
-                <ToggleButtonGroup
-                    color="primary"
+            <div className="flex justify-center">
+                <ToggleGroup
                     value={nav}
-                    exclusive
-                    onChange={(_, i) => {
-                        if (i === null) return;
-                        setNav(i as number);
-                    }}
+                    onValueChange={(value) => setNav(Number(value))}
+                    className="flex gap-4"
                 >
-                    <ToggleButton
+                    <ToggleGroupItem
                         data-tooltip-id="t"
                         data-tooltip-content={"Game Settings"}
                         value={0}
-                        className="r mini"
+                        className="h-12 w-12 rounded-md border border-neutral-700 bg-neutral-950 hover:border-neutral-500 hover:bg-neutral-900"
                     >
                         <IoIosSettings size={30} color="white" />
-                    </ToggleButton>
-                    <ToggleButton
+                    </ToggleGroupItem>
+                    <ToggleGroupItem
                         data-tooltip-id="t"
                         data-tooltip-content={"Audio Settings"}
                         value={1}
-                        className="r mini"
+                        className="h-12 w-12 rounded-md border border-neutral-700 bg-neutral-950 hover:border-neutral-500 hover:bg-neutral-900"
                     >
                         <AiFillSound size={30} color="white" />
-                    </ToggleButton>
-                    <ToggleButton
+                    </ToggleGroupItem>
+                    <ToggleGroupItem
                         data-tooltip-id="t"
                         data-tooltip-content={"Graphics Settings"}
                         value={2}
-                        className="r mini"
+                        className="h-12 w-12 rounded-md border border-neutral-700 bg-neutral-950 hover:border-neutral-500 hover:bg-neutral-900"
                     >
                         <PiGraphicsCardFill size={30} color="white" />
-                    </ToggleButton>
-                    <ToggleButton
+                    </ToggleGroupItem>
+                    <ToggleGroupItem
                         data-tooltip-id="t"
                         data-tooltip-content={"Hide/Show Elements"}
                         value={3}
-                        className="r mini"
+                        className="h-12 w-12 rounded-md border border-neutral-700 bg-neutral-950 hover:border-neutral-500 hover:bg-neutral-900"
                     >
                         <IoMdEye size={30} color="white" />
-                    </ToggleButton>
-                </ToggleButtonGroup>
-            </center>
+                    </ToggleGroupItem>
+                </ToggleGroup>
+            </div>
             <div style={{ minHeight: "45.7vh" }}>
                 <table id="settings">
                     <tbody>
@@ -107,11 +105,7 @@ export function Settings({
                                         <td>Player Name</td>
                                         <td>
                                             <Input
-                                                style={{
-                                                    display: "inline-block",
-                                                    width: "26.06vh",
-                                                }}
-                                                size="small"
+                                                className="inline-block w-[26.06vh]"
                                                 data-tooltip-id="t"
                                                 data-tooltip-content={
                                                     "Player Name"
@@ -134,30 +128,22 @@ export function Settings({
                                         <td>
                                             <Select
                                                 key={"useArrow"}
-                                                color="info"
-                                                style={{
-                                                    color: "white",
-                                                    width: "22.419vh",
-                                                    height: "4.17vh",
-                                                    textAlign: "center",
-                                                    border: "1px solid #444",
-                                                }}
+                                                className="h-10 w-[22.419vh] border border-neutral-700 bg-neutral-950 text-center text-white"
                                                 onChange={(event) => {
                                                     set({
                                                         useArrow:
-                                                            (event.target
-                                                                .value as number) ===
-                                                            1,
+                                                            event.currentTarget
+                                                                .value === "1",
                                                     });
                                                 }}
-                                                value={+useArrow}
+                                                value={String(+useArrow)}
                                             >
-                                                <MenuItem value={0}>
+                                                <SelectOption value="0">
                                                     Circle
-                                                </MenuItem>
-                                                <MenuItem value={1}>
+                                                </SelectOption>
+                                                <SelectOption value="1">
                                                     Arrow
-                                                </MenuItem>
+                                                </SelectOption>
                                             </Select>
                                         </td>
                                     </tr>
@@ -171,13 +157,10 @@ export function Settings({
                                                 min={0}
                                                 step={0.01}
                                                 max={1}
-                                                style={{ width: 150 }}
+                                                className="w-40"
                                                 value={fovChange}
-                                                onChange={(_, value) =>
-                                                    set({
-                                                        fovChange:
-                                                            value as number,
-                                                    })
+                                                onValueChange={(value) =>
+                                                    set({ fovChange: value })
                                                 }
                                             />
                                             <p
@@ -201,7 +184,7 @@ export function Settings({
                                             <Switch
                                                 key={"displayVelocity"}
                                                 checked={displayVelocity}
-                                                onChange={(_, value) =>
+                                                onCheckedChange={(value) =>
                                                     set({
                                                         displayVelocity: value,
                                                     })
@@ -221,13 +204,10 @@ export function Settings({
                                                 min={0}
                                                 step={0.01}
                                                 max={1}
-                                                style={{ width: "15.64" }}
+                                                className="w-[15.64vh]"
                                                 value={masterVolume}
-                                                onChange={(_, value) => {
-                                                    set({
-                                                        masterVolume:
-                                                            value as number,
-                                                    });
+                                                onValueChange={(value) => {
+                                                    set({ masterVolume: value });
                                                 }}
                                             />
                                             <p
@@ -249,13 +229,10 @@ export function Settings({
                                                 min={0}
                                                 step={0.01}
                                                 max={1}
-                                                style={{ width: "15.64" }}
+                                                className="w-[15.64vh]"
                                                 value={musicVolume}
-                                                onChange={(_, value) => {
-                                                    set({
-                                                        musicVolume:
-                                                            value as number,
-                                                    });
+                                                onValueChange={(value) => {
+                                                    set({ musicVolume: value });
                                                 }}
                                             />
                                             <p
@@ -277,13 +254,10 @@ export function Settings({
                                                 min={0}
                                                 step={0.01}
                                                 max={1}
-                                                style={{ width: "15.64" }}
+                                                className="w-[15.64vh]"
                                                 value={sfxVolume}
-                                                onChange={(_, value) => {
-                                                    set({
-                                                        sfxVolume:
-                                                            value as number,
-                                                    });
+                                                onValueChange={(value) => {
+                                                    set({ sfxVolume: value });
                                                 }}
                                             />
                                             <p
@@ -307,7 +281,7 @@ export function Settings({
                                             <Switch
                                                 key={"displayAudio"}
                                                 checked={displayAudio}
-                                                onChange={(_, value) =>
+                                                onCheckedChange={(value) =>
                                                     set({ displayAudio: value })
                                                 }
                                             />
@@ -332,12 +306,10 @@ export function Settings({
                                                 min={15}
                                                 step={5}
                                                 max={120}
-                                                style={{ width: "15.64" }}
+                                                className="w-[15.64vh]"
                                                 value={fps}
-                                                onChange={(_, value) => {
-                                                    set({
-                                                        fps: value as number,
-                                                    });
+                                                onValueChange={(value) => {
+                                                    set({ fps: value });
                                                 }}
                                             />
                                             <p
@@ -363,7 +335,7 @@ export function Settings({
                                             <Switch
                                                 key={"useVsync"}
                                                 checked={useVsync}
-                                                onChange={(_, value) =>
+                                                onCheckedChange={(value) =>
                                                     set({ useVsync: value })
                                                 }
                                             />
@@ -386,7 +358,7 @@ export function Settings({
                                             <Switch
                                                 key={"useSTATS"}
                                                 checked={useSTATS}
-                                                onChange={(_, value) =>
+                                                onCheckedChange={(value) =>
                                                     set({ useSTATS: value })
                                                 }
                                             />
@@ -404,7 +376,7 @@ export function Settings({
                                             <Switch
                                                 key={"useBloom"}
                                                 checked={useBloom}
-                                                onChange={(_, value) =>
+                                                onCheckedChange={(value) =>
                                                     set({ useBloom: value })
                                                 }
                                             />
@@ -420,13 +392,10 @@ export function Settings({
                                                 min={0}
                                                 step={5}
                                                 max={100}
-                                                style={{ width: "15.64" }}
+                                                className="w-[15.64vh]"
                                                 value={motionBlur}
-                                                onChange={(_, value) => {
-                                                    set({
-                                                        motionBlur:
-                                                            value as number,
-                                                    });
+                                                onValueChange={(value) => {
+                                                    set({ motionBlur: value });
                                                 }}
                                             />
                                             <p
@@ -452,7 +421,7 @@ export function Settings({
                                             <Switch
                                                 key={"Antialiasing"}
                                                 checked={Antialiasing}
-                                                onChange={(_, value) =>
+                                                onCheckedChange={(value) =>
                                                     set({ Antialiasing: value })
                                                 }
                                             />
@@ -469,7 +438,7 @@ export function Settings({
                                         >
                                             <Switch
                                                 checked={renderColliders}
-                                                onChange={(_, value) =>
+                                                onCheckedChange={(value) =>
                                                     set({
                                                         renderColliders: value,
                                                     })
@@ -491,7 +460,7 @@ export function Settings({
                                             <Switch
                                                 key={"displaySun"}
                                                 checked={displaySun}
-                                                onChange={(_, value) =>
+                                                onCheckedChange={(value) =>
                                                     set({ displaySun: value })
                                                 }
                                             />
@@ -509,7 +478,7 @@ export function Settings({
                                             <Switch
                                                 key={"displayStars"}
                                                 checked={displayStars}
-                                                onChange={(_, value) =>
+                                                onCheckedChange={(value) =>
                                                     set({ displayStars: value })
                                                 }
                                             />
@@ -527,7 +496,7 @@ export function Settings({
                                             <Switch
                                                 key={"displayFences"}
                                                 checked={displayFences}
-                                                onChange={(_, value) =>
+                                                onCheckedChange={(value) =>
                                                     set({
                                                         displayFences: value,
                                                     })
@@ -547,7 +516,7 @@ export function Settings({
                                             <Switch
                                                 key={"displayPillars"}
                                                 checked={displayPillars}
-                                                onChange={(_, value) =>
+                                                onCheckedChange={(value) =>
                                                     set({
                                                         displayPillars: value,
                                                     })
@@ -567,7 +536,7 @@ export function Settings({
                                             <Switch
                                                 key={"displayWater"}
                                                 checked={displayWater}
-                                                onChange={(_, value) =>
+                                                onCheckedChange={(value) =>
                                                     set({ displayWater: value })
                                                 }
                                             />
@@ -585,41 +554,41 @@ export function Settings({
             <Condition
                 conditions={goBack === undefined}
                 onTrue={
-                    <button className="r" id={backButtonID}>
+                    <Button id={backButtonID} className="mt-6 min-w-[8rem]">
                         Back
-                    </button>
+                    </Button>
                 }
                 onFalse={
-                    <button className="r" onClick={() => goBack!()}>
+                    <Button className="mt-6 min-w-[8rem]" onClick={() => goBack!()}>
                         Back
-                    </button>
+                    </Button>
                 }
             />
 
-            <button
-                className="r"
+            <Button
+                className="mt-4"
                 data-tooltip-id="t"
                 data-tooltip-content={"Load From Cookies"}
                 onClick={() => loadFromCookies(true)}
             >
                 Load
-            </button>
-            <button
-                className="r"
+            </Button>
+            <Button
+                className="mt-4 ml-4"
                 data-tooltip-id="t"
                 data-tooltip-content={"Save to Cookies"}
                 onClick={() => saveToCookies(true)}
             >
                 Save
-            </button>
-            <button
-                className="r"
+            </Button>
+            <Button
+                className="mt-4 ml-4"
                 data-tooltip-id="t"
                 data-tooltip-content={"Reset to defaults"}
                 onClick={() => reset()}
             >
                 Reset
-            </button>
+            </Button>
         </main>
     );
 }

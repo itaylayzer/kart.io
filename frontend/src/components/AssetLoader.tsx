@@ -1,7 +1,8 @@
-import { ReactNode, useEffect } from "react";
+import { useEffect } from "react";
 import { useAssetStore } from "../store/useAssetLoader";
-import { LinearProgress } from "@mui/material";
 import { assetsList } from "@/config/assetsList";
+import { Progress } from "@/components/ui/progress";
+import { cn } from "@/components/ui/utils";
 
 export default function AssetLoader() {
     const { progress, skipAssets, loadMeshes } = useAssetStore();
@@ -18,16 +19,12 @@ export default function AssetLoader() {
     }, []);
 
     return (
-        <LinearProgress
-            style={{
-                width: "52.13vh",
-                marginTop: 10,
-                opacity: 0.2 * +(progress <= 1),
-                transition: "opacity 1s ease-out",
-            }}
-            variant="determinate"
-            color="inherit"
+        <Progress
             value={Math.min(progress, 1) * 100}
+            className={cn(
+                "mt-2 w-[52.13vh] transition-opacity duration-1000",
+                progress <= 1 ? "opacity-20" : "opacity-0"
+            )}
         />
     );
 }

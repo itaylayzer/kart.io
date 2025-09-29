@@ -4,7 +4,8 @@ import AssetLoader from "../components/AssetLoader";
 import { FidgetSpinner } from "react-loader-spinner";
 import { BiErrorAlt } from "react-icons/bi";
 import { AudioContainer } from "../lib/AudioContainer";
-import { Button, TextField } from "@mui/material";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { FaLock } from "react-icons/fa";
 import { useRouter } from "next/router";
 import { useRoom } from "@/hooks/useRoom";
@@ -83,10 +84,9 @@ function Index() {
                                 justifyContent: "center",
                             }}
                         >
-                            <TextField
+                            <Input
                                 data-tooltip-id="t"
                                 data-tooltip-content={"Player Name"}
-                                variant="outlined"
                                 placeholder="Enter Player Name"
                                 value={playerName}
                                 onChange={(a) =>
@@ -97,7 +97,10 @@ function Index() {
                         <br />
                         <br />
                         <center>
-                            <Button className="r" onClick={onPlayButton}>
+                            <Button
+                                className="min-w-[10rem]"
+                                onClick={onPlayButton}
+                            >
                                 Play
                             </Button>
                         </center>
@@ -266,38 +269,38 @@ function Index() {
                                     minWidth: "100%",
                                 }}
                             >
-                                <button
+                                <Button
                                     data-tooltip-id="t"
                                     data-tooltip-content={"Reload Rooms"}
-                                    className="r mini"
+                                    className="h-12 min-w-[7rem] px-4 text-sm uppercase"
                                     onClick={() => loadRooms()}
                                 >
                                     reload
-                                </button>
-                                <button
+                                </Button>
+                                <Button
                                     data-tooltip-id="t"
                                     data-tooltip-content={"Create Room"}
-                                    className="r mini"
+                                    className="h-12 min-w-[7rem] px-4 text-sm uppercase"
                                     onClick={() => router.push("/create")}
                                 >
                                     create
-                                </button>
-                                <button
+                                </Button>
+                                <Button
                                     data-tooltip-id="t"
                                     data-tooltip-content={"Credits Page"}
-                                    className="r mini"
+                                    className="h-12 min-w-[7rem] px-4 text-sm uppercase"
                                     onClick={() => router.push("/credits")}
                                 >
                                     credits
-                                </button>
-                                <button
+                                </Button>
+                                <Button
                                     data-tooltip-id="t"
                                     data-tooltip-content={"Settings Page"}
-                                    className="r mini"
+                                    className="h-12 min-w-[7rem] px-4 text-sm uppercase"
                                     onClick={() => router.push("/settings")}
                                 >
                                     settings
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     </main>,

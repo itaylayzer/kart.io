@@ -1,3 +1,4 @@
+@import "tailwindcss";
 @import url("https://fonts.googleapis.com/css2?family=Signika:wght@300..700&display=swap");
 @import url("https://fonts.cdnfonts.com/css/new-super-mario-font-u");
 
@@ -32,7 +33,6 @@ main {
 }
 
 body,
-body button.r,
 body input,
 p {
     font-family: "Signika";
@@ -44,28 +44,6 @@ p {
     margin-block: 0px;
 }
 body input,
-body button.r {
-    background-color: #15151500;
-    transition: background-color 0.2s, border 0.2s, scale 0.2s;
-    border: 2px solid #444;
-    font-size: 2.29vh;
-    padding: 1.04vh 2.08vh;
-
-    box-sizing: content-box;
-    cursor: pointer;
-    border-radius: 2px;
-}
-body input:hover,
-body input:focus {
-    outline: 0;
-    border: 2px solid #777;
-}
-body button.r {
-    scale: 0.92;
-    padding: 1.04vh 5.21vh;
-}
-
-body input,
 body input:hover {
     color: white !important;
     outline: 0 !important;
@@ -74,17 +52,6 @@ body input:hover {
 body input:focus {
     border: 0 !important;
 }
-body button.r[aria-pressed="true"],
-body button.r:hover {
-    scale: 1;
-
-    border: 2px solid #151515ff;
-    background-color: #151515ff;
-}
-body button.r {
-    outline: 0;
-}
-
 body h1 {
     font-size: 10.42vh;
     text-align: center;
@@ -282,12 +249,6 @@ footer a {
     font-family: monospace;
     font-weight: 500;
     cursor: pointer;
-}
-
-body button.mini {
-    padding: 0.41vh 1.66vh;
-    font-size: 2.08vh;
-    line-height: -1.04vh;
 }
 
 h3 {

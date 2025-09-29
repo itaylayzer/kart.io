@@ -1,5 +1,5 @@
 import { useSettingsStore } from "@/store/useSettingsStore";
-import { Button } from "@mui/material";
+import { Button } from "@/components/ui/button";
 import {
     createRef,
     Dispatch,
@@ -120,11 +120,7 @@ const AudioHTML = forwardRef<AudioRef, {}>((_, ref) => {
                                     setPlaying(false);
                                 }
                             }}
-                            style={{
-                                marginBlock: "auto",
-                                marginRight: 20,
-                                cursor: "pointer",
-                            }}
+                            className="my-auto mr-5 h-12 w-12 rounded-full border border-neutral-700 bg-neutral-900 p-0 hover:bg-neutral-800"
                         >
                             {[FaPlay, FaPause][+playing]({
                                 size: 18,
