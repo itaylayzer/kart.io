@@ -47,7 +47,7 @@ const game = (
                 mesh.visible = mesh.position.distanceTo(Global.camera.position) < 50;
             }
             for (const mesh of Global.unoptimizedObjects) {
-                mesh.visible = mesh.position.distanceTo(Global.camera.position) >= 50;
+                mesh.visible = mesh.position.distanceTo(Global.camera.position) >= 46;
             }
 
             Global.updates
