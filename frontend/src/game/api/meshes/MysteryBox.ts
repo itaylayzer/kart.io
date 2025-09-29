@@ -5,7 +5,6 @@ import { Global } from "../../store/Global";
 import { MathUtils } from "three";
 
 
-import { CS } from "@shared/types/codes";
 import { LocalPlayer } from "../../player/LocalPlayer";
 import { makeAutoLOD } from "../autoLLD";
 export class MysteryBox extends PhysicsObject {
@@ -77,7 +76,7 @@ export class MysteryBox extends PhysicsObject {
                 this.mysteryVisible &&
                 event.body.id === LocalPlayer.getInstance().id
             ) {
-                Global.client.send(CS.TOUCH_MYSTERY, id);
+                // Mystery triggers are processed on the server.
             }
         });
         Global.world.addBody(this);

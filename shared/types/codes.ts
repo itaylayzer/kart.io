@@ -28,3 +28,12 @@ export enum CC {
     UPDATE_TRANSFORM = "f",
     FINISH_LINE = "l",
 }
+
+// ===== Authoritative movement channel (numeric opcodes) =====
+export enum KCS {
+    INPUT_BUFFER = 0,
+}
+
+export enum KCC {
+    STATE_BUFFER = 0,
+}

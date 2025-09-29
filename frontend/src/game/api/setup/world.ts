@@ -1,6 +1,5 @@
 import * as CANNON from "cannon-es";
 import CannonDebugger from "cannon-es-debugger";
-import msgpack from "msgpack-lite";
 import * as THREE from "three";
 import {
     BlendShader,
@@ -269,30 +268,6 @@ function setupSocket(
         LocalPlayer.getInstance().items.setItem(itemIndex);
     })
 
-    Global.client.onMessage(CC.KEY_DOWN, (args: { pid: number; buffer: Buffer }) => {
-        const xplayer = Player.clients.get(args.pid);
-
-        const [key, ...data] = msgpack.decode(
-            new Uint8Array(args.buffer)
-        ) as number[];
-        if (data.length) {
-            const [x, y, z, rx, ry, rz, rw] = data;
-            xplayer?.position.set(x, y, z);
-            xplayer?.quaternion.set(rx, ry, rz, rw);
-        }
-        xplayer?.keyboard.keysDown.add(key);
-    });
-
-    Global.client.onMessage(CC.UPDATE_TRANSFORM, (buffer: Buffer) => {
-        const [pid, ...data] = msgpack.decode(
-            new Uint8Array(buffer)
-        ) as number[];
-        const xplayer = Player.clients.get(pid);
-        const [x, y, z, rx, ry, rz, rw] = data;
-        xplayer?.position.set(x, y, z);
-        xplayer?.quaternion.set(rx, ry, rz, rw);
-    });
-
     Global.client.onMessage(CC.FINISH_LINE, (pid: number) => {
         TrackerController.FINALS.push(pid);
     });
@@ -342,20 +317,6 @@ function setupSocket(
             }
         }
     );
-    Global.client.onMessage(CC.KEY_UP, (args: { pid: number; buffer: Buffer }) => {
-        const xplayer = Player.clients.get(args.pid);
-        const [key, ...data] = msgpack.decode(
-            new Uint8Array(args.buffer)
-        ) as number[];
-        if (data.length) {
-            const [x, y, z, rx, ry, rz, rw] = data;
-            xplayer?.position.set(x, y, z);
-            xplayer?.quaternion.set(rx, ry, rz, rw);
-        }
-        xplayer?.keyboard.keysUp.add(key);
-        xplayer?.keyboard.keysPressed.delete(key);
-    });
-
     $(client.state).players.onRemove(({ color }) => {
         OnlinePlayer.clients.get(color)?.disconnect();
 
