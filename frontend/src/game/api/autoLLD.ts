@@ -24,6 +24,7 @@ export function makeAutoLOD(
     lod.position.copy(srcMesh.position);
     lod.quaternion.copy(srcMesh.quaternion);
     lod.scale.copy(srcMesh.scale);
+    srcMesh.position.sub(lod.position);
 
     const srcGeom = srcMesh.geometry as THREE.BufferGeometry;
     if (!srcGeom.index) srcGeom.setIndex([...Array(srcGeom.getAttribute("position").count).keys()]); // ensure indexed
