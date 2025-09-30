@@ -473,9 +473,8 @@ function setupRenderer() {
         for (const water of waterGround) {
             water.position.y -= 1;
         }
-        Global.optimizedObjects.push(...waterGround);
         beforeUpdate = _beforeUpdate;
-        waterGround.forEach((c) => Global.scene.add(c));
+        waterGround.forEach((c) => makeAutoLOD(c, Global.scene, [0, 200], [1.0, 0.35]));
     }
 
     Global.render = () => {
