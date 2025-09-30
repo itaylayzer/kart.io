@@ -328,7 +328,8 @@ export function createFencesPilars(
     roadWidth: number,
     segmentCount: number = 10, // Number of segments
     ls: number = 1400,
-    roadMeshes: THREE.Mesh[]
+    roadMeshes: THREE.Mesh[],
+    radialSegments: number
 ): THREE.Mesh[] {
     const points = curve.getPoints(ls);
     const fenceMeshes: THREE.Mesh[] = [];
@@ -377,8 +378,8 @@ export function createFencesPilars(
                     0.1,
                     0.1,
                     0.8 + extraHeight + point.y,
-                    5,
-                    5
+                    radialSegments,
+                    1
                 ),
                 new THREE.MeshPhongMaterial({ color: "white" })
             );
