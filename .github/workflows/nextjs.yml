@@ -62,7 +62,7 @@ jobs:
 
             - name: Build with Next.js
               working-directory: ./frontend
-              run: bunx next build
+              run: NODE_ENV=production bunx next build
 
             - name: Upload artifact
               uses: actions/upload-pages-artifact@v3
