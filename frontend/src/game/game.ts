@@ -10,7 +10,7 @@ import { Scoreboard } from "./player/Scoreboard";
 import { WorldMap } from "./player/WorldMap";
 import { Global } from "./store/Global";
 import { KartClient } from "@/types/KartClient";
-import { FOG } from "./constants";
+import { LocalPlayer } from "./player/LocalPlayer";
 
 const game = (
     assets: loadedAssets,
@@ -44,10 +44,10 @@ const game = (
             Global.elapsedTime = clock.getElapsedTime();
 
             for (const mesh of Global.optimizedObjects) {
-                mesh.visible = mesh.position.distanceTo(Global.camera.position) < 50;
+                mesh.visible = mesh.position.distanceTo(LocalPlayer.getInstance().position) < 40;
             }
             for (const mesh of Global.unoptimizedObjects) {
-                mesh.visible = mesh.position.distanceTo(Global.camera.position) >= 46;
+                mesh.visible = mesh.position.distanceTo(LocalPlayer.getInstance().position) >= 20;
             }
 
             Global.updates

@@ -132,11 +132,25 @@ const add = (object: THREE.Mesh) => makeAutoLOD(object, Global.scene, [0, 50, 12
 function setupRoad() {
     const fullRoadsSegments = createRoad(Global.curve, 5, 50, 3000);
     const lowRoadsSegments = createRoad(Global.curve, 5, 50, 100);
+    const midRoadsSegments = createRoad(Global.curve, 5, 50, 500);
 
+    const SIZE = lowRoadsSegments.length;
+    for (let i = 0; i < SIZE; i++) {
+        const lod = new THREE.LOD();
+
+        lod.addLevel(midRoadsSegments[i], 0);
+        lod.addLevel(lowRoadsSegments[i], 50);
+
+        lod.position.copy(midRoadsSegments[i].getWorldPosition(new THREE.Vector3()));
+        midRoadsSegments[i].position.sub(lod.position);
+        lowRoadsSegments[i].position.sub(lod.position);
+        Global.scene.add(lod);
+        Global.unoptimizedObjects.push(lod);
+    }
 
     Global.roadMesh = fullRoadsSegments;
     Global.scene.add(...fullRoadsSegments);
-    Global.scene.add(...lowRoadsSegments);
+    Global.optimizedObjects.push(...Global.roadMesh);
 
     if (Global.settings.displayStars) {
         const points = createStarfield(1000, 50);
@@ -209,8 +223,6 @@ function setupRoad() {
 
     if (Global.settings.displaySun) add(sun);
 
-    Global.optimizedObjects.push(...Global.roadMesh);
-    Global.unoptimizedObjects.push(...lowRoadsSegments);
 }
 
 function setupSocket(
