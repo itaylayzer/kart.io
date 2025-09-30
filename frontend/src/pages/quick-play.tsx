@@ -7,12 +7,12 @@ import { CC, CS } from "@/shared/types/codes";
 import { useAssetStore } from "@/store/useAssetLoader";
 import { KartClient } from "@/types/KartClient";
 import { KartRaceState } from "@schema/KartRaceState";
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function quickPlay() {
     if (process.env.NODE_ENV === "production") {
-        notFound(); // acts like a 404
+        return <p></p>;
     }
 
     const Element = () => {
