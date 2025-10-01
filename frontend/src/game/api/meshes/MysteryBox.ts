@@ -84,6 +84,7 @@ export class MysteryBox extends PhysicsObject {
     }
 
     static toggleMystery(id: number, isVisible: boolean) {
-        this.boxes.get(id)!.mysteryVisible = isVisible;
+        const box = this.boxes.get(id);
+        if (box) box.mysteryVisible = isVisible;
     }
 }

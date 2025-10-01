@@ -281,22 +281,34 @@ function setupSocket(
     })
 
     client.state.players.forEach(({ color, startTransform }, key) => {
+        console.log('startTransform', startTransform)
         const xplayer = Player.clients.get(color);
+
         if (xplayer === undefined) return;
-        {
-            const { x, y, z } = startTransform.position;
-            xplayer.position.set(x, y, z);
+
+        const setPosition = () => {
+            {
+                const { x, y, z } = startTransform.position;
+                xplayer.position.set(x, y, z);
+            }
+
+            {
+                const { x, y, z, w } = startTransform.quaternion;
+                xplayer.quaternion.set(x, y, z, w);
+            }
+
+            xplayer.velocity.setZero();
+            xplayer.force.setZero();
+
+            xplayer.tracker.reset();
         }
 
-        {
-            const { x, y, z, w } = startTransform.quaternion;
-            xplayer.quaternion.set(x, y, z, w);
-        }
+        setTimeout(setPosition, 100);
+        // setTimeout(setPosition, 50);
+        // setTimeout(setPosition, 150);
+        // setTimeout(setPosition, 17);
+        // setPosition();
 
-        xplayer.velocity.setZero();
-        xplayer.force.setZero();
-
-        xplayer.tracker.reset();
     })
 
     AudioController.init();

@@ -1,5 +1,5 @@
 import { Room, Client, AuthContext, Delayed } from "@colyseus/core";
-import { KartRaceState, PlayerSchema } from "./schema/KartRaceState";
+import { KartRaceState, PlayerSchema, TransformSchema } from "./schema/KartRaceState";
 import { roadUtils as RoadUtils } from "@/utils/roadUtils";
 import { KartScene } from "@/scenes/KartScene";
 import { CC, CS } from "@shared/types/codes";
@@ -12,10 +12,14 @@ export class KartRace extends Room<
   maxClients = 16;
   autoDispose = false;
   state = new KartRaceState();
+
   private roadUtils: ReturnType<typeof RoadUtils>;
   private scene: KartScene;
   private password: string;
   private firstJoinTimer: Delayed;
+  private starters: TransformSchema[] = [];
+  private starterGenerator: ReturnType<ReturnType<typeof RoadUtils>['positionsGenerator']>
+
 
   onAuth(client: Client<any, any>, options: any, context: AuthContext) {
     console.log(
@@ -50,6 +54,8 @@ export class KartRace extends Room<
       roomName: options.roomName,
     });
     this.roadUtils = RoadUtils(options.mapId);
+    this.starterGenerator = this.roadUtils.positionsGenerator();
+
 
     this.state.mapId = options.mapId;
     this.password = options.password;
@@ -153,17 +159,9 @@ export class KartRace extends Room<
       this.state.players
     );
 
-    const generator = this.roadUtils.positionsGenerator();
-    this.state.players.forEach((player, key) => {
-      this.state.players.set(
-        key,
-        player.assign({ startTransform: generator() }).clone()
-      );
-    });
-
     this.clock.setTimeout(() => {
       this.clients.forEach((client) => client.send(CC.START_GAME));
-    }, this.patchRate * 3);
+    }, this.patchRate * 0);
   }
 
   onJoin(client: Client, options: { playerName: string }) {
@@ -178,6 +176,15 @@ export class KartRace extends Room<
         finished: false,
       })
     );
+
+    if (this.state.players.size > this.starters.length) {
+      const startTransform = this.starterGenerator();
+      this.state.players.set(client.sessionId, this.state.players.get(client.sessionId).assign({ startTransform }));
+      this.starters.push(startTransform);
+    } else {
+      const startTransform = this.starters[this.state.players.size - 1];
+      this.state.players.set(client.sessionId, this.state.players.get(client.sessionId).assign({ startTransform }));
+    }
 
     this.firstJoinTimer.clear();
     this.autoDispose = true;
