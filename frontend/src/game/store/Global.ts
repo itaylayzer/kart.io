@@ -5,8 +5,9 @@ import {
     Object3D,
     PerspectiveCamera,
     Scene,
-    WebGLRenderer,
 } from "three";
+
+import WebGPURenderer from "three/addons/renderers/webgpu/WebGPURenderer.js"
 import { MouseController } from "../controller/MouseController";
 import { CameraController } from "../controller/CameraController";
 
@@ -29,7 +30,7 @@ export class Global {
     public static mouseController: MouseController;
     public static scene: Scene;
     public static container: HTMLDivElement;
-    public static renderer: WebGLRenderer;
+    public static renderer: WebGPURenderer;
     public static camera: PerspectiveCamera;
     public static cameraController: CameraController;
     public static cannonDebugger: ReturnType<typeof CannonDebugger>;

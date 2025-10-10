@@ -402,6 +402,8 @@ export function createWater(
     segmentX: number,
     segmentY: number
 ) {
+    return [];
+    /*
     const segmentWidth = sizeX / segmentX;
     const segmentHeight = sizeY / segmentY;
 
@@ -506,6 +508,7 @@ export function createWater(
     };
 
     return [waterMeshes, beforeUpdate] as [THREE.Mesh[], () => void];
+    */
 }
 export function createStarfield(radius: number, count: number) {
     const starGeometry = new THREE.BufferGeometry();

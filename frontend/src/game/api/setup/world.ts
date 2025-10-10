@@ -40,6 +40,7 @@ import { StartTimer } from "../../player/StartTimer";
 import { KartClient } from "@/types/KartClient";
 import { getStateCallbacks } from "colyseus.js";
 import { makeAutoLOD } from "../autoLLD";
+import WebGPURenderer from "three/examples/jsm/renderers/webgpu/WebGPURenderer.js";
 
 function setupLights() {
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 1);
@@ -83,7 +84,7 @@ function setupObjects() {
 function setupScene() {
     Global.container = document.querySelector("div.gameContainer")!;
 
-    Global.renderer = new THREE.WebGLRenderer({
+    Global.renderer = new WebGPURenderer({
         antialias: Global.settings.Antialiasing,
     });
     // Global.renderer.sortObjects = false;
@@ -421,58 +422,58 @@ function setupSocket(
     });
 }
 function setupRenderer() {
-    const composer = new EffectComposer(Global.renderer);
+    // const composer = new EffectComposer(Global.renderer);
 
-    composer.addPass(new RenderPass(Global.scene, Global.camera));
+    // composer.addPass(new RenderPass(Global.scene, Global.camera));
 
-    const bloomPass = new UnrealBloomPass(
-        new THREE.Vector2(window.innerWidth, window.innerHeight),
-        1.5,
-        0.4,
-        0.85
-    );
-    bloomPass.threshold = 1;
-    bloomPass.strength = 0.5;
-    bloomPass.radius = 0;
+    // const bloomPass = new UnrealBloomPass(
+    //     new THREE.Vector2(window.innerWidth, window.innerHeight),
+    //     1.5,
+    //     0.4,
+    //     0.85
+    // );
+    // bloomPass.threshold = 1;
+    // bloomPass.strength = 0.5;
+    // bloomPass.radius = 0;
 
-    // blend pass
-    if (Global.settings.motionBlur > 0) {
-        const renderTargetParameters = {
-            minFilter: THREE.LinearFilter,
-            magFilter: THREE.LinearFilter,
-            stencilBuffer: false,
-        };
+    // // blend pass
+    // if (Global.settings.motionBlur > 0) {
+    //     const renderTargetParameters = {
+    //         minFilter: THREE.LinearFilter,
+    //         magFilter: THREE.LinearFilter,
+    //         stencilBuffer: false,
+    //     };
 
-        const savePass = new SavePass(
-            new THREE.WebGLRenderTarget(
-                window.innerWidth,
-                window.innerHeight,
-                renderTargetParameters
-            )
-        );
+    //     const savePass = new SavePass(
+    //         new THREE.WebGLRenderTarget(
+    //             window.innerWidth,
+    //             window.innerHeight,
+    //             renderTargetParameters
+    //         )
+    //     );
 
-        const blendPass = new ShaderPass(BlendShader, "tDiffuse1");
-        blendPass.uniforms["tDiffuse2"].value = savePass.renderTarget.texture;
-        blendPass.uniforms["mixRatio"].value =
-            (0.2 * Global.settings.motionBlur) / 100;
+    //     const blendPass = new ShaderPass(BlendShader, "tDiffuse1");
+    //     blendPass.uniforms["tDiffuse2"].value = savePass.renderTarget.texture;
+    //     blendPass.uniforms["mixRatio"].value =
+    //         (0.2 * Global.settings.motionBlur) / 100;
 
-        // output pass
+    //     // output pass
 
-        const outputPass = new ShaderPass(CopyShader);
-        outputPass.renderToScreen = true;
+    //     const outputPass = new ShaderPass(CopyShader);
+    //     outputPass.renderToScreen = true;
 
-        // setup pass chain
+    //     // setup pass chain
 
-        composer.addPass(blendPass);
-        composer.addPass(savePass);
-        composer.addPass(outputPass);
-    }
+    //     composer.addPass(blendPass);
+    //     composer.addPass(savePass);
+    //     composer.addPass(outputPass);
+    // }
 
-    if (Global.settings.useBloom) composer.addPass(bloomPass);
+    // if (Global.settings.useBloom) composer.addPass(bloomPass);
 
     window.addEventListener("resize", () => {
         const s = 1;
-        composer.setSize(s * window.innerWidth, s * window.innerHeight);
+        // composer.setSize(s * window.innerWidth, s * window.innerHeight);
         Global.camera.aspect = window.innerWidth / window.innerHeight;
         Global.camera.updateProjectionMatrix();
 
@@ -481,19 +482,19 @@ function setupRenderer() {
 
     let beforeUpdate = () => { };
     if (Global.settings.displayWater) {
-        const [waterGround, _beforeUpdate] = createWater(500, 500, 10, 10);
-        for (const water of waterGround) {
-            water.position.y -= 1;
-        }
-        beforeUpdate = _beforeUpdate;
-        waterGround.forEach((c) => makeAutoLOD(c, Global.scene, [0, 200], [1.0, 0.35]));
+        // const [waterGround, _beforeUpdate] = createWater(500, 500, 10, 10);
+        // for (const water of waterGround) {
+        //     water.position.y -= 1;
+        // }
+        // beforeUpdate = _beforeUpdate;
+        // waterGround.forEach((c) => makeAutoLOD(c, Global.scene, [0, 200], [1.0, 0.35]));
     }
 
     Global.render = () => {
         beforeUpdate();
 
-        // Global.renderer.render(Global.scene, Global.camera);
-        composer.render();
+        Global.renderer.render(Global.scene, Global.camera);
+        // composer.render();
     };
 }
 

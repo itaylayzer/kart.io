@@ -149,6 +149,7 @@ export class TrackerController {
             }</p>`;
     }
     public static getScoreboard(): [string, string, number, number][] {
+        return []
         return this.sortedTrackers.map(
             ([playerID, tracker], index) =>
                 [
