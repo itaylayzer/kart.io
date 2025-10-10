@@ -32,5 +32,6 @@ export const roadUtils = (mapId: number) => {
                 990
             );
         }
+        , curve
     }
 }

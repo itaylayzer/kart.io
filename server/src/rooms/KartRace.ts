@@ -148,13 +148,31 @@ export class KartRace extends Room<
         this.clients.forEach((c) => c.send(CC.SHOW_WINNERS, getPID(client)));
       }
     });
+
+    // this.setSimulationInterval(() => {
+    //   this.players.forEach((player, key) => {
+    //     const [doUpdate, position, tick] = player.update(1 / 60);
+
+    //     if (doUpdate) {
+    //       this.players.forEach((_, otherKey) => {
+    //         try {
+    //           const data = [key, position] as any[];
+    //           if (key === otherKey) data.push(tick);
+    //           this.clients
+    //             .getById(otherKey)
+    //             .send(ClientCodes.POSITION_UPDATE, data);
+    //         } catch { }
+    //       });
+    //     }
+    //   });
+    // })
   }
 
   onGameStart() {
     this.state.startTime = Date.now() + 5_000;
 
     this.scene = new KartScene(
-      this.state.mapId,
+      this.roadUtils.curve,
       this.state.mysteries,
       this.state.players
     );

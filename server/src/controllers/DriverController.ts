@@ -1,15 +1,6 @@
+import { PlayerEntity } from "@/entities/PlayerEntity";
 import * as CANNON from "cannon-es";
-import { Global } from "../store/Global";
-
 import * as THREE from "three";
-import { damp, lerp } from "three/src/math/MathUtils.js";
-import { IKeyboardController } from "./IKeyboardController";
-import clamp from "../api/clamp";
-import { AudioController } from "./AudioController";
-import { Player } from "../player/Player";
-import msgpack from "msgpack-lite";
-import { CS } from "../store/codes";
-import { StartTimer } from "../player/StartTimer";
 
 const maxDistance = 1;
 export class DriveController {
@@ -21,10 +12,7 @@ export class DriveController {
 
     constructor(
         public maxSpeed: number,
-        body: Player,
-        keyboard: IKeyboardController,
-        audio: AudioController,
-        islocal: boolean
+        player: PlayerEntity,
     ) {
         let steeringAngle = 0;
         let maxSteeringAngle = 15; // Limit steering angle (30 degrees)
@@ -42,11 +30,11 @@ export class DriveController {
         const putToGround = () => {
             raycaster.set(
                 new THREE.Vector3()
-                    .copy(body.position)
+                    .copy(player.position)
                     .add(new THREE.Vector3(0, 0.2, 0)),
-                new THREE.Vector3(0, -1, 0).applyQuaternion(body.quaternion)
+                new THREE.Vector3(0, -1, 0).applyQuaternion(player.quaternion)
             );
-            const intercetions = raycaster.intersectObjects(Global.roadMesh);
+            const intercetions = raycaster.intersectObjects(player.context.roadMesh);
 
             const closestIntersection =
                 intercetions.length === 0
@@ -64,10 +52,10 @@ export class DriveController {
                 // this.body.position.copy(this.last);
 
                 const releventTransfer =
-                    body.tracker.getPointTransform() as THREE.Object3D;
+                    player.tracker.getPointTransform() as THREE.Object3D;
 
                 const A = new THREE.Vector3()
-                    .copy(body.position)
+                    .copy(player.position)
                     .sub(releventTransfer.position);
                 const B = new THREE.Vector3(1, 0, 0).applyQuaternion(
                     releventTransfer.quaternion
@@ -81,7 +69,7 @@ export class DriveController {
 
                 impulse.multiplyScalar(5);
 
-                body.applyImpulse(
+                player.applyImpulse(
                     new CANNON.Vec3(impulse.x, impulse.y, impulse.z)
                 );
                 return;
@@ -93,12 +81,12 @@ export class DriveController {
             const groundNormal = closestIntersection.normal;
 
             // Adjust the kart's position to the ground
-            body.position.y = groundPoint.y;
+            player.position.y = groundPoint.y;
 
             if (groundNormal === undefined) return;
 
             // Convert the current up vector and ground normal to CANNON.Vec3
-            const currentUp = body.quaternion.vmult(new CANNON.Vec3(0, 1, 0));
+            const currentUp = player.quaternion.vmult(new CANNON.Vec3(0, 1, 0));
             const groundNormalCannon = new CANNON.Vec3(
                 groundNormal.x,
                 groundNormal.y,
@@ -110,26 +98,8 @@ export class DriveController {
             alignUpQuat.setFromVectors(currentUp, groundNormalCannon);
 
             // Apply the alignment quaternion to the current quaternion
-            body.quaternion = alignUpQuat.mult(body.quaternion);
+            player.quaternion = alignUpQuat.mult(player.quaternion);
         };
-
-        islocal &&
-            setInterval(() => {
-                if (rocketMode || shakeMode || body.velocity.isZero()) return;
-                Global.client.send(
-                    CS.UPDATE_TRANSFORM,
-                    msgpack.encode([
-                        body.pid,
-                        body.position.x,
-                        body.position.y,
-                        body.position.z,
-                        body.quaternion.x,
-                        body.quaternion.y,
-                        body.quaternion.z,
-                        body.quaternion.w,
-                    ])
-                );
-            }, 1000);
 
         const keyboardUpdate = () => {
             if (keyboard.isKeyDown(32) || keyboard.isKeyDown(-6)) {
@@ -140,7 +110,7 @@ export class DriveController {
                 driftSide[0] !== 0 &&
                 (keyboard.isKeyPressed(32) || keyboard.isKeyPressed(-6))
             ) {
-                driftTime += Global.deltaTime;
+                driftTime += player.context.deltaTime;
             }
             if (keyboard.isKeyUp(32) || keyboard.isKeyUp(-6) || driftTime > 3) {
                 driftSide[0] = 0;
@@ -150,22 +120,22 @@ export class DriveController {
             if (keyboard.horizontalRaw !== 0) {
                 speedTime = 0;
             }
-            speedTime += Global.deltaTime;
+            speedTime += player.context.deltaTime;
 
-            driftSide[1] = damp(
+            driftSide[1] = THREE.MathUtils.damp(
                 driftSide[1],
                 driftSide[0],
                 1.5,
-                Global.deltaTime * 7
+                player.context.deltaTime * 7
             );
             const driftSpeedMultiplier =
                 driftTime < 1 ? Math.sqrt(driftTime) : 5;
 
-            const timeSpeedMultiplier = clamp((speedTime - 1) / 3, 0, 5);
+            const timeSpeedMultiplier = THREE.MathUtils.clamp((speedTime - 1) / 3, 0, 5);
 
             // Determine forward direction
             const forward = new CANNON.Vec3(0, 0, 1);
-            body.quaternion.vmult(forward, forward);
+            player.quaternion.vmult(forward, forward);
 
             // Apply forward/reverse force
             const drivingForce = forward.scale(
@@ -176,16 +146,15 @@ export class DriveController {
                     timeSpeedMultiplier) *
                 2 *
                 +!shakeMode *
-                +!StartTimer.locked
             );
             // Calculate and apply friction (simplified)
-            const velocity = body.velocity.clone();
+            const velocity = player.velocity.clone();
             const frictionForce = velocity.scale(-2); // Adjust friction coefficient as needed
 
             // Combine driving force and friction
             const totalForce = drivingForce.vadd(frictionForce);
 
-            body.force.copy(totalForce);
+            player.force.copy(totalForce);
 
             // Steering mechanics
             steeringAngle =
@@ -198,19 +167,19 @@ export class DriveController {
             const steeringQuaternion = new CANNON.Quaternion();
             steeringQuaternion.setFromAxisAngle(
                 new CANNON.Vec3(0, 1, 0),
-                steeringAngle * 0.1 * Global.deltaTime
+                steeringAngle * 0.1 * player.context.deltaTime
             );
 
             // Apply steering by rotating the kart's quaternion
-            body.quaternion.mult(steeringQuaternion, body.quaternion);
+            player.quaternion.mult(steeringQuaternion, player.quaternion);
 
             // Optional: Apply angular damping to stabilize turning
             const angularDamping = 0.95;
-            body.angularVelocity.scale(angularDamping, body.angularVelocity);
+            player.angularVelocity.scale(angularDamping, player.angularVelocity);
 
             putToGround();
 
-            mushroomAddon = lerp(mushroomAddon, 0, Global.deltaTime * 5);
+            mushroomAddon = THREE.MathUtils.lerp(mushroomAddon, 0, player.context.deltaTime * 5);
 
             return [turboMode, driftSide[1], false, mushroomAddon] as [
                 boolean,
@@ -222,17 +191,17 @@ export class DriveController {
 
         const rocketUpdate = () => {
             const { quaternion: ThreeQuaternion } =
-                body.tracker.getPointTransform(body.position);
+                player.tracker.getPointTransform(player.position);
             const quaternion = new CANNON.Quaternion(
                 ThreeQuaternion.x,
                 ThreeQuaternion.y,
                 ThreeQuaternion.z,
                 ThreeQuaternion.w
             );
-            body.quaternion.slerp(
+            player.quaternion.slerp(
                 quaternion,
-                Global.deltaTime * 10,
-                body.quaternion
+                player.context.deltaTime * 10,
+                player.quaternion
             );
 
             const forward = new CANNON.Vec3(0, 0, 1);
@@ -240,10 +209,10 @@ export class DriveController {
 
             const drivingForce = forward.scale(10);
 
-            body.velocity.lerp(
+            player.velocity.lerp(
                 drivingForce,
-                Global.deltaTime * 7,
-                body.velocity
+                player.context.deltaTime * 7,
+                player.velocity
             );
 
             driftSide[1] = driftSide[0] = 0;
@@ -256,18 +225,11 @@ export class DriveController {
             const val = [keyboardUpdate, rocketUpdate][+rocketMode]();
 
             const velocityMagnitude = Math.abs(
-                body.velocity.dot(
-                    body.quaternion.vmult(new CANNON.Vec3(0, 0, 1))
+                player.velocity.dot(
+                    player.quaternion.vmult(new CANNON.Vec3(0, 0, 1))
                 )
             );
 
-            islocal &&
-                Global.settings.displayVelocity &&
-                (document.querySelector(
-                    "p#velocity"
-                )!.innerHTML = `${velocityMagnitude.toFixed(2)} KM/S`);
-
-            audio.update(isNaN(velocityMagnitude) ? 0 : velocityMagnitude);
             return val;
         };
         this.turbo = () => {
@@ -281,7 +243,7 @@ export class DriveController {
         };
         this.shake = () => {
             shakeMode = !rocketMode;
-            shakeMode && body.model.shake(1000);
+            // shakeMode && player.model.shake(1000);
 
             // @ts-ignore typescripts make it setTimeout by nodejs insted of webapi
             rocketTimeoutID = setTimeout(() => {
@@ -289,23 +251,23 @@ export class DriveController {
             }, 1000);
         };
         this.rocket = (pos, quat) => {
-            body.position.copy(pos);
-            body.quaternion.copy(quat);
+            player.position.copy(pos);
+            player.quaternion.copy(quat);
             rocketTimeoutID != undefined && clearTimeout(rocketTimeoutID);
 
-            body.model.setRocketModel(true);
+            player.setRocketModel(true);
             rocketMode = true;
 
             // @ts-ignore typescripts make it setTimeout by nodejs insted of webapi
             rocketTimeoutID = setTimeout(() => {
                 rocketMode = false;
-                body.model.setRocketModel(false);
+                player.setRocketModel(false);
             }, 5000);
         };
         this.mushroom = () => {
-            const forwardVec = body.quaternion.vmult(new CANNON.Vec3(0, 0, 1));
+            const forwardVec = player.quaternion.vmult(new CANNON.Vec3(0, 0, 1));
             mushroomAddon = 1;
-            body.applyImpulse(forwardVec.scale(40));
+            player.applyImpulse(forwardVec.scale(40));
         };
     }
 }
