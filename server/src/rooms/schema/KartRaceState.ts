@@ -1,9 +1,14 @@
 import { ArraySchema, MapSchema, Schema, type } from "@colyseus/schema";
+import { Vec3 } from "cannon-es";
 
 export class VectorSchema extends Schema {
   @type("float32") x: number = 0;
   @type("float32") y: number = 0;
   @type("float32") z: number = 0;
+
+  public cannon() {
+    return new Vec3(this.x, this.y, this.z);
+  }
 }
 
 export class QuaternionSchema extends Schema {

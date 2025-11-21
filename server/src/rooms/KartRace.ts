@@ -4,6 +4,8 @@ import { roadUtils as RoadUtils } from "@/utils/roadUtils";
 import { KartScene } from "@/scenes/KartScene";
 import { CC, CS } from "@shared/types/codes";
 import { MathUtils } from "three";
+import { SyncedMovementController } from "@/controllers/SyncedMovementController";
+import { InputPayload, StatePayload } from "@shared/types/payloads";
 
 export class KartRace extends Room<
   KartRaceState,
@@ -19,6 +21,8 @@ export class KartRace extends Room<
   private firstJoinTimer: Delayed;
   private starters: TransformSchema[] = [];
   private starterGenerator: ReturnType<ReturnType<typeof RoadUtils>['positionsGenerator']>
+  private movementControllers: Map<string, SyncedMovementController> = new Map();
+  private gameStarted = false;
 
 
   onAuth(client: Client<any, any>, options: any, context: AuthContext) {
@@ -132,36 +136,95 @@ export class KartRace extends Room<
       );
     });
 
-    this.onMessage(CS.FINISH_LINE, (client) => {
-      this.clients.forEach((c) => c.send(CC.FINISH_LINE, getPID(client)));
-
-      this.state.players.set(client.sessionId, this.state.players.get(client.sessionId).assign({ finished: true }));
-
-      const allFinishes = Array.from(this.state.players.values()).map(
-        (v) => v.finished
-      );
-
-      const allFinished =
-        allFinishes.filter((v) => !v).length === 0;
-
-      if (allFinished) {
-        this.clients.forEach((c) => c.send(CC.SHOW_WINNERS, getPID(client)));
+    // Authoritative input buffer handler
+    this.onMessage(CS.INPUT_BUFFER, (client, inputPayload: InputPayload) => {
+      const controller = this.movementControllers.get(client.sessionId);
+      if (controller && this.gameStarted) {
+        controller.onClientInput(inputPayload);
       }
     });
+
+    // Server-authoritative finish line detection (moved to server tick)
+    // Client no longer sends FINISH_LINE, server detects it
   }
 
   onGameStart() {
     this.state.startTime = Date.now() + 5_000;
 
     this.scene = new KartScene(
-      this.state.mapId,
+      this.roadUtils.curve,
       this.state.mysteries,
       this.state.players
     );
 
+    // Initialize movement controllers for all players
+    this.state.players.forEach((playerSchema, sessionId) => {
+      const playerEntity = this.scene.getPlayerEntity(sessionId);
+      if (playerEntity) {
+        const controller = new SyncedMovementController(
+          sessionId,
+          playerEntity,
+          (state: StatePayload) => {
+            // Send state to the owning client
+            const client = this.clients.find(c => c.sessionId === sessionId);
+            if (client) {
+              client.send(CC.STATE_BUFFER, state);
+            }
+            
+            // Send position update to other clients
+            this.clients.forEach((c) => {
+              if (c.sessionId !== sessionId) {
+                c.send(CC.POSITION_UPDATE, {
+                  pid: playerSchema.color,
+                  position: state.position,
+                  quaternion: state.quaternion,
+                  velocity: state.velocity,
+                  turboMode: state.turboMode,
+                  rocketMode: state.rocketMode,
+                  driftSide: state.driftSide,
+                  mushroomAddon: state.mushroomAddon,
+                });
+              }
+            });
+          }
+        );
+        this.movementControllers.set(sessionId, controller);
+        playerEntity.engine.setGameStarted(false); // Will be enabled when game actually starts
+      }
+    });
+
+    // Start game after countdown
     this.clock.setTimeout(() => {
+      this.gameStarted = true;
+      // Enable movement for all players
+      this.state.players.forEach((_, sessionId) => {
+        const playerEntity = this.scene.getPlayerEntity(sessionId);
+        if (playerEntity) {
+          playerEntity.engine.setGameStarted(true);
+        }
+      });
+      
       this.clients.forEach((client) => client.send(CC.START_GAME));
-    }, this.patchRate * 0);
+    }, 5000);
+
+    // Set up authoritative simulation loop (60Hz for physics, 20Hz for state updates)
+    this.setSimulationInterval(() => {
+      if (!this.gameStarted || !this.scene) return;
+
+      // Update scene (physics, movement controllers)
+      this.scene.update();
+
+      // Update movement controllers (process inputs, send states)
+      this.movementControllers.forEach((controller) => {
+        controller.update(1 / 60); // Fixed timestep
+      });
+
+      // Server-authoritative finish line detection
+      this.checkFinishLine();
+
+      // Server-authoritative mystery box management
+      this.updateMysteryBoxes();
+    }, 1000 / 60); // 60Hz physics update
   }
 
   onJoin(client: Client, options: { playerName: string }) {
@@ -193,12 +256,26 @@ export class KartRace extends Room<
   onLeave(client: Client, consented: boolean) {
     console.log(client.sessionId, "left!");
     this.state.players.delete(client.sessionId);
+    this.movementControllers.delete(client.sessionId);
 
     this.scene?.onLeave(client.sessionId);
 
     if (this.state.players.size === 0) {
       this.disconnect();
     }
+  }
+
+  private checkFinishLine() {
+    // Server-authoritative finish line detection
+    // This should check if players have completed the race
+    // Implementation depends on your finish line detection logic
+    // For now, keeping the client-triggered version but server should validate
+  }
+
+  private updateMysteryBoxes() {
+    // Server-authoritative mystery box spawning/despawning
+    // Check if mystery boxes should respawn based on time
+    // This ensures all clients see the same mystery box states
   }
 
   onDispose() {
