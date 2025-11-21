@@ -32,3 +32,5 @@ url-guide.md
 # Configuration Files
 .env
 config.ts
+
+*local*

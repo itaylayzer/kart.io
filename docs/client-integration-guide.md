@@ -2,7 +2,12 @@
 
 ## Current Status
 
-The server-side authoritative system is fully implemented and ready. The client-side `PredictionController` has been updated to work with the new system, but it needs to be integrated into the game loop.
+✅ **COMPLETED**: The client-side `PredictionController` is now fully integrated into the game loop. The system works as follows:
+
+-   **Local Player**: Uses `PredictionController` for client prediction and server reconciliation
+-   **Other Players**: Receive `CC.POSITION_UPDATE` and are lerped (no reconciliation)
+-   **Game Rendering**: Starts immediately during countdown (doesn't wait for `CC.START_GAME`)
+-   **Countdown**: Shows "3", "2", "1", "Go!" during the 5 second wait
 
 ## What Needs to Be Done
 
@@ -29,13 +34,19 @@ import { PredictionController } from "@/game/controller/PredictionController";
 import { CS, CC } from "@/shared/types/codes";
 import { InputPayload, StatePayload } from "@shared/types/payloads";
 
-function setupSocket(client: KartClient, localID: number, players: Map<number, [string, number, boolean]>) {
+function setupSocket(
+    client: KartClient,
+    localID: number,
+    players: Map<number, [string, number, boolean]>
+) {
     Global.client = client;
 
     // Create prediction controller for local player
-    const predictionController = new PredictionController((inputPayload: InputPayload) => {
-        client.send(CS.INPUT_BUFFER, inputPayload);
-    });
+    const predictionController = new PredictionController(
+        (inputPayload: InputPayload) => {
+            client.send(CS.INPUT_BUFFER, inputPayload);
+        }
+    );
 
     // Handle server state updates
     client.onMessage(CC.STATE_BUFFER, (state: StatePayload) => {
@@ -43,35 +54,46 @@ function setupSocket(client: KartClient, localID: number, players: Map<number, [
     });
 
     // Handle other players' position updates
-    client.onMessage(CC.POSITION_UPDATE, (data: {
-        pid: number;
-        position: Vector3Like;
-        quaternion: QuaternionLike;
-        velocity: Vector3Like;
-        turboMode: boolean;
-        rocketMode: boolean;
-        driftSide: number;
-        mushroomAddon: number;
-    }) => {
-        const onlinePlayer = Player.clients.get(data.pid);
-        if (onlinePlayer) {
-            // Update online player position/rotation
-            onlinePlayer.position.set(data.position.x, data.position.y, data.position.z);
-            onlinePlayer.quaternion.set(
-                data.quaternion.x,
-                data.quaternion.y,
-                data.quaternion.z,
-                data.quaternion.w
-            );
-            onlinePlayer.velocity.set(data.velocity.x, data.velocity.y, data.velocity.z);
-            
-            // Update visual effects
-            onlinePlayer.turboMode = data.turboMode;
-            onlinePlayer.rocketMode = data.rocketMode;
-            onlinePlayer.driftSide = data.driftSide;
-            onlinePlayer.mushroomAddon = data.mushroomAddon;
+    client.onMessage(
+        CC.POSITION_UPDATE,
+        (data: {
+            pid: number;
+            position: Vector3Like;
+            quaternion: QuaternionLike;
+            velocity: Vector3Like;
+            turboMode: boolean;
+            rocketMode: boolean;
+            driftSide: number;
+            mushroomAddon: number;
+        }) => {
+            const onlinePlayer = Player.clients.get(data.pid);
+            if (onlinePlayer) {
+                // Update online player position/rotation
+                onlinePlayer.position.set(
+                    data.position.x,
+                    data.position.y,
+                    data.position.z
+                );
+                onlinePlayer.quaternion.set(
+                    data.quaternion.x,
+                    data.quaternion.y,
+                    data.quaternion.z,
+                    data.quaternion.w
+                );
+                onlinePlayer.velocity.set(
+                    data.velocity.x,
+                    data.velocity.y,
+                    data.velocity.z
+                );
+
+                // Update visual effects
+                onlinePlayer.turboMode = data.turboMode;
+                onlinePlayer.rocketMode = data.rocketMode;
+                onlinePlayer.driftSide = data.driftSide;
+                onlinePlayer.mushroomAddon = data.mushroomAddon;
+            }
         }
-    });
+    );
 
     // Update prediction controller in game loop
     // This should be called in the main game update loop (probably in game.ts)
@@ -124,19 +146,18 @@ if (!gameStarted) {
 
 ## Testing Checklist
 
-- [ ] Client sends `CS.INPUT_BUFFER` messages
-- [ ] Client receives `CC.STATE_BUFFER` messages
-- [ ] Client receives `CC.POSITION_UPDATE` for other players
-- [ ] Local player movement is predicted smoothly
-- [ ] Reconciliation works when server state differs
-- [ ] Other players' positions update correctly
-- [ ] No jitter or stuttering in movement
-- [ ] Works with network lag
+-   [ ] Client sends `CS.INPUT_BUFFER` messages
+-   [ ] Client receives `CC.STATE_BUFFER` messages
+-   [ ] Client receives `CC.POSITION_UPDATE` for other players
+-   [ ] Local player movement is predicted smoothly
+-   [ ] Reconciliation works when server state differs
+-   [ ] Other players' positions update correctly
+-   [ ] No jitter or stuttering in movement
+-   [ ] Works with network lag
 
 ## Notes
 
-- The server is ready and waiting for `CS.INPUT_BUFFER` messages
-- The `PredictionController` class is fully implemented
-- Integration is mainly about connecting it to the existing game loop
-- Old input system can be kept temporarily for backwards compatibility during testing
-
+-   The server is ready and waiting for `CS.INPUT_BUFFER` messages
+-   The `PredictionController` class is fully implemented
+-   Integration is mainly about connecting it to the existing game loop
+-   Old input system can be kept temporarily for backwards compatibility during testing

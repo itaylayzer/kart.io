@@ -113,23 +113,9 @@ export class DriveController {
             body.quaternion = alignUpQuat.mult(body.quaternion);
         };
 
-        islocal &&
-            setInterval(() => {
-                if (rocketMode || shakeMode || body.velocity.isZero()) return;
-                Global.client.send(
-                    CS.UPDATE_TRANSFORM,
-                    msgpack.encode([
-                        body.pid,
-                        body.position.x,
-                        body.position.y,
-                        body.position.z,
-                        body.quaternion.x,
-                        body.quaternion.y,
-                        body.quaternion.z,
-                        body.quaternion.w,
-                    ])
-                );
-            }, 1000);
+        // REMOVED: Client should NEVER send position updates to server
+        // Server is authoritative on all player positions
+        // Client only sends inputs via CS.INPUT_BUFFER
 
         const keyboardUpdate = () => {
             if (keyboard.isKeyDown(32) || keyboard.isKeyDown(-6)) {

@@ -46,7 +46,7 @@ export class PredictionController {
             this.currentTick++;
         }
 
-        // Interpolate between predicted state and server state for smooth rendering
+        // Return predicted state for rendering (with reconciliation applied)
         return {
             position: this.position.clone(),
             quaternion: this.quaternion.clone(),
@@ -62,17 +62,34 @@ export class PredictionController {
     };
 
     private handleTick = () => {
-        // Check for reconciliation if we have server state
+        // Always check for reconciliation when we have new server state
+        // This ensures we reconcile the LOCAL PLAYER's position with server
         if (
             this.latestServerState !== null &&
             this.lastProcessedState !== null &&
-            new Vector3()
+            this.latestServerState.tick !== this.lastProcessedState.tick
+        ) {
+            // Check if position differs significantly
+            const positionDiff = new Vector3()
                 .copy(this.latestServerState.position)
                 .distanceTo(
                     new Vector3().copy(this.lastProcessedState.position)
-                ) > 0.001
-        ) {
-            this.handleServerReconciliation();
+                );
+            
+            if (positionDiff > 0.001) {
+                this.handleServerReconciliation();
+            } else {
+                // Small difference, just update latest state
+                this.lastProcessedState = this.latestServerState;
+                this.latestStatedPosition.copy(this.latestServerState.position);
+                this.latestStatedQuaternion.set(
+                    this.latestServerState.quaternion.x,
+                    this.latestServerState.quaternion.y,
+                    this.latestServerState.quaternion.z,
+                    this.latestServerState.quaternion.w
+                );
+                this.latestStatedVelocity.copy(this.latestServerState.velocity);
+            }
         }
 
         // Get average input from recent inputs

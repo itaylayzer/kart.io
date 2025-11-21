@@ -128,13 +128,8 @@ export class KartRace extends Room<
       );
     });
 
-    this.onMessage(CS.UPDATE_TRANSFORM, (client, buffer: Buffer) => {
-      this.clients.forEach(
-        (c) =>
-          c.sessionId !== client.sessionId &&
-          c.send(CC.UPDATE_TRANSFORM, buffer)
-      );
-    });
+    // REMOVED: CS.UPDATE_TRANSFORM - Server is authoritative on all positions
+    // Clients should NEVER send position updates, only inputs via CS.INPUT_BUFFER
 
     // Authoritative input buffer handler
     this.onMessage(CS.INPUT_BUFFER, (client, inputPayload: InputPayload) => {
@@ -151,6 +146,7 @@ export class KartRace extends Room<
   onGameStart() {
     this.state.startTime = Date.now() + 5_000;
 
+    // Create scene immediately so clients can render during countdown
     this.scene = new KartScene(
       this.roadUtils.curve,
       this.state.mysteries,
@@ -165,6 +161,9 @@ export class KartRace extends Room<
           sessionId,
           playerEntity,
           (state: StatePayload) => {
+            // Only send updates if game has started
+            if (!this.gameStarted) return;
+            
             // Send state to the owning client
             const client = this.clients.find(c => c.sessionId === sessionId);
             if (client) {
@@ -189,11 +188,34 @@ export class KartRace extends Room<
           }
         );
         this.movementControllers.set(sessionId, controller);
-        playerEntity.engine.setGameStarted(false); // Will be enabled when game actually starts
+        playerEntity.engine.setGameStarted(false); // Movement disabled until countdown ends
       }
     });
 
-    // Start game after countdown
+    // Set up simulation loop immediately (but movement is disabled)
+    // This allows the scene to render and players to see their starting positions
+    this.setSimulationInterval(() => {
+      if (!this.scene) return;
+
+      // Update scene (physics) - but movement controllers won't process inputs until gameStarted = true
+      this.scene.update();
+
+      // Only process inputs and send states if game has started
+      if (this.gameStarted) {
+        // Update movement controllers (process inputs, send states)
+        this.movementControllers.forEach((controller) => {
+          controller.update(1 / 60); // Fixed timestep
+        });
+
+        // Server-authoritative finish line detection
+        this.checkFinishLine();
+
+        // Server-authoritative mystery box management
+        this.updateMysteryBoxes();
+      }
+    }, 1000 / 60); // 60Hz physics update
+
+    // Start game after 5 second countdown
     this.clock.setTimeout(() => {
       this.gameStarted = true;
       // Enable movement for all players
@@ -206,25 +228,6 @@ export class KartRace extends Room<
       
       this.clients.forEach((client) => client.send(CC.START_GAME));
     }, 5000);
-
-    // Set up authoritative simulation loop (60Hz for physics, 20Hz for state updates)
-    this.setSimulationInterval(() => {
-      if (!this.gameStarted || !this.scene) return;
-
-      // Update scene (physics, movement controllers)
-      this.scene.update();
-
-      // Update movement controllers (process inputs, send states)
-      this.movementControllers.forEach((controller) => {
-        controller.update(1 / 60); // Fixed timestep
-      });
-
-      // Server-authoritative finish line detection
-      this.checkFinishLine();
-
-      // Server-authoritative mystery box management
-      this.updateMysteryBoxes();
-    }, 1000 / 60); // 60Hz physics update
   }
 
   onJoin(client: Client, options: { playerName: string }) {

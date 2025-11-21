@@ -1,0 +1,67 @@
+# Cursor Rules for kart.io Authoritative Server
+
+## Task Completion Checklist
+
+Before marking any task as complete, you MUST:
+
+1. **Build Both Frontend and Backend**
+
+    ```bash
+    cd server && bun run build
+    cd ../frontend && bun run build
+    ```
+
+    - If builds fail, fix all compilation errors before proceeding
+    - Never commit code that doesn't compile
+
+2. **Sync Shared Types**
+
+    - Always use `shared/types/payloads.ts` as the source of truth for `InputPayload` and `StatePayload`
+    - Frontend and server should import from `@shared/types/payloads`
+    - Never duplicate type definitions - if you need to add fields, add them to shared/types
+    - After modifying shared types, rebuild both frontend and server
+
+3. **Verify No Client Position Sending**
+    - Client should NEVER send full position/transform to server
+    - Server is authoritative on all player positions
+    - Client only sends `CS.INPUT_BUFFER` with input (horizontal, vertical, drift)
+    - Remove any code that sends `CS.UPDATE_TRANSFORM` or similar position updates
+    - Check for `setInterval` or `setTimeout` that send positions
+
+## Architecture Principles
+
+1. **Server Authority**
+
+    - Server controls all movement, physics, and game state
+    - Server sends authoritative state via `CC.STATE_BUFFER` to owning client
+    - Server sends `CC.POSITION_UPDATE` to other clients for other players
+
+2. **Client Prediction**
+
+    - Client predicts movement locally for responsiveness
+    - Client reconciles with server state when differences occur
+    - Client never sends position - only inputs
+
+3. **Game Start Flow**
+    - Game renders during 5 second countdown
+    - Players see their starting positions
+    - Movement is disabled until `CC.START_GAME` is received
+    - After countdown, server enables movement and sends `CC.START_GAME`
+
+## Common Issues to Check
+
+-   [ ] Client sending position updates (should only send inputs)
+-   [ ] Type mismatches between shared/types and frontend/server
+-   [ ] Build errors in either frontend or server
+-   [ ] Movement enabled before game start
+-   [ ] Missing reconciliation on client
+-   [ ] Server not processing inputs correctly
+
+## File Locations
+
+-   Shared types: `shared/types/payloads.ts`
+-   Server room: `server/src/rooms/KartRace.ts`
+-   Server controller: `server/src/controllers/DriverController.ts`
+-   Server movement: `server/src/controllers/SyncedMovementController.ts`
+-   Client prediction: `frontend/src/game/controller/PredictionController.ts`
+-   Client setup: `frontend/src/game/api/setup/world.ts`
