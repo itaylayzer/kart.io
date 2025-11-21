@@ -80,3 +80,19 @@ jobs:
             - name: Deploy to GitHub Pages
               id: deployment
               uses: actions/deploy-pages@v4
+
+    # Server Update job
+    server:
+        environment:
+            name: server-deploy
+        steps:
+            - uses: actions/checkout@v4
+            - name: Run scripts
+              uses: appleboy/ssh-action@v1.0.0
+              with:
+                  host: ${{ vars.SERVER_IP }}
+                  username: ${{ vars.SSH_USER }}
+                  key: ${{ secrets.SSH_PRIVATE_KEY }}
+                  script: |
+                      cd /home/ubuntu/ 
+                      bash kart.io.deploy.sh
