@@ -61,11 +61,16 @@ export class KartScene {
         this.context.world.step(2.6 * this.context.deltaTime);
     }
 
+    getPlayerEntity(sessionId: string): PlayerEntity | undefined {
+        return this.players.get(sessionId);
+    }
+
     onLeave(id: string) {
         const playerEntity = this.players.get(id);
-        playerEntity.dispose();
-
-        this.players.delete(id);
+        if (playerEntity) {
+            playerEntity.dispose();
+            this.players.delete(id);
+        }
     }
 
     dispose() {

@@ -9,6 +9,7 @@ export enum CS {
     APPLY_MYSTERY = "a",
     UPDATE_TRANSFORM = "f",
     FINISH_LINE = "l",
+    INPUT_BUFFER = "b",  // Input buffer for authoritative movement
 }
 
 // client codes
@@ -27,4 +28,6 @@ export enum CC {
     SHOW_WINNERS = "w",
     UPDATE_TRANSFORM = "f",
     FINISH_LINE = "l",
+    STATE_BUFFER = "x",  // State buffer for authoritative movement
+    POSITION_UPDATE = "p",  // Position update for other players
 }

@@ -8,7 +8,7 @@ import { TrackerController } from "@/controllers/TrackerController";
 
 export class PlayerEntity extends PhysicsObject {
 
-    private engine: DriveController;
+    public engine: DriveController;
     public tracker: TrackerController;
     constructor(public context: GameContext, private schema: PlayerSchema) {
 
@@ -32,12 +32,11 @@ export class PlayerEntity extends PhysicsObject {
         this.context.playersBodies.add(this.id);
 
         this.update.push(() => {
-            this.engine.update();
+            // Update tracker (for road alignment)
             this.tracker.update();
-
-        },
-
-            this.matchEngines.bind(this));
+            // Match physics to visual
+            this.matchEngines();
+        });
     }
 
 
