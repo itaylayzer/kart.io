@@ -65,3 +65,4 @@ Before marking any task as complete, you MUST:
 -   Server movement: `server/src/controllers/SyncedMovementController.ts`
 -   Client prediction: `frontend/src/game/controller/PredictionController.ts`
 -   Client setup: `frontend/src/game/api/setup/world.ts`
+

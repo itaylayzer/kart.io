@@ -163,13 +163,13 @@ export class KartRace extends Room<
           (state: StatePayload) => {
             // Only send updates if game has started
             if (!this.gameStarted) return;
-            
+
             // Send state to the owning client
             const client = this.clients.find(c => c.sessionId === sessionId);
             if (client) {
               client.send(CC.STATE_BUFFER, state);
             }
-            
+
             // Send position update to other clients
             this.clients.forEach((c) => {
               if (c.sessionId !== sessionId) {
@@ -215,6 +215,8 @@ export class KartRace extends Room<
       }
     }, 1000 / 60); // 60Hz physics update
 
+    this.clients.forEach((client) => client.send(CC.START_GAME));
+
     // Start game after 5 second countdown
     this.clock.setTimeout(() => {
       this.gameStarted = true;
@@ -225,8 +227,7 @@ export class KartRace extends Room<
           playerEntity.engine.setGameStarted(true);
         }
       });
-      
-      this.clients.forEach((client) => client.send(CC.START_GAME));
+
     }, 5000);
   }
 
