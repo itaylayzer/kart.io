@@ -168,30 +168,11 @@ function setupRoad() {
                 5.1,
                 100,
                 1400,
-                fullRoadsSegments,
-                5
+                fullRoadsSegments
             );
-            const lowTiles = createFencesPilars(
-                Global.curve,
-                5.1,
-                100,
-                1400,
-                fullRoadsSegments,
-                3
-            );
-
+           
             for (let i = 0; i < tiles.length; i++) {
-                const lod = new THREE.LOD();
-
-                lod.position.copy(tiles[i].position);
-
-                tiles[i].position.sub(lod.position);
-                lowTiles[i].position.sub(lod.position);
-
-                lod.addLevel(tiles[i], 0);
-                lod.addLevel(lowTiles[i], 50);
-
-                Global.scene.add(lod);
+                Global.scene.add(tiles[i]);
             }
 
             tiles.forEach((f) => add(f));

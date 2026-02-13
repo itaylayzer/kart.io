@@ -329,7 +329,6 @@ export function createFencesPilars(
     segmentCount: number = 10, // Number of segments
     ls: number = 1400,
     roadMeshes: THREE.Mesh[],
-    radialSegments: number
 ): THREE.Mesh[] {
     const points = curve.getPoints(ls);
     const fenceMeshes: THREE.Mesh[] = [];
@@ -358,6 +357,8 @@ export function createFencesPilars(
             normal.y = 0;
             normal.normalize();
 
+            const centeralPoint = new THREE.Vector3(points[startIdx].x, points[startIdx].y, points[startIdx].z);
+
             // Calculate the four vertices for the current fence segment
             const point = new THREE.Vector3(
                 points[startIdx].x + direction * roadWidth * normal.x,
@@ -374,15 +375,17 @@ export function createFencesPilars(
             const extraHeight = 1 - 0.8 / 2;
 
             const mesh = new THREE.Mesh(
-                new THREE.CylinderGeometry(
-                    0.1,
-                    0.1,
+                new THREE.BoxGeometry(
+                    0.2,
                     0.8 + extraHeight + point.y,
-                    radialSegments,
-                    1
+                    0.2,
                 ),
                 new THREE.MeshPhongMaterial({ color: "white" })
             );
+
+            mesh.lookAt(centeralPoint);
+            mesh.rotation.x = 0;
+            mesh.rotation.z = 0;
             mesh.frustumCulled = true;
 
             mesh.position.copy(point);
