@@ -202,121 +202,131 @@ export function createFences(
     const fenceMeshes: THREE.Mesh[] = [];
 
     const dw = [1, -1]; // Directions for both sides of the road
-
-    for (let side = 0; side < 2; side++) {
-        for (
-            let segmentIndex = 0;
-            segmentIndex < segmentCount;
-            segmentIndex++
-        ) {
-            const startIdx = segmentIndex * segmentLength;
-            const endIdx = (segmentIndex + 1) * segmentLength;
-
-            const segmentGeometry = new THREE.BufferGeometry();
-            const vertices = [];
-            const indices = [];
-
-            const direction = dw[side];
-
-            for (let j = startIdx; j < endIdx; j++) {
-                const tangent = curve.getTangent(j / ls);
-                const normal = new THREE.Vector3();
-                const binormal = new THREE.Vector3(0, 1, 0);
-
-                normal.crossVectors(tangent, binormal);
-                normal.y = 0;
-                normal.normalize();
-
-                // Calculate the four vertices for the current fence segment
-                const bottomLeft = new THREE.Vector3(
-                    points[j].x + direction * roadWidth * normal.x,
-                    points[j].y,
-                    points[j].z + direction * roadWidth * normal.z
-                ).add(binormal.clone().multiplyScalar(0.1));
-
-                const topLeft = new THREE.Vector3(
-                    points[j].x + direction * roadWidth * normal.x,
-                    points[j].y,
-                    points[j].z + direction * roadWidth * normal.z
-                ).add(binormal.clone().multiplyScalar(0.3));
-
-                const bottomRight = new THREE.Vector3(
-                    points[j + 1].x + direction * roadWidth * normal.x,
-                    points[j + 1].y,
-                    points[j + 1].z + direction * roadWidth * normal.z
-                ).add(binormal.clone().multiplyScalar(0.1));
-
-                const topRight = new THREE.Vector3(
-                    points[j + 1].x + direction * roadWidth * normal.x,
-                    points[j + 1].y,
-                    points[j + 1].z + direction * roadWidth * normal.z
-                ).add(binormal.clone().multiplyScalar(0.3));
-
-                // Push the vertices to the vertices array
-                vertices.push(
-                    bottomLeft.x,
-                    bottomLeft.y,
-                    bottomLeft.z, // 0
-                    bottomRight.x,
-                    bottomRight.y,
-                    bottomRight.z, // 1
-                    topRight.x,
-                    topRight.y,
-                    topRight.z, // 2
-                    topLeft.x,
-                    topLeft.y,
-                    topLeft.z // 3
-                );
-
-                const baseIndex = (j - startIdx) * 4;
-
-                // Create two triangles (two faces) using the vertices
-                indices.push(
-                    baseIndex,
-                    baseIndex + 1,
-                    baseIndex + 2, // First triangle
-                    baseIndex,
-                    baseIndex + 2,
-                    baseIndex + 3 // Second triangle
-                );
-            }
-
-            // Calculate the centroid of the segment
-            const centroid = new THREE.Vector3();
-            for (let i = 0; i < vertices.length; i += 3) {
-                centroid.x += vertices[i];
-                centroid.y += vertices[i + 1];
-                centroid.z += vertices[i + 2];
-            }
-            centroid.divideScalar(vertices.length / 3);
-
-            // Translate vertices so the centroid is at the origin
-            for (let i = 0; i < vertices.length; i += 3) {
-                vertices[i] -= centroid.x;
-                vertices[i + 1] -= centroid.y;
-                vertices[i + 2] -= centroid.z;
-            }
-
-            segmentGeometry.setAttribute(
-                "position",
-                new THREE.Float32BufferAttribute(vertices, 3)
-            );
-            segmentGeometry.setIndex(indices);
-
-            const material = new THREE.MeshBasicMaterial({
-                color: 0x8b4513, // Brown color for the fence
+    const yaddonMultiplier = 0.13;
+    const height = 0.1;
+    for (let yaddon = 0; yaddon < 2; yaddon++) {
+        const material = yaddon ? new THREE.MeshBasicMaterial({
+            color: 0x8b4513, // Brown color for the fence
+            side: THREE.DoubleSide,
+        }) :
+            new THREE.MeshBasicMaterial({
+                color: 0x326fa8, // Brown color for the fence
                 side: THREE.DoubleSide,
-            });
+            })
+            ;
 
-            segmentGeometry.computeBoundingBox();
-            segmentGeometry.computeVertexNormals();
+        for (let side = 0; side < 2; side++) {
+            for (
+                let segmentIndex = 0;
+                segmentIndex < segmentCount;
+                segmentIndex++
+            ) {
+                const startIdx = segmentIndex * segmentLength;
+                const endIdx = (segmentIndex + 1) * segmentLength;
 
-            const segmentMesh = new THREE.Mesh(segmentGeometry, material);
+                const segmentGeometry = new THREE.BufferGeometry();
+                const vertices = [];
+                const indices = [];
 
-            // Set the position of the segment mesh to the centroid
-            segmentMesh.position.copy(centroid);
-            segmentMesh.frustumCulled = true;
-            fenceMeshes.push(segmentMesh);
+                const direction = dw[side];
+
+                for (let j = startIdx; j < endIdx; j++) {
+                    const tangent = curve.getTangent(j / ls);
+                    const normal = new THREE.Vector3();
+                    const binormal = new THREE.Vector3(0, 1, 0);
+
+                    normal.crossVectors(tangent, binormal);
+                    normal.y = 0;
+                    normal.normalize();
+
+                    // Calculate the four vertices for the current fence segment
+                    const bottomLeft = new THREE.Vector3(
+                        points[j].x + direction * roadWidth * normal.x,
+                        points[j].y + yaddon * yaddonMultiplier,
+                        points[j].z + direction * roadWidth * normal.z
+                    ).add(binormal.clone().multiplyScalar(0.1));
+
+                    const topLeft = new THREE.Vector3(
+                        points[j].x + direction * roadWidth * normal.x,
+                        points[j].y + yaddon * yaddonMultiplier,
+                        points[j].z + direction * roadWidth * normal.z
+                    ).add(binormal.clone().multiplyScalar(0.1 + height));
+
+                    const bottomRight = new THREE.Vector3(
+                        points[j + 1].x + direction * roadWidth * normal.x,
+                        points[j + 1].y + yaddon * yaddonMultiplier,
+                        points[j + 1].z + direction * roadWidth * normal.z
+                    ).add(binormal.clone().multiplyScalar(0.1));
+
+                    const topRight = new THREE.Vector3(
+                        points[j + 1].x + direction * roadWidth * normal.x,
+                        points[j + 1].y + yaddon * yaddonMultiplier,
+                        points[j + 1].z + direction * roadWidth * normal.z
+                    ).add(binormal.clone().multiplyScalar(0.1 + height));
+
+                    // Push the vertices to the vertices array
+                    vertices.push(
+                        bottomLeft.x,
+                        bottomLeft.y,
+                        bottomLeft.z, // 0
+                        bottomRight.x,
+                        bottomRight.y,
+                        bottomRight.z, // 1
+                        topRight.x,
+                        topRight.y,
+                        topRight.z, // 2
+                        topLeft.x,
+                        topLeft.y,
+                        topLeft.z // 3
+                    );
+
+                    const baseIndex = (j - startIdx) * 4;
+
+                    // Create two triangles (two faces) using the vertices
+                    indices.push(
+                        baseIndex,
+                        baseIndex + 1,
+                        baseIndex + 2, // First triangle
+                        baseIndex,
+                        baseIndex + 2,
+                        baseIndex + 3 // Second triangle
+                    );
+                }
+
+                // Calculate the centroid of the segment
+                const centroid = new THREE.Vector3();
+                for (let i = 0; i < vertices.length; i += 3) {
+                    centroid.x += vertices[i];
+                    centroid.y += vertices[i + 1];
+                    centroid.z += vertices[i + 2];
+                }
+                centroid.divideScalar(vertices.length / 3);
+
+                // Translate vertices so the centroid is at the origin
+                for (let i = 0; i < vertices.length; i += 3) {
+                    vertices[i] -= centroid.x;
+                    vertices[i + 1] -= centroid.y;
+                    vertices[i + 2] -= centroid.z;
+                }
+
+                segmentGeometry.setAttribute(
+                    "position",
+                    new THREE.Float32BufferAttribute(vertices, 3)
+                );
+                segmentGeometry.setIndex(indices);
+
+
+
+                segmentGeometry.computeBoundingBox();
+                segmentGeometry.computeVertexNormals();
+
+                const segmentMesh = new THREE.Mesh(segmentGeometry, material);
+
+                // Set the position of the segment mesh to the centroid
+                segmentMesh.position.copy(centroid);
+                segmentMesh.frustumCulled = true;
+                fenceMeshes.push(segmentMesh);
+            }
         }
     }
 
