@@ -204,6 +204,7 @@ export function createFences(
     const dw = [1, -1]; // Directions for both sides of the road
     const yaddonMultiplier = 0.13;
     const height = 0.1;
+    const FENCE_DEPTH = 0.05;
     for (let yaddon = 0; yaddon < 2; yaddon++) {
         const material = yaddon ? new THREE.MeshBasicMaterial({
             color: 0x8b4513, // Brown color for the fence
@@ -239,57 +240,90 @@ export function createFences(
                     normal.y = 0;
                     normal.normalize();
 
-                    // Calculate the four vertices for the current fence segment
-                    const bottomLeft = new THREE.Vector3(
+                    // Calculate depth offset along the normal direction (away from road)
+                    const depthOffset = normal.clone().multiplyScalar(FENCE_DEPTH);
+
+                    // Calculate the four vertices for the back face (at road edge, facing towards road)
+                    const bottomLeftBack = new THREE.Vector3(
                         points[j].x + direction * roadWidth * normal.x,
                         points[j].y + yaddon * yaddonMultiplier,
                         points[j].z + direction * roadWidth * normal.z
                     ).add(binormal.clone().multiplyScalar(0.1));
 
-                    const topLeft = new THREE.Vector3(
+                    const topLeftBack = new THREE.Vector3(
                         points[j].x + direction * roadWidth * normal.x,
                         points[j].y + yaddon * yaddonMultiplier,
                         points[j].z + direction * roadWidth * normal.z
                     ).add(binormal.clone().multiplyScalar(0.1 + height));
 
-                    const bottomRight = new THREE.Vector3(
+                    const bottomRightBack = new THREE.Vector3(
                         points[j + 1].x + direction * roadWidth * normal.x,
                         points[j + 1].y + yaddon * yaddonMultiplier,
                         points[j + 1].z + direction * roadWidth * normal.z
                     ).add(binormal.clone().multiplyScalar(0.1));
 
-                    const topRight = new THREE.Vector3(
+                    const topRightBack = new THREE.Vector3(
                         points[j + 1].x + direction * roadWidth * normal.x,
                         points[j + 1].y + yaddon * yaddonMultiplier,
                         points[j + 1].z + direction * roadWidth * normal.z
                     ).add(binormal.clone().multiplyScalar(0.1 + height));
 
-                    // Push the vertices to the vertices array
+                    // Calculate the four vertices for the front face (extended away from road)
+                    const bottomLeftFront = bottomLeftBack.clone().add(depthOffset);
+                    const topLeftFront = topLeftBack.clone().add(depthOffset);
+                    const bottomRightFront = bottomRightBack.clone().add(depthOffset);
+                    const topRightFront = topRightBack.clone().add(depthOffset);
+
+                    const baseIndex = (j - startIdx) * 8;
+
+                    // Push the vertices to the vertices array (front face first, then back face)
+                    // Front face: bottomLeft, bottomRight, topRight, topLeft
                     vertices.push(
-                        bottomLeft.x,
-                        bottomLeft.y,
-                        bottomLeft.z, // 0
-                        bottomRight.x,
-                        bottomRight.y,
-                        bottomRight.z, // 1
-                        topRight.x,
-                        topRight.y,
-                        topRight.z, // 2
-                        topLeft.x,
-                        topLeft.y,
-                        topLeft.z // 3
+                        bottomLeftFront.x, bottomLeftFront.y, bottomLeftFront.z, // 0
+                        bottomRightFront.x, bottomRightFront.y, bottomRightFront.z, // 1
+                        topRightFront.x, topRightFront.y, topRightFront.z, // 2
+                        topLeftFront.x, topLeftFront.y, topLeftFront.z, // 3
+                        // Back face: bottomLeft, bottomRight, topRight, topLeft
+                        bottomLeftBack.x, bottomLeftBack.y, bottomLeftBack.z, // 4
+                        bottomRightBack.x, bottomRightBack.y, bottomRightBack.z, // 5
+                        topRightBack.x, topRightBack.y, topRightBack.z, // 6
+                        topLeftBack.x, topLeftBack.y, topLeftBack.z // 7
                     );
 
-                    const baseIndex = (j - startIdx) * 4;
-
-                    // Create two triangles (two faces) using the vertices
+                    // Front face (facing away from road)
                     indices.push(
-                        baseIndex,
-                        baseIndex + 1,
-                        baseIndex + 2, // First triangle
-                        baseIndex,
-                        baseIndex + 2,
-                        baseIndex + 3 // Second triangle
+                        baseIndex, baseIndex + 1, baseIndex + 2, // First triangle
+                        baseIndex, baseIndex + 2, baseIndex + 3 // Second triangle
+                    );
+
+                    // Back face (facing towards road)
+                    indices.push(
+                        baseIndex + 4, baseIndex + 6, baseIndex + 5, // First triangle (reversed winding)
+                        baseIndex + 4, baseIndex + 7, baseIndex + 6 // Second triangle (reversed winding)
+                    );
+
+                    // Top face
+                    indices.push(
+                        baseIndex + 3, baseIndex + 2, baseIndex + 6, // First triangle
+                        baseIndex + 3, baseIndex + 6, baseIndex + 7 // Second triangle
+                    );
+
+                    // Bottom face
+                    indices.push(
+                        baseIndex, baseIndex + 5, baseIndex + 1, // First triangle
+                        baseIndex, baseIndex + 4, baseIndex + 5 // Second triangle
+                    );
+
+                    // Left face
+                    indices.push(
+                        baseIndex, baseIndex + 7, baseIndex + 4, // First triangle
+                        baseIndex, baseIndex + 3, baseIndex + 7 // Second triangle
+                    );
+
+                    // Right face
+                    indices.push(
+                        baseIndex + 1, baseIndex + 5, baseIndex + 6, // First triangle
+                        baseIndex + 1, baseIndex + 6, baseIndex + 2 // Second triangle
                     );
                 }
 
