@@ -155,23 +155,23 @@ export function createRoad(
         }
 
         const material = [
-            new THREE.MeshBasicMaterial({
+            new THREE.MeshToonMaterial({
                 color: 0xffffff,
                 side: THREE.DoubleSide,
             }),
-            new THREE.MeshBasicMaterial({
+            new THREE.MeshToonMaterial({
                 color: 0x111111,
                 side: THREE.DoubleSide,
             }),
-            new THREE.MeshBasicMaterial({
+            new THREE.MeshToonMaterial({
                 color: 0xffffff,
                 side: THREE.DoubleSide,
             }),
-            new THREE.MeshBasicMaterial({
+            new THREE.MeshToonMaterial({
                 color: 0x111111,
                 side: THREE.DoubleSide,
             }),
-            new THREE.MeshBasicMaterial({
+            new THREE.MeshToonMaterial({
                 color: 0xffffff,
                 side: THREE.DoubleSide,
             }),
@@ -200,17 +200,18 @@ export function createFences(
     const points = curve.getPoints(ls);
     const segmentLength = Math.floor(ls / segmentCount);
     const fenceMeshes: THREE.Mesh[] = [];
+    roadWidth += 0.1;
 
     const dw = [1, -1]; // Directions for both sides of the road
     const yaddonMultiplier = 0.13;
     const height = 0.1;
     const FENCE_DEPTH = 0.05;
     for (let yaddon = 0; yaddon < 2; yaddon++) {
-        const material = yaddon ? new THREE.MeshBasicMaterial({
+        const material = yaddon ? new THREE.MeshToonMaterial({
             color: 0x8b4513, // Brown color for the fence
             side: THREE.DoubleSide,
         }) :
-            new THREE.MeshBasicMaterial({
+            new THREE.MeshToonMaterial({
                 color: 0x326fa8, // Brown color for the fence
                 side: THREE.DoubleSide,
             })
@@ -231,7 +232,13 @@ export function createFences(
 
                 const direction = dw[side];
 
-                for (let j = startIdx; j < endIdx; j++) {
+                // Extend endIdx to include one extra point for overlap (prevent gaps between segments)
+                const extendedEndIdx = Math.min(endIdx + 1, points.length - 1);
+
+                for (let j = startIdx; j < extendedEndIdx; j++) {
+                    // Skip if we're at the last point and there's no next point
+                    if (j >= points.length - 1) break;
+
                     const tangent = curve.getTangent(j / ls);
                     const normal = new THREE.Vector3();
                     const binormal = new THREE.Vector3(0, 1, 0);
@@ -240,8 +247,18 @@ export function createFences(
                     normal.y = 0;
                     normal.normalize();
 
+                    // For the right side vertices, use the normal at the next point
+                    // This ensures the right vertices of this block align with the left vertices of the next block
+                    const nextTangent = curve.getTangent((j + 1) / ls);
+                    const nextNormal = new THREE.Vector3();
+                    const nextBinormal = new THREE.Vector3(0, 1, 0);
+                    nextNormal.crossVectors(nextTangent, nextBinormal);
+                    nextNormal.y = 0;
+                    nextNormal.normalize();
+
                     // Calculate depth offset along the normal direction (away from road)
                     const depthOffset = normal.clone().multiplyScalar(FENCE_DEPTH);
+                    const rightDepthOffset = nextNormal.clone().multiplyScalar(FENCE_DEPTH);
 
                     // Calculate the four vertices for the back face (at road edge, facing towards road)
                     const bottomLeftBack = new THREE.Vector3(
@@ -256,23 +273,24 @@ export function createFences(
                         points[j].z + direction * roadWidth * normal.z
                     ).add(binormal.clone().multiplyScalar(0.1 + height));
 
+                    // Use next point's normal for right side vertices to ensure alignment with next block
                     const bottomRightBack = new THREE.Vector3(
-                        points[j + 1].x + direction * roadWidth * normal.x,
+                        points[j + 1].x + direction * roadWidth * nextNormal.x,
                         points[j + 1].y + yaddon * yaddonMultiplier,
-                        points[j + 1].z + direction * roadWidth * normal.z
-                    ).add(binormal.clone().multiplyScalar(0.1));
+                        points[j + 1].z + direction * roadWidth * nextNormal.z
+                    ).add(nextBinormal.clone().multiplyScalar(0.1));
 
                     const topRightBack = new THREE.Vector3(
-                        points[j + 1].x + direction * roadWidth * normal.x,
+                        points[j + 1].x + direction * roadWidth * nextNormal.x,
                         points[j + 1].y + yaddon * yaddonMultiplier,
-                        points[j + 1].z + direction * roadWidth * normal.z
-                    ).add(binormal.clone().multiplyScalar(0.1 + height));
+                        points[j + 1].z + direction * roadWidth * nextNormal.z
+                    ).add(nextBinormal.clone().multiplyScalar(0.1 + height));
 
                     // Calculate the four vertices for the front face (extended away from road)
                     const bottomLeftFront = bottomLeftBack.clone().add(depthOffset);
                     const topLeftFront = topLeftBack.clone().add(depthOffset);
-                    const bottomRightFront = bottomRightBack.clone().add(depthOffset);
-                    const topRightFront = topRightBack.clone().add(depthOffset);
+                    const bottomRightFront = bottomRightBack.clone().add(rightDepthOffset);
+                    const topRightFront = topRightBack.clone().add(rightDepthOffset);
 
                     const baseIndex = (j - startIdx) * 8;
 
@@ -424,7 +442,7 @@ export function createFencesPilars(
                     0.8 + extraHeight + point.y,
                     0.2,
                 ),
-                new THREE.MeshPhongMaterial({ color: "white" })
+                new THREE.MeshToonMaterial({ color: "white" })
             );
 
             mesh.lookAt(centeralPoint);
