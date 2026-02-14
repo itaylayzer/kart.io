@@ -39,7 +39,12 @@ import { Scoreboard } from "../../player/Scoreboard";
 import { StartTimer } from "../../player/StartTimer";
 import { KartClient } from "@/types/KartClient";
 import { getStateCallbacks } from "colyseus.js";
+import type { StatePayload } from "@shared/types/payloads";
 import { makeAutoLOD } from "../autoLLD";
+
+const isValidPosition = (x: number, y: number, z: number) =>
+    Number.isFinite(x) && Number.isFinite(y) && Number.isFinite(z) &&
+    Math.abs(x) < 1e4 && Math.abs(y) < 1e4 && Math.abs(z) < 1e4;
 
 function setupLights() {
     const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 1);
@@ -233,7 +238,8 @@ function setupRoad() {
 function setupSocket(
     client: KartClient,
     localID: number,
-    players: Map<number, [string, number, boolean]>
+    players: Map<number, [string, number, boolean]>,
+    gameStartTime: number = 0
 ) {
     Global.client = client;
 
@@ -249,7 +255,7 @@ function setupSocket(
         MysteryBox.toggleMystery(index, mystery.visible);
     })
 
-    StartTimer.start(client.state.startTime);
+    StartTimer.start(gameStartTime || client.state.startTime);
 
 
     requestAnimationFrame(() => {
@@ -261,36 +267,20 @@ function setupSocket(
         new MysteryBox(id, new CANNON.Vec3(x, y, z));
     })
 
-    client.state.players.forEach(({ color, startTransform }, key) => {
-        console.log('startTransform', startTransform)
+    // Set kart positions immediately so they're on the track before first physics step
+    // (100ms delay caused karts to float - they started at pid*10,pid*10,pid*10)
+    client.state.players.forEach(({ color, startTransform }) => {
         const xplayer = Player.clients.get(color);
-
         if (xplayer === undefined) return;
 
-        const setPosition = () => {
-            {
-                const { x, y, z } = startTransform.position;
-                xplayer.position.set(x, y, z);
-            }
-
-            {
-                const { x, y, z, w } = startTransform.quaternion;
-                xplayer.quaternion.set(x, y, z, w);
-            }
-
-            xplayer.velocity.setZero();
-            xplayer.force.setZero();
-
-            xplayer.tracker.reset();
-        }
-
-        setTimeout(setPosition, 100);
-        // setTimeout(setPosition, 50);
-        // setTimeout(setPosition, 150);
-        // setTimeout(setPosition, 17);
-        // setPosition();
-
-    })
+        const { x, y, z } = startTransform.position;
+        const { x: qx, y: qy, z: qz, w: qw } = startTransform.quaternion;
+        xplayer.position.set(x, y, z);
+        xplayer.quaternion.set(qx, qy, qz, qw);
+        xplayer.velocity.setZero();
+        xplayer.force.setZero();
+        xplayer.tracker.reset();
+    });
 
     AudioController.init();
 
@@ -304,10 +294,12 @@ function setupSocket(
         const [key, ...data] = msgpack.decode(
             new Uint8Array(args.buffer)
         ) as number[];
-        if (data.length) {
+        if (data.length && xplayer) {
             const [x, y, z, rx, ry, rz, rw] = data;
-            xplayer?.position.set(x, y, z);
-            xplayer?.quaternion.set(rx, ry, rz, rw);
+            if (isValidPosition(x, y, z)) {
+                xplayer.position.set(x, y, z);
+                xplayer.quaternion.set(rx, ry, rz, rw);
+            }
         }
         xplayer?.keyboard.keysDown.add(key);
     });
@@ -317,14 +309,59 @@ function setupSocket(
             new Uint8Array(buffer)
         ) as number[];
         const xplayer = Player.clients.get(pid);
-        const [x, y, z, rx, ry, rz, rw] = data;
-        xplayer?.position.set(x, y, z);
-        xplayer?.quaternion.set(rx, ry, rz, rw);
+        if (xplayer && data.length >= 7) {
+            const [x, y, z, rx, ry, rz, rw] = data;
+            if (isValidPosition(x, y, z)) {
+                xplayer.position.set(x, y, z);
+                xplayer.quaternion.set(rx, ry, rz, rw);
+            }
+        }
     });
 
     Global.client.onMessage(CC.FINISH_LINE, (pid: number) => {
         TrackerController.FINALS.push(pid);
     });
+
+    Global.client.onMessage(CC.STATE_BUFFER, (state: StatePayload) => {
+        const local = LocalPlayer.getInstance();
+        if (!isValidPosition(state.position.x, state.position.y, state.position.z)) return;
+        local.position.set(state.position.x, state.position.y, state.position.z);
+        local.quaternion.set(
+            state.quaternion.x,
+            state.quaternion.y,
+            state.quaternion.z,
+            state.quaternion.w
+        );
+        local.velocity.set(state.velocity.x, state.velocity.y, state.velocity.z);
+        local.turboMode = state.turboMode;
+        local.rocketMode = state.rocketMode;
+        local.driftSide = state.driftSide;
+        local.mushroomAddon = state.mushroomAddon;
+    });
+
+    Global.client.onMessage(
+        CC.POSITION_UPDATE,
+        (payload: {
+            pid: number;
+            position: { x: number; y: number; z: number };
+            quaternion: { x: number; y: number; z: number; w: number };
+        }) => {
+            const xplayer = Player.clients.get(payload.pid);
+            if (xplayer && isValidPosition(payload.position.x, payload.position.y, payload.position.z)) {
+                xplayer.position.set(
+                    payload.position.x,
+                    payload.position.y,
+                    payload.position.z
+                );
+                xplayer.quaternion.set(
+                    payload.quaternion.x,
+                    payload.quaternion.y,
+                    payload.quaternion.z,
+                    payload.quaternion.w
+                );
+            }
+        }
+    );
 
     Scoreboard.finishMacth = false;
     Global.client.onMessage(CC.SHOW_WINNERS, () => {
@@ -376,10 +413,12 @@ function setupSocket(
         const [key, ...data] = msgpack.decode(
             new Uint8Array(args.buffer)
         ) as number[];
-        if (data.length) {
+        if (data.length && xplayer) {
             const [x, y, z, rx, ry, rz, rw] = data;
-            xplayer?.position.set(x, y, z);
-            xplayer?.quaternion.set(rx, ry, rz, rw);
+            if (isValidPosition(x, y, z)) {
+                xplayer.position.set(x, y, z);
+                xplayer.quaternion.set(rx, ry, rz, rw);
+            }
         }
         xplayer?.keyboard.keysUp.add(key);
         xplayer?.keyboard.keysPressed.delete(key);
@@ -487,7 +526,8 @@ function setupSTATS() {
 export default function (
     client: KartClient,
     pid: number,
-    players: Map<number, [string, number, boolean]>
+    players: Map<number, [string, number, boolean]>,
+    gameStartTime: number = 0
 ) {
     Global.optimizedObjects = [];
     Global.unoptimizedObjects = [];
@@ -505,6 +545,6 @@ export default function (
     setupSTATS();
 
     requestAnimationFrame(() => {
-        setupSocket(client, pid, players);
+        setupSocket(client, pid, players, gameStartTime);
     });
 }

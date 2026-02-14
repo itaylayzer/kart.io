@@ -11,7 +11,8 @@ export const usePlayScreen = (
     pid: number,
     players: Map<number, [string, number, boolean]>,
     map: number,
-    goBack: () => void
+    goBack: () => void,
+    gameStartTime: number = 0
 ) => {
     const assets = useAssetStore();
     const settings = useSettingsStore();
@@ -21,7 +22,7 @@ export const usePlayScreen = (
             ["Barriers", "Zane Little Music"],
             "/kart.io/audios/barriers.mp3"
         );
-        const { destroyer } = game(assets, client, pid, players, settings, map, goBack);
+        const { destroyer } = game(assets, client, pid, players, settings, map, goBack, gameStartTime);
         destroyers.push(destroyer);
 
         return useDestroy(destroyers);

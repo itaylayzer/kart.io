@@ -17,14 +17,14 @@ export default function AssetLoader() {
         return () => {};
     }, []);
 
+    return null;
     return (
         <LinearProgress
             style={{
-                width: "52.13vh",
-                marginTop: 10,
                 opacity: 0.2 * +(progress <= 1),
                 transition: "opacity 1s ease-out",
             }}
+            className=" bottom-0 w-full"
             variant="determinate"
             color="inherit"
             value={Math.min(progress, 1) * 100}

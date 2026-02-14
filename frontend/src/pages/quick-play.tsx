@@ -18,6 +18,7 @@ export default function quickPlay() {
     const Element = () => {
         const [client, setClient] = useState<KartClient>();
         const [startGameScreen, setStartGameScreen] = useState(false);
+        const [gameStartTime, setGameStartTime] = useState<number>(0);
         const { progress } = useAssetStore();
         useEffect(() => {
             (async () => {
@@ -43,7 +44,12 @@ export default function quickPlay() {
                 );
                 setClient(client);
 
-                client.onMessage(CC.START_GAME, () => {
+                client.onMessage(CC.START_GAME, (startTime?: number) => {
+                    setGameStartTime(
+                        typeof startTime === "number"
+                            ? startTime
+                            : client.state.startTime || Date.now() + 5000
+                    );
                     setStartGameScreen(true);
                 });
 
@@ -68,6 +74,7 @@ export default function quickPlay() {
                     map={0}
                     pid={0}
                     players={map}
+                    gameStartTime={gameStartTime}
                 />
             </>
         );

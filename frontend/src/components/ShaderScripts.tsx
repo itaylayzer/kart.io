@@ -63,7 +63,7 @@ const fragmentShaderWater = `
       	gl_FragColor.a = 1.0;
 
       	#include <tonemapping_fragment>
-      	#include <encodings_fragment>
+      	#include <colorspace_fragment>
       	#include <fog_fragment>
 
       }
@@ -125,7 +125,7 @@ const fragmentShaderWaterfall = `
       	gl_FragColor.a = 1.0;
 
       	#include <tonemapping_fragment>
-      	#include <encodings_fragment>
+      	#include <colorspace_fragment>
       	#include <fog_fragment>
 
       }`;

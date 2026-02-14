@@ -166,10 +166,11 @@ export class KartRace extends Room<
             if (!this.gameStarted) return;
 
             // Send state to the owning client
-            const client = this.clients.find(c => c.sessionId === sessionId);
-            if (client) {
-              client.send(CC.STATE_BUFFER, state);
-            }
+            // FIXME: 
+            // const client = this.clients.find(c => c.sessionId === sessionId);
+            // if (client) {
+            //   client.send(CC.STATE_BUFFER, state);
+            // }
 
             // Send position update to other clients
             this.clients.forEach((c) => {
@@ -216,7 +217,10 @@ export class KartRace extends Room<
       }
     }, 1000 / 60); // 60Hz physics update
 
-    this.clients.forEach((client) => client.send(CC.START_GAME));
+    // Send startTime with message so client has it before state sync (avoids race)
+    this.clients.forEach((client) =>
+      client.send(CC.START_GAME, this.state.startTime)
+    );
 
     // Start game after 5 second countdown
     this.clock.setTimeout(() => {

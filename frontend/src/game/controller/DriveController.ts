@@ -39,7 +39,26 @@ export class DriveController {
         let shakeMode = false;
         let mushroomAddon = 0;
 
+        const RESCUE_DISTANCE = 15; // If kart is this far from track, snap instead of impulse
+
         const putToGround = () => {
+            const pos = body.position;
+            const isValid = (x: number) => Number.isFinite(x);
+            if (!isValid(pos.x) || !isValid(pos.y) || !isValid(pos.z)) {
+                // Position is NaN/Infinity - rescue by snapping to track
+                const trackPoint = body.tracker.getPointTransform() as THREE.Object3D;
+                body.position.set(trackPoint.position.x, trackPoint.position.y, trackPoint.position.z);
+                body.quaternion.set(
+                    trackPoint.quaternion.x,
+                    trackPoint.quaternion.y,
+                    trackPoint.quaternion.z,
+                    trackPoint.quaternion.w
+                );
+                body.velocity.setZero();
+                body.angularVelocity.setZero();
+                return;
+            }
+
             raycaster.set(
                 new THREE.Vector3()
                     .copy(body.position)
@@ -61,10 +80,27 @@ export class DriveController {
                 closestIntersection === undefined ||
                 closestIntersection.distance > maxDistance
             ) {
-                // this.body.position.copy(this.last);
-
                 const releventTransfer =
                     body.tracker.getPointTransform() as THREE.Object3D;
+                const distToTrack = new THREE.Vector3(pos.x, pos.y, pos.z).distanceTo(releventTransfer.position);
+
+                if (distToTrack > RESCUE_DISTANCE) {
+                    // Too far from track - snap to prevent kart from drifting away
+                    body.position.set(
+                        releventTransfer.position.x,
+                        releventTransfer.position.y,
+                        releventTransfer.position.z
+                    );
+                    body.quaternion.set(
+                        releventTransfer.quaternion.x,
+                        releventTransfer.quaternion.y,
+                        releventTransfer.quaternion.z,
+                        releventTransfer.quaternion.w
+                    );
+                    body.velocity.setZero();
+                    body.angularVelocity.setZero();
+                    return;
+                }
 
                 const A = new THREE.Vector3()
                     .copy(body.position)

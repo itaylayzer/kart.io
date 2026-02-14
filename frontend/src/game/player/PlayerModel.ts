@@ -154,8 +154,11 @@ export class PlayerModel extends THREE.Group {
         };
 
         this.update = () => {
-            this.position.copy(body.position);
-            this.quaternion.copy(body.quaternion);
+            const p = body.position;
+            if (Number.isFinite(p.x) && Number.isFinite(p.y) && Number.isFinite(p.z)) {
+                this.position.copy(body.position);
+                this.quaternion.copy(body.quaternion);
+            }
 
             model.rotation.set(0, 0, 0);
 
@@ -197,8 +200,10 @@ export class PlayerModel extends THREE.Group {
                 (-keyboard.horizontal * Math.PI * 2) / 3
             );
 
-            this.position.copy(body.position);
-            this.quaternion.copy(body.quaternion);
+            if (Number.isFinite(p.x) && Number.isFinite(p.y) && Number.isFinite(p.z)) {
+                this.position.copy(body.position);
+                this.quaternion.copy(body.quaternion);
+            }
 
             trails.forEach((v) => v.update());
         };

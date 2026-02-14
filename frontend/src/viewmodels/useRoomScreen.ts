@@ -20,6 +20,7 @@ export const useRoomScreen = (
 	const [ready, toggleReady] = useToggle(false);
 	const [client, setClient] = useState<KartClient>();
 	const [startGameScreen, setStartGameScreen] = useState(false);
+	const [gameStartTime, setGameStartTime] = useState<number>(0);
 	const { playerName } = useSettingsStore();
 	const [pid, setPID] = useState<number>(0);
 	const isConnected = client !== undefined;
@@ -30,7 +31,7 @@ export const useRoomScreen = (
 	}
 
 	useEffect(() => {
-		console.error('useRoomScreen: start');
+		console.warn('useRoomScreen: start');
 
 		let disconnect = () => { };
 		// join server
@@ -106,12 +107,14 @@ export const useRoomScreen = (
 			})
 
 
-			client.onMessage(CC.START_GAME, () => {
+			client.onMessage(CC.START_GAME, (startTime?: number) => {
+				// startTime from server avoids state sync race
+				setGameStartTime(typeof startTime === "number" ? startTime : client.state.startTime || Date.now() + 5000);
 				setStartGameScreen(true);
 			});
 
 			disconnect = () => {
-				console.error('useRoomScreen: disconnect');
+				console.warn('useRoomScreen: disconnect');
 
 				client.leave();
 				setClient(undefined);
@@ -120,14 +123,14 @@ export const useRoomScreen = (
 
 		}).catch((err: unknown) => {
 			disconnect();
-			console.error('useRoomScreen: catch', err);
+			console.warn('useRoomScreen: catch', err);
 			const reason = err instanceof Error ? err.message : (err && typeof err === "object" && "message" in err ? String((err as { message?: unknown }).message) : "");
 			toast.error(`Unable to connect${reason ? `: ${reason}` : ""}`);
 			goBack();
 		})
 
 		window.onbeforeunload = window.onunload = () => {
-			console.error('useRoomScreen: onbeforeunload');
+			console.warn('useRoomScreen: onbeforeunload');
 
 			disconnect();
 		};
@@ -156,6 +159,7 @@ export const useRoomScreen = (
 		toggleReady,
 		ready,
 		startGameScreen,
+		gameStartTime,
 		pid,
 		socket: client,
 		disconnect,

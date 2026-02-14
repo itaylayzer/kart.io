@@ -19,7 +19,8 @@ const game = (
     players: Map<number, [string, number, boolean]>,
     settings: settingsType,
     mapIndex: number,
-    goBack: () => void
+    goBack: () => void,
+    gameStartTime: number = 0
 ) => {
     Global.assets = assets;
     Global.settings = settings;
@@ -28,7 +29,7 @@ const game = (
     );
 
     const scoreboard = new Scoreboard();
-    setupWorld(client, pid, players);
+    setupWorld(client, pid, players, gameStartTime);
 
     Global.system = new System();
     Global.system.addRenderer(new SpriteRenderer(Global.scene, THREE));
@@ -43,11 +44,19 @@ const game = (
             Global.deltaTime = clock.getDelta();
             Global.elapsedTime = clock.getElapsedTime();
 
-            for (const mesh of Global.optimizedObjects) {
-                mesh.visible = mesh.position.distanceTo(LocalPlayer.getInstance().position) < 40;
-            }
-            for (const mesh of Global.unoptimizedObjects) {
-                mesh.visible = mesh.position.distanceTo(LocalPlayer.getInstance().position) >= 20;
+            try {
+                const lp = LocalPlayer.getInstance();
+                const pos = lp.position;
+                if (Number.isFinite(pos.x) && Number.isFinite(pos.y) && Number.isFinite(pos.z)) {
+                    for (const mesh of Global.optimizedObjects) {
+                        mesh.visible = mesh.position.distanceTo(pos) < 40;
+                    }
+                    for (const mesh of Global.unoptimizedObjects) {
+                        mesh.visible = mesh.position.distanceTo(pos) >= 20;
+                    }
+                }
+            } catch {
+                /* LocalPlayer may not exist during teardown */
             }
 
             Global.updates

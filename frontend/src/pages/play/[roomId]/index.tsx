@@ -47,7 +47,8 @@ export default function RoomPage() {
                 <StringInputDialog
                     open={true}
                     onOpenChange={(open) => {
-                        if (!open && !passwordSubmittedRef.current) router.push("/");
+                        if (!open && !passwordSubmittedRef.current)
+                            router.push("/");
                         passwordSubmittedRef.current = false;
                     }}
                     title="Room Password"
@@ -74,6 +75,7 @@ function LobbyContent({ room, router }: { room: any; router: any }) {
         toggleReady,
         ready,
         startGameScreen,
+        gameStartTime,
         pid,
         socket,
         disconnect,
@@ -97,9 +99,6 @@ function LobbyContent({ room, router }: { room: any; router: any }) {
 
     return (
         <div className="min-h-screen w-full bg-zinc-950 text-foreground font-sans overflow-hidden">
-            <header>
-                <AssetLoader />
-            </header>
             <AudioContainer />
             <ShaderScripts />
 
@@ -112,6 +111,7 @@ function LobbyContent({ room, router }: { room: any; router: any }) {
                         players={players!}
                         pid={pid}
                         map={map}
+                        gameStartTime={gameStartTime}
                     />
                 }
                 onFalse={
@@ -276,6 +276,8 @@ function LobbyContent({ room, router }: { room: any; router: any }) {
                     </div>
                 }
             />
+
+            <AssetLoader />
         </div>
     );
 }

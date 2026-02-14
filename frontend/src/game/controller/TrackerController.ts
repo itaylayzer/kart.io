@@ -149,15 +149,19 @@ export class TrackerController {
             }</p>`;
     }
     public static getScoreboard(): [string, string, number, number][] {
-        return this.sortedTrackers.map(
-            ([playerID, tracker], index) =>
-                [
-                    Player.clients.get(playerID)!.color,
-                    Player.clients.get(playerID)!.name,
-                    index + 1,
-                    Math.max(tracker.round, 0),
-                ] as [string, string, number, number]
-        );
+        try {
+            return this.sortedTrackers.map(
+                ([playerID, tracker], index) =>
+                    [
+                        Player.clients.get(playerID)!.color,
+                        Player.clients.get(playerID)!.name,
+                        index + 1,
+                        Math.max(tracker.round, 0),
+                    ] as [string, string, number, number]
+            );
+        } catch {
+            return []
+        }
     }
 }
 export function generateRange(
