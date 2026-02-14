@@ -3,7 +3,7 @@ import { Global } from "../store/Global";
 import * as THREE from "three";
 import * as CANNON from "cannon-es";
 import { CS } from "../store/codes";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 
 export class TrackerController {
     public reset: () => void;
@@ -63,7 +63,7 @@ export class TrackerController {
             if (forwardPos[0] === 1 && this.lastIndex === 0) {
                 this.round++;
                 if (isLocal && this.round >= MAX_ROUNDS) {
-                    toast("You Can Switch Cameras Now", { type: "info" });
+                    toast.info("You Can Switch Cameras Now");
                     Global.client.send(CS.FINISH_LINE);
                 }
             }

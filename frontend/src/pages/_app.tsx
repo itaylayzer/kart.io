@@ -2,7 +2,6 @@ import "reflect-metadata";
 
 import "@/styles/globals.css";
 import "@/styles/audio.css";
-import "react-toastify/dist/ReactToastify.css";
 import "react-tooltip/dist/react-tooltip.css";
 
 import type { AppProps } from "next/app";
@@ -10,11 +9,12 @@ import Head from "next/head";
 
 import "@/config/globals";
 import { Tooltip } from "react-tooltip";
-import { ToastContainer } from "react-toastify";
+import { ThemeProvider } from "next-themes";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function App({ Component, pageProps }: AppProps) {
     return (
-        <>
+        <ThemeProvider attribute="class" defaultTheme="dark">
             <Head>
                 <title>Kart.IO</title>
             </Head>
@@ -29,19 +29,8 @@ export default function App({ Component, pageProps }: AppProps) {
                     fontWeight: 400,
                 }}
             />
-            <ToastContainer
-                position="bottom-right"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnHover
-                pauseOnFocusLoss={false}
-                closeButton={false}
-                theme="dark"
-            />
+            <Toaster position="bottom-right" theme="dark" />
             <Component {...pageProps} />
-        </>
+        </ThemeProvider>
     );
 }

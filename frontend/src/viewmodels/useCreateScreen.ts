@@ -1,10 +1,6 @@
-import { createVectorsFromNumbers } from "@/game/api/setup/road";
-import { renderMap } from "@/game/player/WorldMap";
 import { useRouter } from "next/router";
-import { createRef, useEffect, useState } from "react";
-import { toast } from "react-toastify";
-import { CatmullRomCurve3 } from "three";
-import { curvePoints } from "@shared/config/road";
+import { createRef, useState } from "react";
+import { toast } from "sonner";
 import { useRoom } from "@/hooks/useRoom";
 
 export const useCreateScreen = () => {
@@ -13,6 +9,7 @@ export const useCreateScreen = () => {
     const [roomName, setRoomName] = useState<string>("");
     const [roomPassword, setRoomPassword] = useState<string>("");
     const [roomMap, setRoomMap] = useState<number>(0);
+    const [roomVisible, setRoomVisible] = useState<boolean>(true);
 
     const [room, setRoom] = useRoom();
     const roomMapCanvasRef = createRef<HTMLCanvasElement>();
@@ -23,7 +20,8 @@ export const useCreateScreen = () => {
                 body: {
                     roomName: roomName,
                     mapId: roomMap,
-                    password: roomPassword
+                    password: roomPassword,
+                    visible: roomVisible
                 }
             });
 
@@ -36,22 +34,10 @@ export const useCreateScreen = () => {
             router.push(`/play/${response.data}`);
 
         } catch (err) {
-            toast("Cannot Connect", {
-                type: "error",
-            });
+            toast.error("Cannot Connect");
             router.push('/');
         }
     }
-    useEffect(() => {
-        if (roomMapCanvasRef.current === null) return;
-        renderMap(
-            new CatmullRomCurve3(
-                createVectorsFromNumbers(curvePoints[roomMap])
-            ),
-            roomMapCanvasRef.current!,
-            500
-        );
-    }, [roomMapCanvasRef.current, roomMap]);
 
     return {
         room,
@@ -59,11 +45,13 @@ export const useCreateScreen = () => {
         setRoomName,
         setRoom,
         setRoomPassword,
+        setRoomVisible,
         roomMap,
         setRoomMap,
         roomMapCanvasRef,
         roomName,
         roomPassword,
+        roomVisible,
         router
     };
 

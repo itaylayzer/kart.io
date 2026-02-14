@@ -385,9 +385,9 @@ function setupSocket(
         xplayer?.keyboard.keysPressed.delete(key);
     });
 
-    $(client.state).players.onRemove(({ color }) => {
-        OnlinePlayer.clients.get(color)?.disconnect();
-
+    $(client.state).players.onRemove((player) => {
+        const color = player?.color;
+        if (color !== undefined) OnlinePlayer.clients.get(color)?.disconnect();
     })
 
     client.onLeave.once = () => {

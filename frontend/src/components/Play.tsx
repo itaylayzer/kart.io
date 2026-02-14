@@ -2,6 +2,7 @@ import { Socket } from "socket.io-client";
 import { useStyles } from "../hooks/useStyles";
 import { usePlayScreen } from "../viewmodels";
 import { KartClient } from "@/types/KartClient";
+import { Button } from "@/components/ui/button";
 
 export function Play({
     client,
@@ -23,96 +24,83 @@ export function Play({
         <>
             <div style={styles.gameContainer} className="gameContainer"></div>
 
-            <p id="wrong" style={styles.wrong}>
+            <p 
+                id="wrong" 
+                className="absolute top-5 left-1/2 -translate-x-1/2 bg-[#111] m-0 text-white py-[1.04vh] px-[2.08vh] rounded-lg text-[2.6vh] z-10"
+                style={{ fontFamily: "New Super Mario Font U" }}
+            >
                 YOU'R FACING THE WRONG DIRECTION
             </p>
             <div
                 id="position"
-                style={{
-                    bottom: 10,
-                    zIndex: 10,
-                    position: "absolute",
-                    gap: 10,
-                }}
+                className="absolute bottom-[10px] left-[10px] z-10 flex gap-[10px]"
             >
-                <div style={styles.position}></div>
-                <div style={styles.position}></div>
+                <div className="bg-[#050505] py-[0.41vh] px-[1.66vh] rounded"></div>
+                <div className="bg-[#050505] py-[0.41vh] px-[1.66vh] rounded"></div>
             </div>
-            <canvas id="map" width={500} height={500} style={styles.map} />
+            <canvas 
+                id="map" 
+                width={500} 
+                height={500} 
+                className="absolute top-1/2 -translate-y-1/2 right-[10px] aspect-square w-[26.06vh] z-[3] pointer-events-none"
+            />
 
-            <main
-                style={{
-                    backgroundColor: "rgba(8,8,8, 0%)",
-                    boxShadow: `0px 0px 10px 0px rgba(0, 0, 0, 50%)`,
-                    borderRadius: 10,
-                    zIndex: 12,
-                    visibility: "hidden",
-                }}
-            >
-                <center>
+            <main className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-transparent shadow-[0px_0px_10px_0px_rgba(0,0,0,0.5)] rounded-lg z-[12] invisible">
+                <div className="flex flex-col items-center">
                     <h3 className="scoreboard_finish">Game Finished</h3>
                     <table id="scoreboard">
                         <tbody></tbody>
                     </table>
-                    <button
-                        style={{
-                            pointerEvents: "all",
-                            marginBottom: 10,
-                        }}
-                        className="r scoreboard_finish"
+                    <Button
+                        className="scoreboard_finish pointer-events-auto mb-[10px]"
+                        variant="outline"
                     >
                         Disconnect
-                    </button>
-                </center>
-            </main>
-
-            <main>
-                <div
-                    id="pauseMenu"
-                    style={{ visibility: "hidden", pointerEvents: "none" }}
-                >
-                    <h5>Game Paused</h5>
-                    <p>but the server, keeps playing</p>
-                    <center>
-                        <button className="r" id="resume">
-                            Resume
-                        </button>
-                        <button className="r" id="disconnect">
-                            Disconnect
-                        </button>
-                    </center>
+                    </Button>
                 </div>
             </main>
 
-            <p id="velocity" style={styles.velocity}>
+            <main className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                <div
+                    id="pauseMenu"
+                    className="bg-[#090909] p-[2.08vh] rounded-lg shadow-[0px_0px_10px_0px_#090909] z-[11]"
+                    style={{ visibility: "hidden", pointerEvents: "none" }}
+                >
+                    <h5 className="text-[4.17vh] font-light text-center mt-5 mb-1" style={{ fontFamily: "New Super Mario Font U" }}>
+                        Game Paused
+                    </h5>
+                    <p className="mb-5 mt-0 text-center font-mono">but the server, keeps playing</p>
+                    <div className="flex justify-center gap-2">
+                        <Button variant="outline" id="resume">
+                            Resume
+                        </Button>
+                        <Button variant="outline" id="disconnect">
+                            Disconnect
+                        </Button>
+                    </div>
+                </div>
+            </main>
+
+            <p 
+                id="velocity" 
+                className="absolute bottom-[10px] right-[10px] z-[3] bg-[#050505] py-[0.41vh] px-[1.66vh] rounded"
+                style={{ fontFamily: "New Super Mario Font U" }}
+            >
                 0.00 KM/S
             </p>
 
-            <p id="timer" style={styles.timer}>
+            <p 
+                id="timer" 
+                className="absolute top-[10px] right-[10px] z-[3] bg-[#050505] py-[0.41vh] px-[1.66vh] rounded font-mono font-medium"
+            >
                 00:00.000 s
             </p>
 
             <main
                 id="start-timer"
-                style={{
-                    opacity: "0",
-                    borderRadius: "100%",
-                    backgroundColor: "black",
-                    padding: "3vh",
-                    aspectRatio: "1",
-                    width: 70,
-                    height: 70,
-                }}
+                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 rounded-full bg-black p-[3vh] aspect-square w-[70px] h-[70px] flex items-center justify-center"
             >
-                <p
-                    style={{
-                        fontSize: "8vh",
-                        textAlign: "center",
-                        margin: "0",
-                        marginBlock: "auto",
-                        fontFamily: "monospace",
-                    }}
-                ></p>
+                <p className="text-[8vh] text-center m-0 font-mono"></p>
             </main>
         </>
     );
@@ -126,58 +114,5 @@ const styles = useStyles({
         height: "100%",
         left: 0,
         top: 0,
-    },
-
-    position: {
-        backgroundColor: "#050505",
-        paddingBlock: "0.41vh",
-        paddingInline: "1.66vh",
-        borderRadius: 4,
-    },
-    map: {
-        position: "absolute",
-        top: "50%",
-        translate: "0% -50%",
-        right: 10,
-        aspectRatio: 1,
-        width: "26.06vh",
-        zIndex: 3,
-        pointerEvents: "none",
-    },
-    wrong: {
-        position: "absolute",
-        top: 20,
-        left: "50%",
-        translate: "-50% 0%",
-        backgroundColor: "#111",
-        margin: 0,
-        color: "white",
-        fontFamily: "New Super Mario Font U",
-        padding: "1.04vh 2.08vh",
-        borderRadius: "8px",
-        fontSize: "2.6vh",
-    },
-    velocity: {
-        position: "absolute",
-        bottom: 10,
-        right: 10,
-        zIndex: 3,
-        backgroundColor: "#050505",
-        paddingBlock: "0.41vh",
-        paddingInline: "1.66vh",
-        borderRadius: 4,
-        fontFamily: "New Super Mario Font U",
-    },
-    timer: {
-        position: "absolute",
-        top: 10,
-        right: 10,
-        zIndex: 3,
-        backgroundColor: "#050505",
-        paddingBlock: "0.41vh",
-        paddingInline: "1.66vh",
-        borderRadius: 4,
-        fontFamily: "monospace",
-        fontWeight: 500,
     },
 });

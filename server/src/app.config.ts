@@ -33,7 +33,7 @@ export default config({
 
         app.get('/rooms/:roomType', async (req, res) => {
             const rooms = await matchMaker.query({ name: req.params.roomType });
-            const availableRooms = rooms.filter(room => !room.locked);
+            const availableRooms = rooms.filter(room => !room.locked && room.metadata?.visible !== false);
 
             res.status(200).send(availableRooms);
         })
@@ -42,11 +42,17 @@ export default config({
             const data = req.body as {
                 roomName: string,
                 mapId: number,
-                password: string
+                password: string,
+                visible?: boolean
             };
 
             console.log('creating room', req.params.roomType, 'with data:', JSON.stringify(data, null, 4));
-            res.status(201).send((await matchMaker.createRoom(req.params.roomType, data)).roomId);
+            res.status(201).send((await matchMaker.createRoom(req.params.roomType, {
+                roomName: data.roomName,
+                mapId: data.mapId,
+                password: data.password,
+                visible: data.visible !== false
+            })).roomId);
         })
 
 

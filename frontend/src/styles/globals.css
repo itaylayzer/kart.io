@@ -1,377 +1,115 @@
 @import url("https://fonts.googleapis.com/css2?family=Signika:wght@300..700&display=swap");
-@import url("https://fonts.cdnfonts.com/css/new-super-mario-font-u");
 
-body {
-    background-color: #050505;
-}
+@import "tailwindcss";
 
-*::-webkit-scrollbar {
-    width: 0.52vh;
-}
+@theme {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
 
-*::-webkit-scrollbar-track {
-    background-color: rgb(255, 255, 255, 5%);
-    border-radius: 100px;
-    margin-block: 20px;
-}
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
 
-*::-webkit-scrollbar-thumb {
-    background-color: rgb(255, 255, 255, 25%);
-    border-radius: 100px;
-}
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
 
-*::-webkit-scrollbar-thumb:hover {
-    background-color: rgb(255, 255, 255, 100%);
-}
-main {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    translate: -50% -50%;
-    display: block;
-}
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
 
-body,
-body button.r,
-body input,
-p {
-    font-family: "Signika";
-    font-weight: 100;
-    color: white;
-}
-p {
-    font-size: 2.8vh;
-    margin-block: 0px;
-}
-body input,
-body button.r {
-    background-color: #15151500;
-    transition: background-color 0.2s, border 0.2s, scale 0.2s;
-    border: 2px solid #444;
-    font-size: 2.29vh;
-    padding: 1.04vh 2.08vh;
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
 
-    box-sizing: content-box;
-    cursor: pointer;
-    border-radius: 2px;
-}
-body input:hover,
-body input:focus {
-    outline: 0;
-    border: 2px solid #777;
-}
-body button.r {
-    scale: 0.92;
-    padding: 1.04vh 5.21vh;
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --color-chart-1: hsl(var(--chart-1));
+  --color-chart-2: hsl(var(--chart-2));
+  --color-chart-3: hsl(var(--chart-3));
+  --color-chart-4: hsl(var(--chart-4));
+  --color-chart-5: hsl(var(--chart-5));
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+
+  --font-sans: "Signika", sans-serif;
 }
 
-body input,
-body input:hover {
-    color: white !important;
-    outline: 0 !important;
-    border: 1px solid white !important;
-}
-body input:focus {
-    border: 0 !important;
-}
-body button.r[aria-pressed="true"],
-body button.r:hover {
-    scale: 1;
-
-    border: 2px solid #151515ff;
-    background-color: #151515ff;
-}
-body button.r {
-    outline: 0;
-}
-
-body h1 {
-    font-size: 10.42vh;
-    text-align: center;
-    margin-top: 0px;
-}
-body h2 {
-    font-size: 2.08vh;
-    text-align: center;
-    margin-block: 0px;
-    font-weight: 100;
-    opacity: 0.5;
-    translate: 0px 25px;
-}
-body h6 {
-    font-size: 3.12vh;
-    font-weight: 100;
-    opacity: 0.5;
-    transition: opacity 0.2s;
-    text-align: center;
-    cursor: pointer;
-    margin-top: 0;
-}
-body h6:hover {
-    opacity: 1;
-}
-main div.room {
-    width: 52.13vh;
-    background-color: #151515;
-
-    display: flex;
-    justify-content: space-around;
-    transition: background-color 0.2s, opacity 0.2s, scale 0.2s;
-    cursor: pointer;
-    margin-bottom: 10px;
-    padding: 0.834vh 2.08vh;
-    box-sizing: border-box;
-    opacity: 0.7;
-    background-color: #040404;
-    border: 2px solid #222;
-    scale: 0.98;
-}
-main div.room:hover {
-    opacity: 1;
-    scale: 1;
+@layer base {
+  :root {
+    --background: 240 10% 4%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 4%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 4%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+    --radius: 0.5rem;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+  }
 }
 
-main table#scoreboard {
-    padding: 1.04vh;
-    font-family: "Signika";
-}
-table.instructions,
-table#settings {
-    padding: 1.04vh;
-    border-radius: 10px;
-    font-family: "Signika";
-}
-table.instructions,
-table#settings,
-main table#scoreboard,
-main div.room table {
-    width: 100%;
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+    min-height: 100vh;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-sans);
+    font-weight: 300;
+  }
 }
 
-table.instructions,
-table#settings {
-    border-spacing: 8px;
-}
-table.instructions,
-table#settings tr td,
-main table#scoreboard tr td,
-main div.room table tr td {
-    font-size: 2.08vh;
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
 }
 
-table.instructions tr th,
-table.instructions tr td,
-table#settings tr th,
-table#settings tr td,
-main table#scoreboard tr td,
-main table#scoreboard tr th,
-main div.room table tr td,
-main div.room table tr th {
-    padding-inline: 5px;
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-table.instructions tr th,
-main table#scoreboard tr th,
-main div.room table tr th {
-    text-align: left;
-    font-size: 1.66vh;
-    font-weight: 100;
-    opacity: 0.5;
-}
-main div.room table tr th:nth-child(1) {
-    width: 1.042vh;
-}
-main div.room table tr th:nth-child(3) {
-    width: 11ch;
-}
-table.instructions tr td {
-    font-size: 1.87vh;
-}
-main div.room table tr td {
-    opacity: 0.8;
-}
-main div.room:hover table tr td {
-    opacity: 1;
-}
-main table#scoreboard tr td:nth-child(1) {
-    min-width: 200px;
-    font-family: "New Super Mario Font U";
-    filter: drop-shadow(0px 0px 1px #ce9178);
-}
-main table#scoreboard tr td:nth-child(1),
-main div.room table tr td:nth-child(2) {
-    color: #ce9178;
-}
-main table#scoreboard tr td:nth-child(2),
-main div.room table tr td:nth-child(1) {
-    color: #b5cea8;
-}
-main table#scoreboard tr td:nth-child(3),
-main div.room table tr td:nth-child(3) {
-    color: #9cdcfe;
+::-webkit-scrollbar-thumb {
+  @apply bg-zinc-700/50 rounded-full;
 }
 
-main div#pauseMenu {
-    z-index: 11;
-    display: block;
-    background-color: #090909;
-    padding: 2.08vh;
-    border-radius: 10px;
-    font-family: "Signika";
-    box-shadow: 0px 0px 10px 0px #090909;
-}
-main div#pauseMenu p {
-    margin-bottom: 20px;
-    margin-top: 0;
-    text-align: center;
-    font-family: monospace;
-}
-main div#pauseMenu h5 {
-    font-size: 4.17vh;
-    font-weight: 100;
-    text-align: center;
-    margin-top: 20px;
-    font-family: "New Super Mario Font U";
-
-    margin-bottom: 5px;
-}
-
-div.blocks {
-    position: absolute;
-    width: 100%;
-    height: 10.42vh;
-    left: 0;
-    display: block;
-    background-image: url(/images/blocks.png);
-    background-repeat: repeat;
-    background-size: 10.42vh 10.42vh;
-}
-
-div.blocks.header {
-    top: 18px;
-}
-div.blocks.footer {
-    bottom: 18px;
-}
-footer {
-    background-color: black;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: auto;
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    z-index: 10;
-}
-header {
-    background-color: rgba(0, 0, 0, 0);
-    top: 0;
-    left: 0;
-    min-height: 1.87vh;
-    min-width: 100%;
-    height: auto;
-    position: absolute;
-    z-index: 10;
-    justify-content: center;
-    display: flex;
-}
-
-footer a {
-    font-family: monospace;
-    font-weight: 500;
-    cursor: pointer;
-}
-
-body button.mini {
-    padding: 0.41vh 1.66vh;
-    font-size: 2.08vh;
-    line-height: -1.04vh;
-}
-
-h3 {
-    font-weight: 600;
-    font-size: 3.12vh;
-    margin: 0px;
-    margin-top: 20px;
-}
-
-div.player {
-    display: flex;
-    gap: 10px;
-    transition: scale 0.2s, opacity 0.2s;
-    margin-bottom: 10px;
-}
-div.player > div {
-    display: flex;
-    gap: 10px;
-    border: 2px solid #444;
-    border-radius: 5px;
-    overflow: hidden;
-    width: 100%;
-    padding-inline: 10px;
-    padding-block: 5px;
-}
-div.player > div > div {
-    display: block;
-    min-width: 2.6vh;
-    min-height: 2.6vh;
-    height: 2.6vh;
-    width: 2.6vh;
-}
-
-div.player > div > div div:nth-child(2) {
-    background-color: green;
-}
-div.player p {
-    flex-grow: 1;
-}
-
-div#position {
-    position: "absolute";
-    bottom: 10px;
-    left: 10px;
-    margin: 0;
-    display: flex;
-    gap: 10;
-    color: "white";
-    font-size: 2.08vh;
-    z-index: 10;
-}
-
-div#position div {
-    font-family: "New Super Mario Font U";
-    display: block;
-}
-
-@keyframes startAnim {
-    0% {
-        scale: 2;
-        rotate: -45deg;
-        opacity: 1;
-    }
-    50% {
-        scale: 1;
-        rotate: 0deg;
-        opacity: 1;
-    }
-    100% {
-        scale: 0.5;
-        rotate: 45deg;
-        opacity: 0;
-    }
-}
-
-@keyframes rotate-animations {
-    0% {
-        rotate: 0deg;
-    }
-    100% {
-        rotate: 359deg;
-    }
-}
-
-.animate-rotate {
-    animation: rotate-animations linear 1s infinite;
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-zinc-600;
 }

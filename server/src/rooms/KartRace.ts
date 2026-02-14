@@ -9,7 +9,7 @@ import { InputPayload, StatePayload } from "@shared/types/payloads";
 
 export class KartRace extends Room<
   KartRaceState,
-  { hasPassword: boolean; roomName: string }
+  { hasPassword: boolean; roomName: string; visible?: boolean }
 > {
   maxClients = 16;
   autoDispose = false;
@@ -40,7 +40,7 @@ export class KartRace extends Room<
     return true;
   }
 
-  onCreate(options: { mapId: number; password: string; roomName: string }) {
+  onCreate(options: { mapId: number; password: string; roomName: string; visible?: boolean }) {
     console.log(
       "room",
       this.roomId,
@@ -56,6 +56,7 @@ export class KartRace extends Room<
     this.setMetadata({
       hasPassword: options.password.length > 0,
       roomName: options.roomName,
+      visible: options.visible !== false,
     });
     this.roadUtils = RoadUtils(options.mapId);
     this.starterGenerator = this.roadUtils.positionsGenerator();

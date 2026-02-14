@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useToggle } from "../hooks/useToggle";
 import { io, Socket } from "socket.io-client";
 import { CC, CS } from "@shared/types/codes";
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { useSettingsStore } from "../store/useSettingsStore";
 import Config from "@/config";
 import { KartClient } from "@/types/KartClient";
@@ -36,17 +36,18 @@ export const useRoomScreen = (
 		// join server
 		const playersMap = new Map<number, Player>();
 
-		let password = "";
-		if (room.hasPassword) {
-			if (room.password === undefined) {
-				password = prompt("Room password") ?? "";
-			} else {
-				password = room.password;
-			}
-		}
-		global.colyseus.joinById<KartRaceState>(room.id, { password, playerName }).then((client) => {
-			client.onError(() => {
-				toast("Couldnt Connect", { type: "error" });
+		const password = room.hasPassword ? (room.password ?? "") : "";
+		const joinWithTimeout = Promise.race([
+			global.colyseus.joinById<KartRaceState>(room.id, { password, playerName }),
+			new Promise<never>((_, reject) =>
+				setTimeout(() => reject(new Error("Connection timed out")), 15000)
+			)
+		]);
+
+		joinWithTimeout.then((client) => {
+			client.onError((code?: number, message?: string) => {
+				const reason = message || (code !== undefined ? `Code ${code}` : "");
+				toast.error(`Unable to connect${reason ? `: ${reason}` : ""}`);
 				goBack();
 			})
 
@@ -72,11 +73,9 @@ export const useRoomScreen = (
 				setPlayers(playersMap);
 			});
 
-			$(client.state).players.onAdd(() => {
-
-			});
-
-			$(client.state).players.onRemove(({ color }) => {
+			$(client.state).players.onRemove((player) => {
+				const color = player?.color;
+				if (color === undefined) return;
 				setPlayers((old) => {
 					if (!old) return;
 					old.delete(color);
@@ -85,7 +84,9 @@ export const useRoomScreen = (
 				})
 			});
 
-			$(client.state).players.onAdd(({ color, name, ready }) => {
+			$(client.state).players.onAdd((player, key) => {
+				if (!player) return;
+				const { color, name, ready } = player;
 				setPlayers((old) => {
 					if (!old) return;
 					old.set(color, [name, color, ready]);
@@ -93,7 +94,9 @@ export const useRoomScreen = (
 					return new Map(old);
 				})
 			});
-			$(client.state).players.onChange(({ color, name, ready }) => {
+			$(client.state).players.onChange((player, key) => {
+				if (!player) return;
+				const { color, name, ready } = player;
 				setPlayers((old) => {
 					if (!old) return;
 					old.set(color, [name, color, ready]);
@@ -115,9 +118,12 @@ export const useRoomScreen = (
 				setPlayers(undefined);
 			};
 
-		}).catch(() => {
+		}).catch((err: unknown) => {
 			disconnect();
-			console.error('useRoomScreen: catch');
+			console.error('useRoomScreen: catch', err);
+			const reason = err instanceof Error ? err.message : (err && typeof err === "object" && "message" in err ? String((err as { message?: unknown }).message) : "");
+			toast.error(`Unable to connect${reason ? `: ${reason}` : ""}`);
+			goBack();
 		})
 
 		window.onbeforeunload = window.onunload = () => {

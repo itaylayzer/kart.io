@@ -69,9 +69,9 @@ const AudioHTML = forwardRef<AudioRef, {}>((_, ref) => {
                     data-tooltip-content={`${name[0]} by ${name[1]}`}
                     style={{
                         opacity: +(visible && displayAudio),
-                        left: [20, "50%"][+centered],
-                        translate: `${[0, -50][+centered]}% 0%`,
-                        transformOrigin: ["bottom left", "center center"][
+                        right: [20, "50%"][+centered],
+                        translate: `${[0, 50][+centered]}% 0%`,
+                        transformOrigin: ["bottom right", "center center"][
                             +centered
                         ],
                     }}

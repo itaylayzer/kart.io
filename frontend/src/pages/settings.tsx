@@ -1,22 +1,10 @@
-import { Settings } from "@/components/Settings";
-import AssetLoader from "@/components/AssetLoader";
-import { AudioContainer } from "@/lib/AudioContainer";
+import { useEffect } from "react";
 import { useRouter } from "next/router";
 
-export default function () {
+export default function Settings() {
     const router = useRouter();
-    return (
-        <>
-            <header>
-                <AssetLoader />
-            </header>
-            <AudioContainer />
-
-            <Settings
-                goBack={() => {
-                    router.push("/");
-                }}
-            />
-        </>
-    );
+    useEffect(() => {
+        router.replace("/");
+    }, [router]);
+    return null;
 }

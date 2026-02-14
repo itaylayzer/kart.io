@@ -1,4 +1,4 @@
-import { toast } from "react-toastify";
+import { toast } from "sonner";
 import { create } from "zustand";
 
 export type settingsType = {
@@ -71,7 +71,7 @@ export const useSettingsStore = create<SettingsStore>((set) => ({
 
         if (storedSettings) {
             set(JSON.parse(decodeURIComponent(storedSettings)));
-            dotoast && toast("Loaded", { type: "success" });
+            dotoast && toast.success("Loaded");
         }
     },
 
@@ -81,7 +81,7 @@ export const useSettingsStore = create<SettingsStore>((set) => ({
                 JSON.stringify(state)
             )}; path=/; max-age=31536000`; // 1 year expiry
 
-            dotoast && toast("Saved", { type: "success" });
+            dotoast && toast.success("Saved");
 
             return state;
         });
