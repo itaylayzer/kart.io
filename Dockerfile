@@ -9,7 +9,7 @@ COPY . /app/
 
 # Install dependencies
 RUN bun install --cwd server
-RUN bun add --cwd server @colyseus/bun-websockets
+# RUN bun add --cwd server @colyseus/bun-websockets
 
 # Define arguments for runtime configuration
 ENV NODE_ENV="production"
