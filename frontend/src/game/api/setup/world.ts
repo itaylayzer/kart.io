@@ -134,6 +134,8 @@ function setupWindowEvents() {
 }
 
 const add = (object: THREE.Mesh) => makeAutoLOD(object, Global.scene, [0, 50, 120], [1.0, 0.35, 0.08]);;
+
+
 function setupRoad() {
     const fullRoadsSegments = createRoad(Global.curve, 5, 50, 3000);
     const lowRoadsSegments = createRoad(Global.curve, 5, 50, 100);
@@ -175,7 +177,7 @@ function setupRoad() {
                 1400,
                 fullRoadsSegments
             );
-           
+
             for (let i = 0; i < tiles.length; i++) {
                 Global.scene.add(tiles[i]);
             }
@@ -252,12 +254,18 @@ function setupSocket(
     const $ = getStateCallbacks(client);
 
     $(client.state).mysteries.onChange((mystery, index) => {
+        // while (MysteryBox.length < client.state.mysteries.length) {
+        //     const position = client.state.mysteries[MysteryBox.length].position;
+        //     new MysteryBox(MysteryBox.length, new CANNON.Vec3(position.x, position.y, position.z));
+        // }
         MysteryBox.toggleMystery(index, mystery.visible);
     })
 
     StartTimer.start(gameStartTime || client.state.startTime);
 
-
+    client.state.mysteries.forEach((mystery) => {
+        new MysteryBox(mystery.index, new CANNON.Vec3(mystery.position.x, mystery.position.y, mystery.position.z))
+    });
     requestAnimationFrame(() => {
         Global.container.appendChild(Global.renderer.domElement);
         Global.lockController.lock();
@@ -527,7 +535,7 @@ export default function (
     client: KartClient,
     pid: number,
     players: Map<number, [string, number, boolean]>,
-    gameStartTime: number = 0
+    gameStartTime: number = 0,
 ) {
     Global.optimizedObjects = [];
     Global.unoptimizedObjects = [];

@@ -60,6 +60,7 @@ export class KartRace extends Room<
     });
     this.roadUtils = RoadUtils(options.mapId);
     this.starterGenerator = this.roadUtils.positionsGenerator();
+    this.roadUtils.mysteries(this.state.mysteries);
 
 
     this.state.mapId = options.mapId;
@@ -92,8 +93,7 @@ export class KartRace extends Room<
     this.onMessage(CS.TOUCH_MYSTERY, (client, id: number) => {
       const toggleMystery = (id: number, visible: boolean) => {
         this.state.mysteries[id] = this.state.mysteries[id]
-          .assign({ visible })
-          .clone();
+          .clone().assign({ visible })
       };
       toggleMystery(id, false);
 
@@ -101,7 +101,7 @@ export class KartRace extends Room<
 
       setTimeout(() => {
         toggleMystery(id, true);
-      }, 1000);
+      }, 5000);
     });
 
     const getPID = (client: Client) =>

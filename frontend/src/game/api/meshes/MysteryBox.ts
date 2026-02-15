@@ -78,6 +78,7 @@ export class MysteryBox extends PhysicsObject {
                 event.body.id === LocalPlayer.getInstance().id
             ) {
                 Global.client.send(CS.TOUCH_MYSTERY, id);
+                this.mysteryVisible = false;
             }
         });
         Global.world.addBody(this);
