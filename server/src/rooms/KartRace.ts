@@ -70,14 +70,6 @@ export class KartRace extends Room<
       const xplayer = this.state.players.get(client.sessionId);
       xplayer.assign({ ready });
 
-      console.log(
-        "CS.READY",
-        client.sessionId,
-        "from:",
-        xplayer.ready,
-        "to:",
-        !xplayer.ready
-      );
       this.state.players.set(client.sessionId, xplayer.clone());
 
       if (
@@ -175,16 +167,16 @@ export class KartRace extends Room<
             // Send position update to other clients
             this.clients.forEach((c) => {
               if (c.sessionId !== sessionId) {
-                c.send(CC.POSITION_UPDATE, {
-                  pid: playerSchema.color,
-                  position: state.position,
-                  quaternion: state.quaternion,
-                  velocity: state.velocity,
-                  turboMode: state.turboMode,
-                  rocketMode: state.rocketMode,
-                  driftSide: state.driftSide,
-                  mushroomAddon: state.mushroomAddon,
-                });
+                // c.send(CC.POSITION_UPDATE, {
+                //   pid: playerSchema.color,
+                //   position: state.position,
+                //   quaternion: state.quaternion,
+                //   velocity: state.velocity,
+                //   turboMode: state.turboMode,
+                //   rocketMode: state.rocketMode,
+                //   driftSide: state.driftSide,
+                //   mushroomAddon: state.mushroomAddon,
+                // });
               }
             });
           }
